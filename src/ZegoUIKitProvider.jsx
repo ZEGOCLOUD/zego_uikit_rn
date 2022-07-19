@@ -8,7 +8,7 @@ import initialState from "./dux/sdk/initialState";
 
 export default function ZegoUIKitProvider(props) {
     // destruct from props
-    const { appID, appSign, children } = props;
+    const { appID, appSign, userID, userName, userProfileUrl, userExtendInfo, children } = props;
 
 
     const [sdkStore, sdkDispatcher] = useReducer(sdkReducers, initialState);
@@ -16,7 +16,7 @@ export default function ZegoUIKitProvider(props) {
     useEffect(() => {
         zloginfo('App init...');
 
-        connectSDK({ appID, appSign, sdkStore, sdk: sdkStore.sdk }, { sdkDispatcher });
+        connectSDK({ appID, appSign, userID, userName, userProfileUrl, userExtendInfo, sdkStore, sdk: sdkStore.sdk }, { sdkDispatcher });
 
         return () => {
             zloginfo('App uninit...');

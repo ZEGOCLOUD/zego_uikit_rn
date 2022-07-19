@@ -28,7 +28,7 @@ export const disconnectSdk = ({ sdkDispatcher, sdk, onDisconnect }) => {
     }
 }
 
-export const connectSDK = ({ appID, appSign, configureSession, sdk }, dispatchers) => {
+export const connectSDK = ({ appID, appSign, userID, userName, userProfileUrl, userExtendInfo, configureSession, sdk }, dispatchers) => {
     const { sdkDispatcher } = dispatchers;
     // Disconnect the sdk before connect again
     disconnectSdk({
@@ -41,7 +41,7 @@ export const connectSDK = ({ appID, appSign, configureSession, sdk }, dispatcher
                 if (configureSession && typeof configureSession === 'function') {
                     sessionHandler = configureSession(sdk);
                 }
-                sdk.connect(appID, appSign).then(() => {
+                sdk.connect(appID, appSign, {userID, userName, userProfileUrl, userExtendInfo}).then(() => {
                     sdkDispatcher({ type: INIT_SDK });
                 }).catch((error) => {
                     zlogerror('Create ZegoExpressEngine Failed: ', error);

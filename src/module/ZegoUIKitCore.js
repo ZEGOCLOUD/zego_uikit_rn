@@ -12,16 +12,16 @@ import ZegoExpressEngine, {
     ZegoRoomState,
 } from 'zego-express-engine-reactnative';
 
-import { ZegoAudioVideoService } from "./av_module/service";
+import { ZegoAudioVideoService } from "./audio_video_module/service";
 import { ZegoRoomService } from "./room_module/service";
 import { ZegoUserService } from "./user_module/service";
 import { zloginfo, zlogwarning, zlogerror } from '../utils/logger';
 
 export class ZegoUIKitCore {
     constructor() {
-        this.zegoAudioVideoService = new ZegoAudioVideoService();
-        this.zegoRoomService = new ZegoRoomService();
-        this.zegoUserService = new ZegoUserService();
+        this.zegoAudioVideoService = new ZegoAudioVideoService(this);
+        this.zegoRoomService = new ZegoRoomService(this);
+        this.zegoUserService = new ZegoUserService(this);
 
         // For dispatch event from engine
         this._services = [this.zegoAudioVideoService, this.zegoRoomService, this.zegoUserService];
@@ -94,13 +94,14 @@ export class ZegoUIKitCore {
                 })
             },
         );
+        // https://doc-en-api.zego.im/ReactNative/enums/_zegoexpressdefines_.zegoroomstatechangedreason.html
         ZegoExpressEngine.instance().on(
-            'roomStateUpdate',
-            (roomID, state, errorCode) => {
-                zloginfo('[roomStateUpdate callback]', roomID, state, errorCode);
+            'roomStateChanged',
+            (roomID, reason, errorCode, extendedData) => {
+                zloginfo('[roomStateChanged callback]', roomID, reason, errorCode, extendedData);
                 this._services.forEach(service => {
-                    if (service && service.onRoomStateUpdate) {
-                        service.onRoomStateUpdate(roomID, state, errorCode);
+                    if (service && service.onRoomStateChanged) {
+                        service.onRoomStateChanged(roomID, reason, errorCode, extendedData);
                     }
                 })
             },
@@ -113,10 +114,10 @@ export class ZegoUIKitCore {
         ZegoExpressEngine.instance().off('playerQualityUpdate');
         ZegoExpressEngine.instance().off('remoteCameraStateUpdate');
         ZegoExpressEngine.instance().off('remoteMicStateUpdate');
-        ZegoExpressEngine.instance().off('roomStateUpdate');
+        ZegoExpressEngine.instance().off('roomStateChanged');
     }
 
-    connect(appID, appSign) {
+    connect(appID, appSign, userInfo) {
         new Promise((resolve, reject) => {
             const engineProfile = {
                 appID: appID,
@@ -127,6 +128,12 @@ export class ZegoUIKitCore {
                 zloginfo('Create ZegoExpressEngine succeed!');
                 this._unregisterEngineCallback();
                 this._registerEngineCallback();
+
+                // Set userInfo if valid
+                const { userID } = userInfo;
+                if (userID) {
+                    this.zegoUserService.setLocalUserInfo(userInfo);
+                }
                 resolve();
             }).catch((error) => {
                 zlogerror('Create ZegoExpressEngine Failed: ', error);
