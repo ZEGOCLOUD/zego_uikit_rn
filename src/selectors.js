@@ -1,4 +1,4 @@
-import { zlogerror } from "./utils/logger";
+import { zlogerror } from './utils/logger';
 
 export const getSdk = (store) => {
     const { stores = {} } = store;
@@ -7,7 +7,7 @@ export const getSdk = (store) => {
     return sdk;
 }
 
-export const getZegoAudioVideoService = (store) => () => {
+export const getAudioVideoService = (store) => () => {
     const sdk = getSdk(store);
     if (!sdk) {
         zlogerror('ZegoUIKit SDK instance is invalid!')
@@ -17,7 +17,7 @@ export const getZegoAudioVideoService = (store) => () => {
     }
 }
 
-export const getZegoRoomService = (store) => () => {
+export const getRoomService = (store) => () => {
     const sdk = getSdk(store);
     if (!sdk) {
         zlogerror('ZegoUIKit SDK instance is invalid!')
@@ -27,7 +27,7 @@ export const getZegoRoomService = (store) => () => {
     }
 }
 
-export const getZegoUserService = (store) => () => {
+export const getUserService = (store) => () => {
     const sdk = getSdk(store);
     if (!sdk) {
         zlogerror('ZegoUIKit SDK instance is invalid!')

@@ -33,8 +33,8 @@ export class ZegoUIKitCore {
             (roomID, updateType, userList) => {
                 zloginfo('[roomUserUpdate callback]', roomID, updateType, userList);
                 this._services.forEach(service => {
-                    if (service && service.onRoomUserUpdate) {
-                        service.onRoomUserUpdate(roomID, updateType, userList);
+                    if (service && service._onRoomUserUpdate) {
+                        service._onRoomUserUpdate(roomID, updateType, userList);
                     }
                 })
             },
@@ -44,8 +44,8 @@ export class ZegoUIKitCore {
             (roomID, updateType, streamList) => {
                 zloginfo('[roomStreamUpdate callback]', roomID, updateType, streamList);
                 this._services.forEach(service => {
-                    if (service && service.onRoomStreamUpdate) {
-                        service.onRoomStreamUpdate(roomID, updateType, streamList);
+                    if (service && service._onRoomStreamUpdate) {
+                        service._onRoomStreamUpdate(roomID, updateType, streamList);
                     }
                 })
             },
@@ -55,8 +55,8 @@ export class ZegoUIKitCore {
             (streamID, quality) => {
                 zloginfo('[publisherQualityUpdate callback]', streamID, quality);
                 this._services.forEach(service => {
-                    if (service && service.onPublisherQualityUpdate) {
-                        service.onPublisherQualityUpdate(streamID, quality);
+                    if (service && service._onPublisherQualityUpdate) {
+                        service._onPublisherQualityUpdate(streamID, quality);
                     }
                 })
             },
@@ -66,8 +66,8 @@ export class ZegoUIKitCore {
             (streamID, quality) => {
                 zloginfo('[playerQualityUpdate callback]', streamID, quality);
                 this._services.forEach(service => {
-                    if (service && service.onPlayerQualityUpdate) {
-                        service.onPlayerQualityUpdate(streamID, quality);
+                    if (service && service._onPlayerQualityUpdate) {
+                        service._onPlayerQualityUpdate(streamID, quality);
                     }
                 })
             },
@@ -77,8 +77,8 @@ export class ZegoUIKitCore {
             (streamID, state) => {
                 zloginfo('[remoteCameraStateUpdate callback]', streamID, state);
                 this._services.forEach(service => {
-                    if (service && service.onRemoteCameraStateUpdate) {
-                        service.onRemoteCameraStateUpdate(streamID, state);
+                    if (service && service._onRemoteCameraStateUpdate) {
+                        service._onRemoteCameraStateUpdate(streamID, state);
                     }
                 })
             },
@@ -88,8 +88,8 @@ export class ZegoUIKitCore {
             (streamID, state) => {
                 zloginfo('[remoteMicStateUpdate callback]', streamID, state);
                 this._services.forEach(service => {
-                    if (service && service.onRemoteMicStateUpdate) {
-                        service.onRemoteMicStateUpdate(streamID, state);
+                    if (service && service._onRemoteMicStateUpdate) {
+                        service._onRemoteMicStateUpdate(streamID, state);
                     }
                 })
             },
@@ -100,8 +100,8 @@ export class ZegoUIKitCore {
             (roomID, reason, errorCode, extendedData) => {
                 zloginfo('[roomStateChanged callback]', roomID, reason, errorCode, extendedData);
                 this._services.forEach(service => {
-                    if (service && service.onRoomStateChanged) {
-                        service.onRoomStateChanged(roomID, reason, errorCode, extendedData);
+                    if (service && service._onRoomStateChanged) {
+                        service._onRoomStateChanged(roomID, reason, errorCode, extendedData);
                     }
                 })
             },

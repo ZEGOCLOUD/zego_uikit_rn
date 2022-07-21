@@ -62,6 +62,10 @@ export class ZegoAudioVideoService {
         });
     }
 
+    audioOutputDeviceType() {
+
+    }
+
     turnMicDeviceOn(userID, on) {
         return new Promise((resolve, reject) => {
             if (this._isLocalUser(userID)) {
@@ -106,7 +110,7 @@ export class ZegoAudioVideoService {
     onMicDeviceOn(callback) {
         if (typeof callback !== 'function') {
             this._onMicDeviceOnCallbacks = [];
-            zloginfo('Set an invalid callback to [onMicDeviceOn], all callbacks were clear.');
+            zlogwarning('Set an invalid callback to [onMicDeviceOn], all callbacks were clear.');
         } else {
             this._onMicDeviceOnCallbacks.push(callback);
         }
@@ -114,10 +118,13 @@ export class ZegoAudioVideoService {
     onCameraDeviceOn(callback) {
         if (typeof callback !== 'function') {
             this._onCameraDeviceOnCallbacks = [];
-            zloginfo('Set an invalid callback to [onCameraDeviceOn], all callbacks were clear.');
+            zlogwarning('Set an invalid callback to [onCameraDeviceOn], all callbacks were clear.');
         } else {
             this._onCameraDeviceOnCallbacks.push(callback);
         }
+    }
+    onAudioOutputDeviceTypeChange(callback) {
+        // TODO SDK missing API for this callback
     }
     setAudioConfig(config) {
         // TODO
@@ -127,7 +134,7 @@ export class ZegoAudioVideoService {
     }
 
     // Event from engine >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    onRoomStateChanged(roomID, reason, errorCode, extendedData) {
+    _onRoomStateChanged(roomID, reason, errorCode, extendedData) {
         // Not support multi-room right now
         if (reason == 1 || reason == 4) { // Logined || Reconnected
             this._isRoomConnected = true;
@@ -135,7 +142,7 @@ export class ZegoAudioVideoService {
             this._currentRoomState = reason;
         }
     }
-    onRemoteCameraStateUpdate(streamID, state) {
+    _onRemoteCameraStateUpdate(streamID, state) {
         // StreamID format: roomid_userid_main
         const streamIDParts = streamID.split('_');
         const userID = streamIDParts[1];
@@ -144,7 +151,7 @@ export class ZegoAudioVideoService {
             callback(userID, this._cameraStateMap[userID]);
         });
     }
-    onRemoteMicStateUpdate(streamID, state) {
+    _onRemoteMicStateUpdate(streamID, state) {
         // StreamID format: roomid_userid_main
         const streamIDParts = streamID.split('_');
         const userID = streamIDParts[1];
