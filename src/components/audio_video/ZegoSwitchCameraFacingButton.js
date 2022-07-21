@@ -1,21 +1,18 @@
 import { useState } from "react";
 import { Image, View } from "react-native";
-import { userZegoStateContext } from '../../../../hooks/useZegoStateContext'
-import { zegoUIKitSelectors } from '../../../../selectors'
 import { getImageSource } from "../../../utils/image_path_processor";
+import ZegoUIKitInternal from "../../core/internal/ZegoUIKitInternal";
 
 export default function ZegoSwitchCameraFacingButton(props) {
     const { iconFrontFacingCamera, iconBackFacingCamera } = props;
-    const { isFront, setIsFront } = useState(true);// Default front
-    const context = userZegoStateContext();
-    const avService = zegoUIKitSelectors.getAudioVideoService(context);
+    const [isFront, setIsFront] = useState(true);// Default front
     const getImageSourceByPath = () => {
-        const pathFront = iconFrontFacingCamera == undefined ? "TODO default path" : iconFrontFacingCamera;
-        const pathBack = iconBackFacingCamera == undefined ? "TODO default path" : iconFrontFacingCamera;
+        const pathFront = iconFrontFacingCamera ? iconFrontFacingCamera : "TODO default path";
+        const pathBack = iconBackFacingCamera ? iconFrontFacingCamera : "TODO default path";
         return getImageSource(isFront ? pathFront : pathBack);
     }
     const onPress = () => {
-        avService.useFrontFacingCamera(!isFront);
+        ZegoUIKitInternal.useFrontFacingCamera(!isFront);
         setIsFront(!isFront);
     }
 

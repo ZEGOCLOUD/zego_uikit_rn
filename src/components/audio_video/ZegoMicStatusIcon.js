@@ -1,21 +1,18 @@
 import { useState } from "react";
 import { Image, View } from "react-native";
-import { userZegoStateContext } from '../../../../hooks/useZegoStateContext'
-import { zegoUIKitSelectors } from '../../../../selectors'
 import { getImageSource } from "../../../utils/image_path_processor";
+import ZegoUIKitInternal from "../../core/internal/ZegoUIKitInternal";
 
 export default function ZegoMicStatusIcon(props) {
     const { userID, iconMicOn, iconMicOff } = props;
-    const { isOn, setIsOn } = useState(true);// Default on
-    const context = userZegoStateContext();
-    const avService = zegoUIKitSelectors.getAudioVideoService(context);
+    const [isOn, setIsOn] = useState(true);// Default on
     const getImageSourceByPath = () => {
-        const pathOn = iconMicOn == undefined ? "TODO default path" : iconMicOn;
-        const pathOff = iconMicOff == undefined ? "TODO default path" : iconMicOff;
+        const pathOn = iconMicOn ? iconMicOn : "TODO default path";
+        const pathOff = iconMicOff ? iconMicOff : "TODO default path";
         return getImageSource(isOn ? pathOn : pathOff);
     }
     useEffect(() => {
-        avService.onMicDeviceOn((id, on) => {
+        ZegoUIKitInternal.onMicDeviceOn((id, on) => {
             if (id == userID) {
                 setIsOn(on);
             }

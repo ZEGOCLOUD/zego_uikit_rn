@@ -1,33 +1,30 @@
 import { useState } from "react";
 import { Image, View } from "react-native";
-import { userZegoStateContext } from '../../../../hooks/useZegoStateContext'
-import { zegoUIKitSelectors } from '../../../../selectors'
 import { getImageSource } from "../../../utils/image_path_processor";
+import ZegoUIKitInternal from "../../core/internal/ZegoUIKitInternal";
 
 export default function ZegoToggleAudioOutputButton(props) {
     // ZegoAudioRouteSpeaker=(0) ZegoAudioRouteHeadphone=(1) ZegoAudioRouteBluetooth=(2) ZegoAudioRouteReceiver=(3) ZegoAudioRouteExternalUSB=(4) ZegoAudioRouteAirPlay=(5)
     const { iconSpeaker, iconEarpiece, iconBluetooth } = props;
-    const { currentDevice, setCurrentDevice } = useState(0);// Default on
-    const { isOn, setIsOn } = useState(true);
-    const context = userZegoStateContext();
-    const avService = zegoUIKitSelectors.getAudioVideoService(context);
+    const [currentDevice, setCurrentDevice] = useState(0);// Default on
+    const [isOn, setIsOn] = useState(true);
     const getImageSourceByPath = () => {
         const path = "";
         if (currentDevice == 0) {
-            path = iconSpeaker == undefined ? "TODO default path" : iconSpeaker;
+            path = iconSpeaker ? iconSpeaker : "TODO default path";
         } else if (currentDevice == 2) {
-            path = iconBluetooth == undefined ? "TODO default path" : iconBluetooth;
+            path = iconBluetooth ? iconBluetooth : "TODO default path";
         } else {
-            path = iconEarpiece == undefined ? "TODO default path" : iconEarpiece;
+            path = iconEarpiece ? iconEarpiece : "TODO default path";
         }
         return getImageSource(path);
     }
     const onPress = () => {
-        avService.enableSpeaker(!isOn);
+        ZegoUIKitInternal.enableSpeaker(!isOn);
         setIsOn(!isOn);
     }
     useEffect(() => {
-        avService.onAudioOutputDeviceTypeChange((type) => {
+        ZegoUIKitInternal.onAudioOutputDeviceTypeChange((type) => {
             setCurrentDevice(type);
         });
     }, []);

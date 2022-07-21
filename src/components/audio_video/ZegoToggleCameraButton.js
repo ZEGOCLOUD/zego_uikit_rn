@@ -1,28 +1,25 @@
 import { useState } from "react";
 import { Image, View } from "react-native";
-import { userZegoStateContext } from '../../../../hooks/useZegoStateContext'
-import { zegoUIKitSelectors } from '../../../../selectors'
 import { getImageSource } from "../../../utils/image_path_processor";
+import ZegoUIKitInternal from "../../core/internal/ZegoUIKitInternal";
 
 export default function ZegoToggleCameraButton(props) {
     const { userID, iconCameraOn, iconCameraOff } = props;
-    const { isOn, setIsOn } = useState(true);// Default on
-    const context = userZegoStateContext();
-    const avService = zegoUIKitSelectors.getAudioVideoService(context);
+    const [isOn, setIsOn] = useState(true);// Default on
     const getImageSourceByPath = () => {
-        const pathOn = iconCameraOn == undefined ? "TODO default path" : iconCameraOn;
-        const pathOff = iconCameraOff == undefined ? "TODO default path" : iconCameraOff;
+        const pathOn = iconCameraOn ? iconCameraOn : "TODO default path";
+        const pathOff = iconCameraOff ? iconCameraOff : "TODO default path";
         return getImageSource(isOn ? pathOn : pathOff);
     }
     const onPress = () => {
-        avService.turnCameraDeviceOn(userID, !isOn);
+        ZegoUIKitInternal.turnCameraDeviceOn(userID, !isOn);
     }
     useEffect(() => {
-        avService.onCameraDeviceOn((id, on) => {
+        ZegoUIKitInternal.onCameraDeviceOn((id, on) => {
             if (id == userID) {
                 setIsOn(on);
             }
-        });
+        })
     }, []);
 
     // TODO make style layout

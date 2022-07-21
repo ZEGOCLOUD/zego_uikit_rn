@@ -3,13 +3,14 @@ import { findNodeHandle, View } from "react-native";
 import ZegoExpressEngine, {
     ZegoTextureView,
 } from 'zego-express-engine-reactnative';
+import ZegoUIKitInternal from "../../../core/internal/ZegoUIKitInternal";
 
 export default function VideoContainer(props) {
     const { userID, fillMode } = props;
     const viewRef = React.createRef();
     useEffect(() => {
         const viewID = findNodeHandle(viewRef);
-        // TODO store the viewId into core
+        ZegoUIKitInternal.updateRenderingProperty(userID, viewID, fillMode);
     })
     return (<View>
         <ZegoTextureView

@@ -9,36 +9,19 @@ var _onCameraDeviceOnCallbacks = [];
 var _onRoomStateChangedCallbacks = [];
 var _onUserJoinCallbacks = [];
 var _onUserLeaveCallbacks = [];
-// Structure for export
-var _localUserInfo = {
-    userID: '',
-    userName: '',
-    profileUrl: '',
-    extendInfo: {}
-}
-/*
-Internal infomation
-{
-    userID: '',
-    userName: '',
-    profileUrl: '',
-    extendInfo: '',
-    viewID: 0,
-    isMicDeviceOn: true,
-    isCameraDeviceOn: true,
-    audioOutputType: 0,
-    publisherQuality: 0,
-}
-*/
-var _coreUserList = [];
+var _localCoreUser = _createCoreUser('', '', '', {});
 
-function _createCoreUser(userID, userName) {
+var _streamCoreUserMap = {}; // <streamID, CoreUser>
+var _coreUserMap = {}; // <userID, CoreUser>
+function _createCoreUser(userID, userName, profileUrl, extendInfo) {
     return {
         userID: userID,
         userName: userName,
-        profileUrl: '',
-        extendInfo: '',
+        profileUrl: profileUrl,
+        extendInfo: extendInfo,
         viewID: 0,
+        viewFillMode: 1,
+        streamID: '',
         isMicDeviceOn: true,
         isCameraDeviceOn: true,
         audioOutputType: 0,
@@ -46,12 +29,7 @@ function _createCoreUser(userID, userName) {
     }
 }
 function _isLocalUser(userID) {
-    return _localUserInfo.userID === userID;
-}
-
-function _getUserIDByStreamID(streamID) {
-    // StreamID format: roomid_userid_main
-    return streamID.split('_')[1]
+    return _localCoreUser.userID === userID;
 }
 
 function _onRoomUserUpdate(roomID, updateType, userList) {
@@ -60,7 +38,7 @@ function _onRoomUserUpdate(roomID, updateType, userList) {
     if (updateType == 0) {
         userList.forEach(user => {
             const coreUser = _createCoreUser(user.userID, user.userName);
-            _coreUserList.push(coreUser);
+            _coreUserMap[user.userID] = coreUser;
 
             const userInfo = {
                 userID: user.userID,
@@ -69,22 +47,28 @@ function _onRoomUserUpdate(roomID, updateType, userList) {
                 extendInfo: {} // TODO read from zim sdk
             }
             userInfoList.push(userInfo);
+
+            // Start after user insert into list
+            _tryStartPlayStream(user.userID);
         });
         _onUserJoinCallbacks.forEach(callback => {
             callback(userInfoList);
         })
     } else {
         userList.forEach(user => {
-            const coreUser = _coreUserList[_getCoreUserIndexByID(user.userID)];
-            const userInfo = {
-                userID: coreUser.userID,
-                userName: coreUser.userName,
-                profileUrl: coreUser.profileUrl,
-                extendInfo: coreUser.extendInfo
-            }
-            userInfoList.push(userInfo);
-            if (index !== -1) {
-                _coreUserList.splice(index, 1);
+            if (user.userID in _coreUserMap) {
+                const coreUser = _coreUserMap[user.userID];
+                const userInfo = {
+                    userID: coreUser.userID,
+                    userName: coreUser.userName,
+                    profileUrl: coreUser.profileUrl,
+                    extendInfo: coreUser.extendInfo
+                }
+                userInfoList.push(userInfo);
+
+                // Stop play stream before remove user list
+                _tryStopPlayStream(coreUser.userID, true);
+                delete _coreUserMap[user.userID];
             }
         });
         _onUserLeaveCallbacks.forEach(callback => {
@@ -92,26 +76,63 @@ function _onRoomUserUpdate(roomID, updateType, userList) {
         });
     }
 }
+function _onRoomStreamUpdate(roomID, updateType, streamList) {
+    if (updateType == 0) { // Add
+        streamList.forEach(stream => {
+            const userID = stream.user.userID;
+            const userName = stream.user.userName;
+            const streamID = stream.streamID;
+            if (userID in _coreUserMap) {
+                _coreUserMap[userID].streamID = streamID;
+                _streamCoreUserMap[streamID] = _coreUserMap[userID];
+                _tryStartPlayStream(userID);
+            } else {
+                _streamCoreUserMap[streamID] = _createCoreUser(userID, userName, '', {});
+                _streamCoreUserMap[streamID].streamID = streamID;
+            }
+        })
+    } else {
+        streamList.forEach(stream => {
+            const userID = stream.user.userID;
+            const streamID = stream.streamID;
+            if (userID in _coreUserMap) {
+                _tryStopPlayStream(userID, true);
+                _coreUserMap[userID].streamID = '';
+                delete _streamCoreUserMap[streamID];
+            }
+        })
+    }
+}
 function _onRemoteCameraStateUpdate(streamID, state) {
     const userID = _getUserIDByStreamID(streamID);
-    const index = _getCoreUserIndexByID(userID);
-    if (index != -1) {
+    if (userID in _coreUserMap) {
         const isOn = state == 10; // 10 for Open
-        _coreUserList[index].isCameraDeviceOn = isOn;
+        _coreUserMap[userID].isCameraDeviceOn = isOn;
         _onCameraDeviceOnCallbacks.forEach(callback => {
             callback(userID, isOn);
         });
+
+        if (isOn) {
+            _tryStartPlayStream(userID);
+        } else {
+            _tryStopPlayStream(userID);
+        }
     }
 }
 function _onRemoteMicStateUpdate(streamID, state) {
     const userID = _getUserIDByStreamID(streamID);
-    const index = _getCoreUserIndexByID(userID);
-    if (index != -1) {
+    if (userID in _coreUserMap) {
         const isOn = state == 10; // 10 for Open
-        _coreUserList[index].isMicDeviceOn = isOn
+        _coreUserMap[userID].isMicDeviceOn = isOn;
         _onMicDeviceOnCallbacks.forEach(callback => {
             callback(userID, isOn);
         });
+
+        if (isOn) {
+            _tryStartPlayStream(userID);
+        } else {
+            _tryStopPlayStream(userID);
+        }
     }
 }
 function _onRoomStateChanged(roomID, reason, errorCode, extendedData) {
@@ -139,16 +160,16 @@ function _registerEngineCallback() {
         'roomStreamUpdate',
         (roomID, updateType, streamList) => {
             zloginfo('[roomStreamUpdate callback]', roomID, updateType, streamList);
-            // TODO
+            _onRoomStreamUpdate(roomID, updateType, streamList);
         },
     );
     ZegoExpressEngine.instance().on(
         'publisherQualityUpdate',
         (streamID, quality) => {
             zloginfo('[publisherQualityUpdate callback]', streamID, quality);
-            const index = _getCoreUserIndexByID(_localUserInfo.userID);
-            if (index != -1) {
-                _coreUserList[index].publisherQuality = quality;
+            if (streamID.split('_')[2] === 'main') {
+                _localCoreUser.publisherQuality = quality;
+                _coreUserMap[_localCoreUser.userID].publisherQuality = quality;
             }
         },
     );
@@ -197,14 +218,51 @@ function _unregisterEngineCallback() {
     ZegoExpressEngine.instance().off('roomStateChanged');
 }
 
-function _getCoreUserIndexByID(id) {
-    _coreUserList.forEach(user, index => {
-        if (user.userID === id) {
-            return index;
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Stream Handling <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+function _getUserIDByStreamID(streamID) {
+    // StreamID format: roomid_userid_main
+    return streamID.split('_')[1]
+}
+function _getPublishStreamID() {
+    return _currentRoomID + '_' + _localCoreUser.userID + '_main';
+}
+function _tryStartPublishStream() {
+    if (_localCoreUser.isMicDeviceOn || _localCoreUser.isCameraDeviceOn) {
+        ZegoExpressEngine.instance().startPublishingStream(_localCoreUser.streamID);
+        if (_localCoreUser.viewID > 0) {
+            ZegoExpressEngine.instance().startPreview({
+                'reactTag': _localCoreUser.viewID,
+                'viewMode': _localCoreUser.fillMode,
+                'backgroundColor': 0
+            });
         }
-    });
-    zlogwarning('User with id: [', id, '] does not exist!');
-    return - 1;
+    }
+}
+function _tryStopPublishStream(force = false) {
+    if (!_localCoreUser.isMicDeviceOn && !_localCoreUser.isCameraDeviceOn) {
+        ZegoExpressEngine.instance().stopPublishingStream();
+        ZegoExpressEngine.instance().stopPreview();
+    }
+}
+function _tryStartPlayStream(userID) {
+    if (userID in _coreUserMap) {
+        const user = _coreUserMap[userID];
+        if (user.viewID > 0 && user.streamID !== '') {
+            ZegoExpressEngine.instance().startPlayingStream(user.streamID, {
+                'reactTag': user.viewID,
+                'viewMode': user.fillMode,
+                'backgroundColor': 0
+            });
+        }
+    }
+}
+function _tryStopPlayStream(userID, force = false) {
+    if (userID in _coreUserMap) {
+        const user = _coreUserMap[userID];
+        if (force || (user.viewID < 0 || (!user.isMicDeviceOn && !user.isCameraDeviceOn))) {
+            ZegoExpressEngine.instance().stopPlayingStream(user.streamID);
+        }
+    }
 }
 
 export default {
@@ -250,6 +308,29 @@ export default {
     },
 
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Audio Video <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    updateRenderingProperty(userID, viewID, fillMode) {
+        if (userID in _coreUserMap) {
+            _coreUserMap[userID].viewID = viewID;
+            _coreUserMap[userID].fillMode = fillMode;
+
+            if (_localCoreUser.userID == userID) {
+                _localCoreUser.viewID = viewID;
+                _localCoreUser.fillMode = fillMode;
+                if (viewID > 0) {
+                    _tryStartPublishStream();
+                } else {
+                    _tryStopPublishStream();
+                }
+            } else {
+                // Check if stream is ready to play for remote user
+                if (viewID > 0) {
+                    _tryStartPlayStream(userID);
+                } else {
+                    _tryStopPlayStream(userID);
+                }
+            }
+        }
+    },
     useFrontFacingCamera(isFrontFacing) {
         return new Promise((resolve, reject) => {
             if (!_isRoomConnected) {
@@ -265,18 +346,16 @@ export default {
         });
     },
     isMicDeviceOn(userID) {
-        const index = _getCoreUserIndexByID(userID);
-        if (index != -1) {
-            return _coreUserList[index].isMicDeviceOn;
+        if (userID in _coreUserMap) {
+            return _coreUserMap[userID].isMicDeviceOn;
         } else {
             zlogwarning('Can not check mic device is on for user[', userID, '], because no record!');
             return true;
         }
     },
     isCameraDeviceOn(userID) {
-        const index = _getCoreUserIndexByID(userID);
-        if (index != -1) {
-            return _coreUserList[index].isCameraDeviceOn;
+        if (userID in _coreUserMap) {
+            return _coreUserMap[userID].isCameraDeviceOn;
         } else {
             zlogwarning('Can not check camera device is on for user[', userID, '], because no record!');
             return true;
@@ -308,6 +387,13 @@ export default {
                     reject();
                 } else {
                     ZegoExpressEngine.instance().muteMicrophone(!on).then(() => {
+                        _localCoreUser.isMicDeviceOn = on;
+                        _coreUserMap[_localCoreUser.userID].isMicDeviceOn = on;
+                        if (on) {
+                            _tryStartPublishStream();
+                        } else {
+                            _tryStopPublishStream();
+                        }
                         resolve();
                     }).catch((error) => {
                         reject();
@@ -329,6 +415,13 @@ export default {
                 } else {
                     // Default to Main Channel
                     ZegoExpressEngine.instance().enableCamera(on, 0).then(() => {
+                        _localCoreUser.isCameraDeviceOn = on;
+                        _coreUserMap[_localCoreUser.userID].isCameraDeviceOn = on;
+                        if (on) {
+                            _tryStartPublishStream();
+                        } else {
+                            _tryStopPublishStream();
+                        }
                         resolve();
                     }).catch((error) => {
                         reject();
@@ -370,7 +463,7 @@ export default {
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Room <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     joinRoom(roomID) {
         return new Promise((resolve, reject) => {
-            const user = { userID: _localUserInfo.userID, userName: _localUserInfo.userName };
+            const user = { userID: _localCoreUser.userID, userName: _localCoreUser.userName };
             const config = { isUserStatusNotify: true }
             ZegoExpressEngine.instance().loginRoom(roomID, user, config).then(() => {
                 _currentRoomID = roomID;
@@ -408,22 +501,22 @@ export default {
 
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> User <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     setLocalUserInfo(userInfo) {
-        _localUserInfo = userInfo;
-        if (_getCoreUserIndexByID(userInfo.userID) == -1) {
-            _coreUserList.push({
-                userID: userInfo.userID,
-                userName: userInfo.userName,
-                profileUrl: userInfo.profileUrl,
-                extendInfo: userInfo.extendInfo,
-                viewID: -1,
-                isMicDeviceOn: true,
-                isCameraDeviceOn: true,
-                audioOutputType: 0
-            });
+        _localCoreUser.userID = userInfo.userID;
+        _localCoreUser.userName = userInfo.userName;
+        _localCoreUser.profileUrl = userInfo.profileUrl;
+        _localCoreUser.extendInfo = userInfo.extendInfo;
+        _localCoreUser.streamID = _getPublishStreamID();
+        if (!(userInfo.userID in _coreUserMap)) {
+            _coreUserMap[userInfo.userID] = _localCoreUser;
         }
     },
     getLocalUserInfo() {
-        return _localUserInfo;
+        return {
+            userID: _localCoreUser.userID,
+            userName: _localCoreUser.userName,
+            profileUrl: _localCoreUser.profileUrl,
+            extendInfo: _localCoreUser.extendInfo,
+        };
     },
     onUserJoin(callback) {
         if (typeof callback !== 'function') {
