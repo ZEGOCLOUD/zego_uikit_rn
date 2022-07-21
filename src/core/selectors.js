@@ -1,4 +1,4 @@
-import { zlogerror } from './utils/logger';
+import { zlogerror } from '../utils/logger';
 
 export const getSdk = (store) => {
     const { stores = {} } = store;

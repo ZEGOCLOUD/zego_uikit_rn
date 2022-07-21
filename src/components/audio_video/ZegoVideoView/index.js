@@ -2,8 +2,8 @@ import { View } from "react-native";
 import Delegate from "react-delegate-component";
 import AudioContainer from "./AudioContainer";
 import VideoContainer from "./VideoContainer";
-import { userZegoStateContext } from '../../../../hooks/useZegoStateContext'
-import { zegoUIKitSelectors } from '../../../../selectors'
+import { userZegoStateContext } from '../../hooks/useZegoStateContext'
+import { zegoUIKitSelectors } from '../../../selectors'
 
 
 function MaskViewDefault(props) {

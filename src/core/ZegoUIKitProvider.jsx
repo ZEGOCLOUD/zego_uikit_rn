@@ -1,10 +1,10 @@
 import { useEffect, useReducer } from "react";
 import PropTypes from 'prop-types';
-import { connectSDK, disconnectSdk } from "./dux/sdk/thunks";
+import { connectSDK, disconnectSdk } from "./core/dux/sdk/thunks";
 import { zloginfo } from "./utils/logger";
 import { ZegoUIKitContext } from "./ZegoUIKitContext";
 import sdkReducers from "./sdk/reducers";
-import initialState from "./dux/sdk/initialState";
+import initialState from "./core/dux/sdk/initialState";
 
 export default function ZegoUIKitProvider(props) {
     // destruct from props

@@ -1,4 +1,4 @@
-import { zlogwarning } from "../../../utils/logger";
+import { zlogwarning } from "../utils/logger";
 
 export class ZegoUserService {
     constructor(sdk) {

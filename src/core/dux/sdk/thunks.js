@@ -42,7 +42,7 @@ export const connectSDK = ({ appID, appSign, userID, userName, userProfileUrl, u
                     sessionHandler = configureSession(sdk);
                 }
                 sdk.connect(appID, appSign, {userID, userName, userProfileUrl, userExtendInfo}).then(() => {
-                    sdkDispatcher({ type: INIT_SDK });
+                    sdkDispatcher({ type: INIT_SDK, payload: sdk });
                 }).catch((error) => {
                     zlogerror('Create ZegoExpressEngine Failed: ', error);
                     sdkDispatcher({ type: SDK_ERROR });
