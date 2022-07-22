@@ -1,8 +1,6 @@
 import { useEffect } from "react";
 import { findNodeHandle, View } from "react-native";
-import ZegoExpressEngine, {
-    ZegoTextureView,
-} from 'zego-express-engine-reactnative';
+import { ZegoTextureView } from 'zego-express-engine-reactnative';
 import ZegoUIKitInternal from "../../../core/internal/ZegoUIKitInternal";
 
 export default function VideoContainer(props) {

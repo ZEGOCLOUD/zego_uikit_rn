@@ -2,8 +2,6 @@ import { View } from "react-native";
 import Delegate from "react-delegate-component";
 import AudioContainer from "./AudioContainer";
 import VideoContainer from "./VideoContainer";
-import { userZegoStateContext } from '../../hooks/useZegoStateContext'
-import { zegoUIKitSelectors } from '../../../selectors'
 
 
 function MaskViewDefault(props) {
@@ -13,13 +11,10 @@ function MaskViewDefault(props) {
 export default function ZegoVideoView(props) {
     const { userID, roomID, audioViewBackgroudColor, audioViewBackgroudImage, showSoundWave, videoFillMode, maskViewBuilder }
         = props;
-    const context = userZegoStateContext();
-    const userService = zegoUIKitSelectors.getUserService(context);
-    const userInfo = userService.getUserInfoByID(userID);
 
     // TODO make style layout
     return (<View>
-        <AudioContainer showSoundWave={showSoundWave} />
+        <AudioContainer showSoundWave={showSoundWave} audioViewBackgroudColor={audioViewBackgroudColor} audioViewBackgroudImage={audioViewBackgroudImage} />
         <VideoContainer videoFillMode={videoFillMode} />
         <Delegate
             to={maskViewBuilder}

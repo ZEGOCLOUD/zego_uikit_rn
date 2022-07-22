@@ -1,5 +1,5 @@
 import { Button } from "react-native";
-import AudioVideoContainer from "../../components/layout/AudioVideoContainer";
+import AudioVideoContainer from "../../components/layout/AudioViewContainer";
 import ZegoUIKitProvider from "../../ZegoUIKitProvider";
 import PrebuiltCallContainer from "./PrebuiltCallContainer";
 
