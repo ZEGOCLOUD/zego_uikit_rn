@@ -5,7 +5,6 @@ import ZegoUIKit, { ZegoAudioVideoContainer, ZegoToggleCameraButton } from 'reac
 import CounterView from './CounterView';
 import NewView from './NewView';
 
-
 export default function App() {
   useEffect(() => {
     ZegoUIKit.connectSDK(1484647939, '16e1c2b4d4c6345c8644546e8fe636d8b7e47d010e9b4a8825439ecd64ccee6f', { userID: 'oliver', userName: 'Oliver' })
@@ -18,6 +17,7 @@ export default function App() {
       <CounterView tt='First'></CounterView>
       <NewView tt="Second"></NewView>
       <Text>Hello</Text>
+      <ZegoToggleCameraButton userID='oliver'/>
     </View>
   );
 }

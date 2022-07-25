@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Image, View } from "react-native";
+import { Image, TouchableOpacity, View } from "react-native";
 import { getImageSource } from "../../utils/image_path_processor";
 import ZegoUIKitInternal from "../../core/internal/ZegoUIKitInternal";
 
@@ -7,9 +7,9 @@ export default function ZegoToggleMicButton(props) {
     const { userID, iconMicOn, iconMicOff } = props;
     const [isOn, setIsOn] = useState(true);// Default on
     const getImageSourceByPath = () => {
-        const pathOn = iconMicOn ? iconMicOn : "TODO default path";
-        const pathOff = iconMicOff ? iconMicOff : "TODO default path";
-        return getImageSource(isOn ? pathOn : pathOff);
+        const pathOn = iconMicOn ? iconMicOn : require("../../core/resources/white_button_mic_on.png");
+        const pathOff = iconMicOff ? iconMicOff : require("../../core/resources/white_button_mic_off.png");
+        return isOn ? pathOn : pathOff;
     }
     const onPress = () => {
         ZegoUIKitInternal.turnMicDeviceOn(userID, !isOn);

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Image, View } from "react-native";
+import { Image, TouchableOpacity, View } from "react-native";
 import { getImageSource } from "../../utils/image_path_processor";
 import ZegoUIKitInternal from "../../core/internal/ZegoUIKitInternal";
 
@@ -11,13 +11,13 @@ export default function ZegoToggleAudioOutputButton(props) {
     const getImageSourceByPath = () => {
         const path = "";
         if (currentDevice == 0) {
-            path = iconSpeaker ? iconSpeaker : "TODO default path";
+            path = iconSpeaker ? iconSpeaker : require("../../core/resources/white_button_speaker_on.png");
         } else if (currentDevice == 2) {
-            path = iconBluetooth ? iconBluetooth : "TODO default path";
+            path = iconBluetooth ? iconBluetooth : require("../../core/resources/white_button_bluetooth_off.png");
         } else {
-            path = iconEarpiece ? iconEarpiece : "TODO default path";
+            path = iconEarpiece ? iconEarpiece : require("../../core/resources/white_button_speaker_off.png");
         }
-        return getImageSource(path);
+        return path;
     }
     const onPress = () => {
         ZegoUIKitInternal.enableSpeaker(!isOn);

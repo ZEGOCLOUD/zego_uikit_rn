@@ -16,7 +16,6 @@ import ZegoToggleCameraButton from './components/audio_video/ZegoToggleCameraBut
 import ZegoToggleAudioOutputButton from './components/audio_video/ZegoToggleAudioOutputButton'
 import ZegoAudioVideoContainer from './components/layout/AudioVideoContainer'
 
-
 export default {
     connectSDK: ZegoUIKitInternal.connectSDK,
     disconnectSDK: ZegoUIKitInternal.disconnectSDK,
@@ -34,14 +33,17 @@ export default {
     getLocalUserInfo: ZegoUIKitInternal.getLocalUserInfo,
     onUserJoin: ZegoUIKitInternal.onUserJoin,
     onUserLeave: ZegoUIKitInternal.onUserLeave,
-    ZegoVideoView: ZegoVideoView,
-    ZegoCameraStatusIcon: ZegoCameraStatusIcon,
-    ZegoMicStatusIcon: ZegoMicStatusIcon,
-    ZegoSwitchCameraFacingButton: ZegoSwitchCameraFacingButton,
-    ZegoToggleMicButton: ZegoToggleMicButton,
-    ZegoToggleCameraButton: ZegoToggleCameraButton,
-    ZegoToggleAudioOutputButton: ZegoToggleAudioOutputButton,
-    ZegoAudioVideoContainer: ZegoAudioVideoContainer,
+}
+
+export {
+    ZegoVideoView,
+    ZegoCameraStatusIcon,
+    ZegoMicStatusIcon,
+    ZegoSwitchCameraFacingButton,
+    ZegoToggleMicButton,
+    ZegoToggleCameraButton,
+    ZegoToggleAudioOutputButton,
+    ZegoAudioVideoContainer,
 }
 
 
