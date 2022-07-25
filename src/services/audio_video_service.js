@@ -1,5 +1,5 @@
 import ZegoExpressEngine from 'zego-express-engine-reactnative';
-import { zlogerror, zloginfo, zlogwarning } from '../../../utils/logger';
+import { zlogerror, zloginfo, zlogwarning } from '../../utils/logger';
 
 export class ZegoAudioVideoService {
     constructor(sdk) {

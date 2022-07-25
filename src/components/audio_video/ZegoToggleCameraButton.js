@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Image, View } from "react-native";
-import { getImageSource } from "../../../utils/image_path_processor";
+import { getImageSource } from "../../utils/image_path_processor";
 import ZegoUIKitInternal from "../../core/internal/ZegoUIKitInternal";
 
 export default function ZegoToggleCameraButton(props) {

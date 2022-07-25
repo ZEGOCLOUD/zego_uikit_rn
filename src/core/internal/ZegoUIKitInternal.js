@@ -1,5 +1,5 @@
 import ZegoExpressEngine from 'zego-express-engine-reactnative';
-import { zlogerror, zloginfo, zlogwarning } from '../../../utils/logger';
+import { zlogerror, zloginfo, zlogwarning } from '../../utils/logger';
 
 var _isRoomConnected = false;
 var _currentRoomState = 7; // Logout
@@ -268,21 +268,22 @@ function _tryStopPlayStream(userID, force = false) {
 export default {
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SDK <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     connectSDK(appID, appSign, userInfo) {
+        // ZegoExpressEngine.getVersion().then((version) => {
+        //     console.log('>>>>>>>>', version)
+        // })
         new Promise((resolve, reject) => {
             const engineProfile = {
                 appID: appID,
                 appSign: appSign,
-                scenario: ZegoScenario.General,
+                scenario: 0,
             }
             ZegoExpressEngine.createEngineWithProfile(engineProfile).then((engine) => {
                 zloginfo('Create ZegoExpressEngine succeed!');
                 _unregisterEngineCallback();
                 _registerEngineCallback();
-
-                // Set userInfo if valid
-                const { userID } = userInfo;
-                if (userID) {
-                    zegoUserService.setLocalUserInfo(userInfo);
+                
+                if (_localCoreUser.userID === '') {
+                    _localCoreUser = userInfo;
                 }
                 resolve();
             }).catch((error) => {

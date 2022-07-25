@@ -1,17 +1,20 @@
-import * as React from 'react';
+import React, { useEffect } from 'react';
 
 import { StyleSheet, View, Text } from 'react-native';
-import { PrebuiltCall } from 'react-native-zego-uikit-rn';
+import ZegoUIKit, { ZegoAudioVideoContainer, ZegoToggleCameraButton } from 'react-native-zego-uikit-rn';
 import CounterView from './CounterView';
 import NewView from './NewView';
 
 
 export default function App() {
+  useEffect(() => {
+    ZegoUIKit.connectSDK(1484647939, '16e1c2b4d4c6345c8644546e8fe636d8b7e47d010e9b4a8825439ecd64ccee6f', { userID: 'oliver', userName: 'Oliver' })
+    return () => {
+      ZegoUIKit.disconnectSDK();
+    }
+  }, []);
   return (
     <View style={styles.container}>
-      {/* <PrebuiltCall appID={1719562607} appSign='9ff0246b333e6c1f8dffa8501007237176a1fed4ed86141b9a7d1463def4f54b'>
-
-      </PrebuiltCall> */}
       <CounterView tt='First'></CounterView>
       <NewView tt="Second"></NewView>
       <Text>Hello</Text>

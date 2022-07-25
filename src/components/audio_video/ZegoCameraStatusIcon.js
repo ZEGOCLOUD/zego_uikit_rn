@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Image, View } from "react-native";
 import { getImageSource } from "../../utils/image_path_processor";
-import ZegoUIKitInternal from '../../core/ZegoUIKitContext'
 
 export default function ZegoCameraStatusIcon(props) {
     const { userID, iconCameraOn, iconCameraOff } = props;
