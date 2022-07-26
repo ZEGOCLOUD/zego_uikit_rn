@@ -31,7 +31,7 @@ function _createCoreUser(userID, userName, profileUrl, extendInfo) {
     }
 }
 function _isLocalUser(userID) {
-    return _localCoreUser.userID === userID;
+    return userID === undefined || userID === '' || _localCoreUser.userID === userID;
 }
 
 function _onRoomUserUpdate(roomID, updateType, userList) {
@@ -53,7 +53,7 @@ function _onRoomUserUpdate(roomID, updateType, userList) {
             // Start after user insert into list
             _tryStartPlayStream(user.userID);
         });
-        
+
         Object.keys(_onUserJoinCallbackMap).forEach(callbackID => {
             _onUserJoinCallbackMap[callbackID](userInfoList);
         });

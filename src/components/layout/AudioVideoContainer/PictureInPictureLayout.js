@@ -6,7 +6,7 @@ export default function PictureInPictureLayout(props) {
     const { config, maskViewBuilder } = props;
     const [localUser, setLocalUser] = useState({});
     const [remoteUser, setRemoteUser] = useState({});
-    ZegoUIKitInternal.onRoomStateChanged((reason, errorCode, extendedData) => {
+    ZegoUIKitInternal.onRoomStateChanged('PictureInPictureLayout', (reason, errorCode, extendedData) => {
         if (reason == 1 || reason == 4) {
             setLocalUser(ZegoUIKitInternal.getLocalUserInfo());
         } else if (reason == 2 || reason == 5 || reason == 6 || reason == 7) {
@@ -19,14 +19,14 @@ export default function PictureInPictureLayout(props) {
             setRemoteUser({});
         }
     })
-    ZegoUIKitInternal.onUserJoin((userList) => {
+    ZegoUIKitInternal.onUserJoin('PictureInPictureLayout', (userList) => {
         if (userList.length == 1) {
             setRemoteUser(userList[0]);
         } else {
             //TODO
         }
     });
-    ZegoUIKitInternal.onUserLeave((userList) => {
+    ZegoUIKitInternal.onUserLeave('PictureInPictureLayout', (userList) => {
         if (userList.length == 1) {
             setRemoteUser({});
         } else {

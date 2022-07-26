@@ -11,8 +11,13 @@ export default function ZegoMicStatusIcon(props) {
         return isOn ? pathOn : pathOff;
     }
     useEffect(() => {
-        ZegoUIKitInternal.onMicDeviceOn('zego_components_toggle_mic_icon', (id, on) => {
-            if (id == userID) {
+        ZegoUIKitInternal.onMicDeviceOn('ZegoMicStatusIcon', (id, on) => {
+            if (userID === undefined || userID === '') { // local user
+                if (id == ZegoUIKitInternal.getLocalUserInfo().userID) {
+                    setIsOn(on);
+                }
+            }
+            else if (id == userID) {
                 setIsOn(on);
             }
         });

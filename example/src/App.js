@@ -25,10 +25,13 @@ export default function App() {
   }, []);
   return (
     <View style={styles.container}>
-      <ZegoToggleCameraButton userID='oliver' />
-      <ZegoToggleMicButton userID='oliver' />
-      <ZegoMicStatusIcon userID='oliver' />
-      <ZegoCameraStatusIcon userID='oliver' />
+      <ZegoAudioVideoContainer style={styles.avView} />
+      <View style={styles.ctrlBar}>
+        <ZegoToggleCameraButton />
+        <ZegoToggleMicButton />
+        <ZegoMicStatusIcon />
+        <ZegoCameraStatusIcon />
+      </View>
     </View>
   );
 }
@@ -39,9 +42,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  box: {
-    width: 60,
-    height: 60,
-    marginVertical: 20,
+  avView: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    zIndex: 0,
   },
+  ctrlBar: {
+    flex: 1,
+    width: '100%',
+    height: 50
+  },
+  ctrlBtn: {
+    flex: 1,
+    zIndex: 1,
+  }
 });

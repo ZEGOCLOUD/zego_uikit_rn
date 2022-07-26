@@ -12,8 +12,13 @@ export default function ZegoCameraStatusIcon(props) {
     }
 
     useEffect(() => {
-        ZegoUIKitInternal.onCameraDeviceOn('zego_components_toggle_camera_icon', (id, on) => {
-            if (id == userID) {
+        ZegoUIKitInternal.onCameraDeviceOn('ZegoCameraStatusIcon', (id, on) => {
+            if (userID === undefined || userID === '') { // local user
+                if (id == ZegoUIKitInternal.getLocalUserInfo().userID) {
+                    setIsOn(on);
+                }
+            }
+            else if (id == userID) {
                 setIsOn(on);
             }
         });
