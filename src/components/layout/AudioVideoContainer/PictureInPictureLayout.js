@@ -1,9 +1,11 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import ZegoUIKitInternal from "../../../core/internal/ZegoUIKitInternal";
 import ZegoVideoView from "../../audio_video/ZegoVideoView";
+import { StyleSheet, View } from 'react-native'
 
 export default function PictureInPictureLayout(props) {
-    const { config, maskViewBuilder } = props;
+    const { config = {}, maskViewBuilder } = props;
+    const { audioViewBackgroudColor = '', audioViewBackgroudImage = '', showSoundWave = true, videoFillMode = 1 } = config;
     const [localUser, setLocalUser] = useState({});
     const [remoteUser, setRemoteUser] = useState({});
     ZegoUIKitInternal.onRoomStateChanged('PictureInPictureLayout', (reason, errorCode, extendedData) => {
@@ -33,30 +35,39 @@ export default function PictureInPictureLayout(props) {
             //TODO
         }
     });
-    return (<View>
-        <ZegoVideoView style={styles.smallView}
+    return (<View style={styles.container}>
+        <View style={styles.smallView}
             userID={Object.keys(localUser).length === 0 ? '' : localUser.userID}
-            audioViewBackgroudColor={config.audioViewBackgroudColor}
-            audioViewBackgroudImage={config.audioViewBackgroudImage}
-            showSoundWave={config.showSoundWave}
-            videoFillMode={config.videoFillMode}
+            audioViewBackgroudColor={audioViewBackgroudColor}
+            audioViewBackgroudImage={audioViewBackgroudImage}
+            showSoundWave={showSoundWave}
+            videoFillMode={videoFillMode}
             maskViewBuilder={maskViewBuilder}
         />
         <ZegoVideoView style={styles.bigView}
             userID={Object.keys(remoteUser).length === 0 ? '' : remoteUser.userID}
-            audioViewBackgroudColor={config.audioViewBackgroudColor}
-            audioViewBackgroudImage={config.audioViewBackgroudImage}
-            showSoundWave={config.showSoundWave}
-            videoFillMode={config.videoFillMode}
+            audioViewBackgroudColor={audioViewBackgroudColor}
+            audioViewBackgroudImage={audioViewBackgroudImage}
+            showSoundWave={showSoundWave}
+            videoFillMode={videoFillMode}
             maskViewBuilder={maskViewBuilder}
         />
     </View>)
 }
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        width: '100%',
+        height: '100%',
+        position: 'absolute',
+  
+      },
     bigView: {
         width: '100%',
-        height: '100%'
+        height: '100%',
+        position: 'absolute',
+        zIndex: 0,
     },
     smallView: {
         height: '25%',

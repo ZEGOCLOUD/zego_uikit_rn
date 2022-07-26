@@ -1,18 +1,37 @@
-import { useEffect } from "react";
-import { findNodeHandle, View } from "react-native";
+import React, { useEffect } from "react";
+import { findNodeHandle, View, StyleSheet } from "react-native";
 import { ZegoTextureView } from 'zego-express-engine-reactnative';
 import ZegoUIKitInternal from "../../../core/internal/ZegoUIKitInternal";
 
 export default function VideoContainer(props) {
-    const { userID, fillMode } = props;
+    const { userID, roomID, fillMode } = props;
     const viewRef = React.createRef();
-    useEffect(() => {
-        const viewID = findNodeHandle(viewRef);
+
+    ZegoUIKitInternal.onSDKConnected('VideoContainer', () => {
+        const viewID = findNodeHandle(viewRef.current);
         ZegoUIKitInternal.updateRenderingProperty(userID, viewID, fillMode);
-    })
-    return (<View>
+    });
+    return (<View style={styles.container}>
         <ZegoTextureView
+            style={styles.videoContainer}
             ref={viewRef}
         />
     </View>);
 }
+
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        width: '100%',
+        height: '100%',
+        position: 'absolute',
+    },
+    videoContainer: {
+        flex: 1,
+        width: '100%',
+        height: '100%',
+        zIndex: 1,
+        backgroundColor: 'gray'
+    },
+});

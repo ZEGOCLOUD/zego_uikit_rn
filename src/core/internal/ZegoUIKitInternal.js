@@ -10,10 +10,30 @@ var _onCameraDeviceOnCallbackMap = {};
 var _onRoomStateChangedCallbackMap = {};
 var _onUserJoinCallbackMap = {};
 var _onUserLeaveCallbackMap = {};
+var _onUserInfoUpdateCallbackMap = {};
+var _onSDKConnectedCallbackMap = {};
 
 var _localCoreUser = _createCoreUser('', '', '', {});
 var _streamCoreUserMap = {}; // <streamID, CoreUser>
 var _coreUserMap = {}; // <userID, CoreUser>
+
+function _resetData() {
+    zloginfo('Reset all data.')
+    _localCoreUser = _createCoreUser('', '', '', {});
+    _streamCoreUserMap = {};
+    _coreUserMap = {};
+    _currentRoomID = '';
+    _currentRoomState = 7;
+    _isRoomConnected = false;
+
+    _onMicDeviceOnCallbackMap = {};
+    _onCameraDeviceOnCallbackMap = {};
+    _onRoomStateChangedCallbackMap = {};
+    _onUserJoinCallbackMap = {};
+    _onUserLeaveCallbackMap = {};
+    _onUserInfoUpdateCallbackMap = {};
+    _onSDKConnectedCallbackMap = {};
+}
 
 function _createCoreUser(userID, userName, profileUrl, extendInfo) {
     return {
@@ -21,7 +41,7 @@ function _createCoreUser(userID, userName, profileUrl, extendInfo) {
         userName: userName,
         profileUrl: profileUrl,
         extendInfo: extendInfo,
-        viewID: 0,
+        viewID: -1,
         viewFillMode: 1,
         streamID: '',
         isMicDeviceOn: true,
@@ -41,6 +61,7 @@ function _onRoomUserUpdate(roomID, updateType, userList) {
         userList.forEach(user => {
             const coreUser = _createCoreUser(user.userID, user.userName);
             _coreUserMap[user.userID] = coreUser;
+            _notifyUserInfoUpdate(_coreUserMap[user.userID]);
 
             const userInfo = {
                 userID: user.userID,
@@ -88,6 +109,7 @@ function _onRoomStreamUpdate(roomID, updateType, streamList) {
             if (userID in _coreUserMap) {
                 _coreUserMap[userID].streamID = streamID;
                 _streamCoreUserMap[streamID] = _coreUserMap[userID];
+                _notifyUserInfoUpdate(_coreUserMap[userID]);
                 _tryStartPlayStream(userID);
             } else {
                 _streamCoreUserMap[streamID] = _createCoreUser(userID, userName, '', {});
@@ -111,6 +133,7 @@ function _onRemoteCameraStateUpdate(streamID, state) {
     if (userID in _coreUserMap) {
         const isOn = state == 10; // 10 for Open
         _coreUserMap[userID].isCameraDeviceOn = isOn;
+        _notifyUserInfoUpdate(_coreUserMap[userID]);
 
         Object.keys(_onCameraDeviceOnCallbackMap).forEach(callbackID => {
             _onCameraDeviceOnCallbackMap[callbackID](userID, isOn);
@@ -128,6 +151,7 @@ function _onRemoteMicStateUpdate(streamID, state) {
     if (userID in _coreUserMap) {
         const isOn = state == 10; // 10 for Open
         _coreUserMap[userID].isMicDeviceOn = isOn;
+        _notifyUserInfoUpdate(_coreUserMap[userID]);
 
         Object.keys(_onMicDeviceOnCallbackMap).forEach(callbackID => {
             _onMicDeviceOnCallbackMap[callbackID](userID, isOn);
@@ -145,6 +169,7 @@ function _onRoomStateChanged(roomID, reason, errorCode, extendedData) {
     // Not support multi-room right now
     if (reason == 1 || reason == 4) { // Logined || Reconnected
         _isRoomConnected = true;
+        _tryStartPublishStream();
     } else {
         _isRoomConnected = false;
     }
@@ -177,6 +202,7 @@ function _registerEngineCallback() {
             if (streamID.split('_')[2] === 'main') {
                 _localCoreUser.publisherQuality = quality;
                 _coreUserMap[_localCoreUser.userID].publisherQuality = quality;
+                _notifyUserInfoUpdate(_coreUserMap[_localCoreUser.userID]);
             }
         },
     );
@@ -184,11 +210,7 @@ function _registerEngineCallback() {
         'playerQualityUpdate',
         (streamID, quality) => {
             zloginfo('[playerQualityUpdate callback]', streamID, quality);
-            _services.forEach(service => {
-                if (service && service._onPlayerQualityUpdate) {
-                    service._onPlayerQualityUpdate(streamID, quality);
-                }
-            })
+            // TODO
         },
     );
     ZegoExpressEngine.instance().on(
@@ -235,7 +257,9 @@ function _getPublishStreamID() {
 }
 function _tryStartPublishStream() {
     if (_localCoreUser.isMicDeviceOn || _localCoreUser.isCameraDeviceOn) {
+        zloginfo('_tryStartPublishStream', _localCoreUser.isMicDeviceOn, _localCoreUser.isCameraDeviceOn, _localCoreUser.streamID);
         ZegoExpressEngine.instance().startPublishingStream(_localCoreUser.streamID);
+        zloginfo('ZegoExpressEngine startPreview:', _localCoreUser.viewID, _localCoreUser.fillMode);
         if (_localCoreUser.viewID > 0) {
             ZegoExpressEngine.instance().startPreview({
                 'reactTag': _localCoreUser.viewID,
@@ -271,52 +295,34 @@ function _tryStopPlayStream(userID, force = false) {
         }
     }
 }
+function _notifyUserInfoUpdate(userInfo) {
+    Object.keys(_onUserInfoUpdateCallbackMap).forEach(callbackID => {
+        _onUserInfoUpdateCallbackMap[callbackID](userInfo);
+    })
+}
+function _setLocalUserInfo(userInfo) {
+    _localCoreUser.userID = userInfo.userID;
+    _localCoreUser.userName = userInfo.userName;
+    _localCoreUser.profileUrl = userInfo.profileUrl;
+    _localCoreUser.extendInfo = userInfo.extendInfo;
+    if (!(userInfo.userID in _coreUserMap)) {
+        _coreUserMap[userInfo.userID] = _localCoreUser;
+    }
+}
 
 export default {
-    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SDK <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    connectSDK(appID, appSign, userInfo) {
-        return new Promise((resolve, reject) => {
-            const engineProfile = {
-                appID: appID,
-                appSign: appSign,
-                scenario: 0,
-            }
-            ZegoExpressEngine.createEngineWithProfile(engineProfile).then((engine) => {
-                zloginfo('Create ZegoExpressEngine succeed!');
-                _unregisterEngineCallback();
-                _registerEngineCallback();
-
-                if (_localCoreUser.userID === '') {
-                    this.setLocalUserInfo(userInfo);
-                }
-                resolve();
-            }).catch((error) => {
-                zlogerror('Create ZegoExpressEngine Failed: ', error);
-                reject(error);
-            });
-        });
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Internal <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    isRoomConnected() {
+        return _isRoomConnected;
     },
-    disconnectSDK() {
-        return new Promise((resolve, reject) => {
-            if (ZegoExpressEngine.instance()) {
-                ZegoExpressEngine.destroyEngine().then(() => {
-                    zloginfo('Destroy ZegoExpressEngine finished!')
-                    resolve();
-                }).catch((error) => {
-                    zlogerror('Destroy ZegoExpressEngine failed!', error);
-                    reject(error);
-                })
-            } else {
-                resolve();
-            }
-        });
-    },
-
-    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Audio Video <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     updateRenderingProperty(userID, viewID, fillMode) {
+        if (!userID || userID === '') {
+            userID = _localCoreUser.userID;
+        }
         if (userID in _coreUserMap) {
             _coreUserMap[userID].viewID = viewID;
             _coreUserMap[userID].fillMode = fillMode;
+            _notifyUserInfoUpdate(_coreUserMap[userID]);
 
             if (_localCoreUser.userID == userID) {
                 _localCoreUser.viewID = viewID;
@@ -336,6 +342,72 @@ export default {
             }
         }
     },
+    onUserInfoUpdate(callbackID, callback) {
+        if (typeof callback !== 'function') {
+            if (callbackID in _onUserInfoUpdateCallbackMap) {
+                zloginfo('[onCameraDeviceOn] Remove callback for: [', callbackID, '] because callback is not a valid function!');
+                delete _onUserInfoUpdateCallbackMap[callbackID];
+            }
+        } else {
+            _onUserInfoUpdateCallbackMap[callbackID] = callback;
+        }
+    },
+    onSDKConnected(callbackID, callback) {
+        if (typeof callback !== 'function') {
+            if (callbackID in _onSDKConnectedCallbackMap) {
+                zloginfo('[onSDKConnected] Remove callback for: [', callbackID, '] because callback is not a valid function!');
+                delete _onSDKConnectedCallbackMap[callbackID];
+            }
+        } else {
+            _onSDKConnectedCallbackMap[callbackID] = callback;
+        }
+    },
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SDK <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    connectSDK(appID, appSign, userInfo) {
+        return new Promise((resolve, reject) => {
+            const engineProfile = {
+                appID: appID,
+                appSign: appSign,
+                scenario: 0,
+            }
+            ZegoExpressEngine.createEngineWithProfile(engineProfile).then((engine) => {
+                zloginfo('Create ZegoExpressEngine succeed!');
+                _unregisterEngineCallback();
+                _registerEngineCallback();
+
+                if (_localCoreUser.userID === '') {
+                    _setLocalUserInfo(userInfo);
+                }
+
+                Object.keys(_onSDKConnectedCallbackMap).forEach(callbackID => {
+                    _onSDKConnectedCallbackMap[callbackID]();
+                });
+                resolve();
+            }).catch((error) => {
+                zlogerror('Create ZegoExpressEngine Failed: ', error);
+                reject(error);
+            });
+        });
+    },
+    disconnectSDK() {
+        return new Promise((resolve, reject) => {
+            if (ZegoExpressEngine.instance()) {
+                ZegoExpressEngine.destroyEngine().then(() => {
+                    zloginfo('Destroy ZegoExpressEngine finished!')
+                    resolve();
+                }).catch((error) => {
+                    zlogerror('Destroy ZegoExpressEngine failed!', error);
+                    reject(error);
+                }).finally(() => {
+                    _resetData();
+                })
+            } else {
+                resolve();
+            }
+        });
+    },
+
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Audio Video <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     useFrontFacingCamera(isFrontFacing) {
         return new Promise((resolve, reject) => {
             if (!_isRoomConnected) {
@@ -387,9 +459,13 @@ export default {
                 } else {
                     zloginfo('turnMicDeviceOn: ', userID, on);
                     ZegoExpressEngine.instance().muteMicrophone(!on);
+
                     _onRemoteMicStateUpdate(_getPublishStreamID(), on ? 10 : 1); // 10 for open, 1 for disable
+
                     _localCoreUser.isMicDeviceOn = on;
                     _coreUserMap[_localCoreUser.userID].isMicDeviceOn = on;
+                    _notifyUserInfoUpdate(_coreUserMap[userID]);
+
                     if (on) {
                         _tryStartPublishStream();
                     } else {
@@ -414,9 +490,13 @@ export default {
                     // Default to Main Channel
                     zloginfo('turnCameraDeviceOn: ', userID, on);
                     ZegoExpressEngine.instance().enableCamera(on, 0);
+
                     _onRemoteCameraStateUpdate(_getPublishStreamID(), on ? 10 : 1); // 10 for open, 1 for disable
+
                     _localCoreUser.isCameraDeviceOn = on;
                     _coreUserMap[_localCoreUser.userID].isCameraDeviceOn = on;
+                    _notifyUserInfoUpdate(_coreUserMap[userID]);
+
                     if (on) {
                         _tryStartPublishStream();
                     } else {
@@ -447,7 +527,6 @@ export default {
                 zloginfo('[onCameraDeviceOn] Remove callback for: [', callbackID, '] because callback is not a valid function!');
                 delete _onCameraDeviceOnCallbackMap[callbackID];
             }
-            zlogwarning('Set an invalid callback to [onCameraDeviceOn], all callbacks were clear.');
         } else {
             _onCameraDeviceOnCallbackMap[callbackID] = callback;
         }
@@ -468,8 +547,11 @@ export default {
             const user = { userID: _localCoreUser.userID, userName: _localCoreUser.userName };
             const config = { isUserStatusNotify: true }
             ZegoExpressEngine.instance().loginRoom(roomID, user, config).then(() => {
-                zloginfo('Join room success.')
+                zloginfo('Join room success.', user)
                 _currentRoomID = roomID;
+
+                _localCoreUser.streamID = _getPublishStreamID();
+                _coreUserMap[_localCoreUser.userID] = _localCoreUser;
                 resolve();
             }).catch((error) => {
                 zlogerror('Join room falied: ', error);
@@ -506,14 +588,7 @@ export default {
 
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> User <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     setLocalUserInfo(userInfo) {
-        _localCoreUser.userID = userInfo.userID;
-        _localCoreUser.userName = userInfo.userName;
-        _localCoreUser.profileUrl = userInfo.profileUrl;
-        _localCoreUser.extendInfo = userInfo.extendInfo;
-        _localCoreUser.streamID = _getPublishStreamID();
-        if (!(userInfo.userID in _coreUserMap)) {
-            _coreUserMap[userInfo.userID] = _localCoreUser;
-        }
+        _setLocalUserInfo(userInfo);
     },
     getLocalUserInfo() {
         return {
