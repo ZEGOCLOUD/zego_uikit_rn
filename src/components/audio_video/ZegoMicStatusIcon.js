@@ -11,7 +11,7 @@ export default function ZegoMicStatusIcon(props) {
         return isOn ? pathOn : pathOff;
     }
     useEffect(() => {
-        ZegoUIKitInternal.onMicDeviceOn((id, on) => {
+        ZegoUIKitInternal.onMicDeviceOn('zego_components_toggle_mic_icon', (id, on) => {
             if (id == userID) {
                 setIsOn(on);
             }

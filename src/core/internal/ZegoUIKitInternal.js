@@ -4,15 +4,17 @@ import { zlogerror, zloginfo, zlogwarning } from '../../utils/logger';
 var _isRoomConnected = false;
 var _currentRoomState = 7; // Logout
 var _currentRoomID = '';
-var _onMicDeviceOnCallbacks = [];
-var _onCameraDeviceOnCallbacks = [];
-var _onRoomStateChangedCallbacks = [];
-var _onUserJoinCallbacks = [];
-var _onUserLeaveCallbacks = [];
-var _localCoreUser = _createCoreUser('', '', '', {});
 
+var _onMicDeviceOnCallbackMap = {};
+var _onCameraDeviceOnCallbackMap = {};
+var _onRoomStateChangedCallbackMap = {};
+var _onUserJoinCallbackMap = {};
+var _onUserLeaveCallbackMap = {};
+
+var _localCoreUser = _createCoreUser('', '', '', {});
 var _streamCoreUserMap = {}; // <streamID, CoreUser>
 var _coreUserMap = {}; // <userID, CoreUser>
+
 function _createCoreUser(userID, userName, profileUrl, extendInfo) {
     return {
         userID: userID,
@@ -51,9 +53,10 @@ function _onRoomUserUpdate(roomID, updateType, userList) {
             // Start after user insert into list
             _tryStartPlayStream(user.userID);
         });
-        _onUserJoinCallbacks.forEach(callback => {
-            callback(userInfoList);
-        })
+        
+        Object.keys(_onUserJoinCallbackMap).forEach(callbackID => {
+            _onUserJoinCallbackMap[callbackID](userInfoList);
+        });
     } else {
         userList.forEach(user => {
             if (user.userID in _coreUserMap) {
@@ -108,9 +111,9 @@ function _onRemoteCameraStateUpdate(streamID, state) {
     if (userID in _coreUserMap) {
         const isOn = state == 10; // 10 for Open
         _coreUserMap[userID].isCameraDeviceOn = isOn;
-        _onCameraDeviceOnCallbacks.forEach(callback => {
-            zloginfo('###', userID, callback)
-            callback(userID, isOn);
+
+        Object.keys(_onCameraDeviceOnCallbackMap).forEach(callbackID => {
+            _onCameraDeviceOnCallbackMap[callbackID](userID, isOn);
         });
 
         if (isOn) {
@@ -125,8 +128,9 @@ function _onRemoteMicStateUpdate(streamID, state) {
     if (userID in _coreUserMap) {
         const isOn = state == 10; // 10 for Open
         _coreUserMap[userID].isMicDeviceOn = isOn;
-        _onMicDeviceOnCallbacks.forEach(callback => {
-            callback(userID, isOn);
+
+        Object.keys(_onMicDeviceOnCallbackMap).forEach(callbackID => {
+            _onMicDeviceOnCallbackMap[callbackID](userID, isOn);
         });
 
         if (isOn) {
@@ -145,10 +149,10 @@ function _onRoomStateChanged(roomID, reason, errorCode, extendedData) {
         _isRoomConnected = false;
     }
     _currentRoomState = reason;
-    // Trigger callback
-    _onRoomStateChangedCallbacks.forEach(callback => {
-        callback(reason, errorCode, extendedData);
-    })
+
+    Object.keys(_onRoomStateChangedCallbackMap).forEach(callbackID => {
+        _onRoomStateChangedCallbackMap[callbackID](reason, errorCode, extendedData);
+    });
 }
 function _registerEngineCallback() {
     zloginfo('Register callback for ZegoExpressEngine...')
@@ -427,23 +431,28 @@ export default {
             }
         });
     },
-    onMicDeviceOn(callback) {
+    onMicDeviceOn(callbackID, callback) {
         if (typeof callback !== 'function') {
-            _onMicDeviceOnCallbacks = [];
-            zlogwarning('Set an invalid callback to [onMicDeviceOn], all callbacks were clear.');
+            if (callbackID in _onMicDeviceOnCallbackMap) {
+                zloginfo('[onMicDeviceOn] Remove callback for: [', callbackID, '] because callback is not a valid function!');
+                delete _onMicDeviceOnCallbackMap[callbackID];
+            }
         } else {
-            _onMicDeviceOnCallbacks.push(callback);
+            _onMicDeviceOnCallbackMap[callbackID] = callback;
         }
     },
-    onCameraDeviceOn(callback) {
+    onCameraDeviceOn(callbackID, callback) {
         if (typeof callback !== 'function') {
-            _onCameraDeviceOnCallbacks = [];
+            if (callbackID in _onCameraDeviceOnCallbackMap) {
+                zloginfo('[onCameraDeviceOn] Remove callback for: [', callbackID, '] because callback is not a valid function!');
+                delete _onCameraDeviceOnCallbackMap[callbackID];
+            }
             zlogwarning('Set an invalid callback to [onCameraDeviceOn], all callbacks were clear.');
         } else {
-            _onCameraDeviceOnCallbacks.push(callback);
+            _onCameraDeviceOnCallbackMap[callbackID] = callback;
         }
     },
-    onAudioOutputDeviceTypeChange(callback) {
+    onAudioOutputDeviceTypeChange(callbackID, callback) {
         // TODO SDK missing API for this callback
     },
     setAudioConfig(config) {
@@ -484,12 +493,14 @@ export default {
             }
         });
     },
-    onRoomStateChanged(callback) {
+    onRoomStateChanged(callbackID, callback) {
         if (typeof callback !== 'function') {
-            _onRoomStateChangedCallbacks = [];
-            zlogwarning('Set an invalid callback to [onRoomStateChanged], all callbacks were clear.');
+            if (callbackID in _onRoomStateChangedCallbackMap) {
+                zloginfo('[onRoomStateChanged] Remove callback for: [', callbackID, '] because callback is not a valid function!');
+                delete _onRoomStateChangedCallbackMap[callbackID];
+            }
         } else {
-            _onRoomStateChangedCallbacks.push(callback);
+            _onRoomStateChangedCallbackMap[callbackID] = callback;
         }
     },
 
@@ -512,20 +523,24 @@ export default {
             extendInfo: _localCoreUser.extendInfo,
         };
     },
-    onUserJoin(callback) {
+    onUserJoin(callbackID, callback) {
         if (typeof callback !== 'function') {
-            _onUserJoinCallbacks = [];
-            zlogwarning('Set an invalid callback to [onUserJoin], all callbacks were clear.');
+            if (callbackID in _onUserJoinCallbackMap) {
+                zloginfo('[onUserJoin] Remove callback for: [', callbackID, '] because callback is not a valid function!');
+                delete _onUserJoinCallbackMap[callbackID];
+            }
         } else {
-            _onUserJoinCallbacks.push(callback);
+            _onUserJoinCallbackMap[callbackID] = callback;
         }
     },
-    onUserLeave(callback) {
+    onUserLeave(callbackID, callback) {
         if (typeof callback !== 'function') {
-            _onUserLeaveCallbacks = [];
-            zlogwarning('Set an invalid callback to [onUserLeave], all callbacks were clear.');
+            if (callbackID in _onUserLeaveCallbackMap) {
+                zloginfo('[onUserLeave] Remove callback for: [', callbackID, '] because callback is not a valid function!');
+                delete _onUserLeaveCallbackMap[callbackID];
+            }
         } else {
-            _onUserLeaveCallbacks.push(callback);
+            _onUserLeaveCallbackMap[callbackID] = callback;
         }
     }
 }

@@ -15,7 +15,7 @@ export default function ZegoToggleCameraButton(props) {
         ZegoUIKitInternal.turnCameraDeviceOn(userID, !isOn);
     }
     useEffect(() => {
-        ZegoUIKitInternal.onCameraDeviceOn((id, on) => {
+        ZegoUIKitInternal.onCameraDeviceOn('zego_components_toggle_camera_button',(id, on) => {
             if (id == userID) {
                 setIsOn(on);
             }

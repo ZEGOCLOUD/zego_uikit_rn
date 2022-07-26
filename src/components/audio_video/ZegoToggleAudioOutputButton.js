@@ -23,7 +23,7 @@ export default function ZegoToggleAudioOutputButton(props) {
         setIsOn(!isOn);
     }
     useEffect(() => {
-        ZegoUIKitInternal.onAudioOutputDeviceTypeChange((type) => {
+        ZegoUIKitInternal.onAudioOutputDeviceTypeChange('zego_components_toggle_audio_output_button', (type) => {
             setCurrentDevice(type);
         });
     }, []);

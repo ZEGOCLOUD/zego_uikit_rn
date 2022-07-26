@@ -14,7 +14,7 @@ export default function ZegoToggleMicButton(props) {
         ZegoUIKitInternal.turnMicDeviceOn(userID, !isOn);
     }
     useEffect(() => {
-        ZegoUIKitInternal.onMicDeviceOn((id, on) => {
+        ZegoUIKitInternal.onMicDeviceOn('zego_components_toggle_mic_button', (id, on) => {
             if (id == userID) {
                 setIsOn(on);
             }
