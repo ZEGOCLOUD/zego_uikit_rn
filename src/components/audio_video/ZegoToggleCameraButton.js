@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Image, TouchableOpacity, View } from "react-native";
 import ZegoUIKitInternal from "../../core/internal/ZegoUIKitInternal";
+import { zloginfo } from "../../utils/logger";
 
 export default function ZegoToggleCameraButton(props) {
     const { userID, iconCameraOn, iconCameraOff } = props;

@@ -71,7 +71,9 @@
   },
   "peerDependencies": {
     "react": "*",
-    "react-native": "*"
+    "react-native": "*",
+    "react-delegate-component": "*",
+    "zego-express-engine-reactnative": "^0.19.0"
   },
   "jest": {
     "preset": "react-native",
@@ -143,7 +145,6 @@
     ]
   },
   "dependencies": {
-    "react-delegate-component": "^1.0.0",
-    "zego-express-engine-reactnative": "^0.19.0"
+
   }
 }

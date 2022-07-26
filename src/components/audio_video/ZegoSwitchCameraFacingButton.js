@@ -1,6 +1,5 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Image, TouchableOpacity, View } from "react-native";
-import { getImageSource } from "../../utils/image_path_processor";
 import ZegoUIKitInternal from "../../core/internal/ZegoUIKitInternal";
 
 export default function ZegoSwitchCameraFacingButton(props) {
@@ -19,7 +18,7 @@ export default function ZegoSwitchCameraFacingButton(props) {
     // TODO make style layout
     return (<View>
         <TouchableOpacity
-            style={styles.micCon}
+            // style={styles.micCon}
             onPress={onPress}>
             <Image source={getImageSourceByPath()} />
         </TouchableOpacity>

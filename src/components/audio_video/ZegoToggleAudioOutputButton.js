@@ -1,6 +1,5 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Image, TouchableOpacity, View } from "react-native";
-import { getImageSource } from "../../utils/image_path_processor";
 import ZegoUIKitInternal from "../../core/internal/ZegoUIKitInternal";
 
 export default function ZegoToggleAudioOutputButton(props) {
@@ -33,7 +32,7 @@ export default function ZegoToggleAudioOutputButton(props) {
     return (<View>
         <TouchableOpacity
             disabled={currentDevice == 0} // Only speaker can toggle enable
-            style={styles.micCon}
+            // style={styles.micCon}
             onPress={onPress}>
             <Image source={getImageSourceByPath()} />
         </TouchableOpacity>

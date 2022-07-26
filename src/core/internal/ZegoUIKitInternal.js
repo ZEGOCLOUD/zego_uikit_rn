@@ -109,6 +109,7 @@ function _onRemoteCameraStateUpdate(streamID, state) {
         const isOn = state == 10; // 10 for Open
         _coreUserMap[userID].isCameraDeviceOn = isOn;
         _onCameraDeviceOnCallbacks.forEach(callback => {
+            zloginfo('###', userID, callback)
             callback(userID, isOn);
         });
 
@@ -136,12 +137,14 @@ function _onRemoteMicStateUpdate(streamID, state) {
     }
 }
 function _onRoomStateChanged(roomID, reason, errorCode, extendedData) {
+    zloginfo('Room state chaged: ', roomID, reason, errorCode, extendedData);
     // Not support multi-room right now
     if (reason == 1 || reason == 4) { // Logined || Reconnected
         _isRoomConnected = true;
     } else {
-        _currentRoomState = reason;
+        _isRoomConnected = false;
     }
+    _currentRoomState = reason;
     // Trigger callback
     _onRoomStateChangedCallbacks.forEach(callback => {
         callback(reason, errorCode, extendedData);
@@ -268,10 +271,7 @@ function _tryStopPlayStream(userID, force = false) {
 export default {
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SDK <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     connectSDK(appID, appSign, userInfo) {
-        // ZegoExpressEngine.getVersion().then((version) => {
-        //     console.log('>>>>>>>>', version)
-        // })
-        new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             const engineProfile = {
                 appID: appID,
                 appSign: appSign,
@@ -281,9 +281,9 @@ export default {
                 zloginfo('Create ZegoExpressEngine succeed!');
                 _unregisterEngineCallback();
                 _registerEngineCallback();
-                
+
                 if (_localCoreUser.userID === '') {
-                    _localCoreUser = userInfo;
+                    this.setLocalUserInfo(userInfo);
                 }
                 resolve();
             }).catch((error) => {
@@ -338,11 +338,8 @@ export default {
                 zlogerror('You are not connected to any room.')
                 reject();
             } else {
-                ZegoExpressEngine.instance().useFrontCamera(isFrontFacing, 0).then(() => {
-                    resolve();
-                }).catch((error) => {
-                    reject();
-                });
+                ZegoExpressEngine.instance().useFrontCamera(isFrontFacing, 0);
+                resolve();
             }
         });
     },
@@ -369,11 +366,8 @@ export default {
                 zlogerror('You are not connected to any room.')
                 reject();
             } else {
-                ZegoExpressEngine.instance().muteSpeaker(!enable).then(() => {
-                    resolve();
-                }).catch((error) => {
-                    reject();
-                });
+                ZegoExpressEngine.instance().muteSpeaker(!enable);
+                resolve();
             }
         });
     },
@@ -387,18 +381,17 @@ export default {
                     zlogerror('You are not connected to any room.')
                     reject();
                 } else {
-                    ZegoExpressEngine.instance().muteMicrophone(!on).then(() => {
-                        _localCoreUser.isMicDeviceOn = on;
-                        _coreUserMap[_localCoreUser.userID].isMicDeviceOn = on;
-                        if (on) {
-                            _tryStartPublishStream();
-                        } else {
-                            _tryStopPublishStream();
-                        }
-                        resolve();
-                    }).catch((error) => {
-                        reject();
-                    });
+                    zloginfo('turnMicDeviceOn: ', userID, on);
+                    ZegoExpressEngine.instance().muteMicrophone(!on);
+                    _onRemoteMicStateUpdate(_getPublishStreamID(), on ? 10 : 1); // 10 for open, 1 for disable
+                    _localCoreUser.isMicDeviceOn = on;
+                    _coreUserMap[_localCoreUser.userID].isMicDeviceOn = on;
+                    if (on) {
+                        _tryStartPublishStream();
+                    } else {
+                        _tryStopPublishStream();
+                    }
+                    resolve();
                 }
             } else {
                 // TODO
@@ -415,18 +408,17 @@ export default {
                     reject();
                 } else {
                     // Default to Main Channel
-                    ZegoExpressEngine.instance().enableCamera(on, 0).then(() => {
-                        _localCoreUser.isCameraDeviceOn = on;
-                        _coreUserMap[_localCoreUser.userID].isCameraDeviceOn = on;
-                        if (on) {
-                            _tryStartPublishStream();
-                        } else {
-                            _tryStopPublishStream();
-                        }
-                        resolve();
-                    }).catch((error) => {
-                        reject();
-                    });
+                    zloginfo('turnCameraDeviceOn: ', userID, on);
+                    ZegoExpressEngine.instance().enableCamera(on, 0);
+                    _onRemoteCameraStateUpdate(_getPublishStreamID(), on ? 10 : 1); // 10 for open, 1 for disable
+                    _localCoreUser.isCameraDeviceOn = on;
+                    _coreUserMap[_localCoreUser.userID].isCameraDeviceOn = on;
+                    if (on) {
+                        _tryStartPublishStream();
+                    } else {
+                        _tryStopPublishStream();
+                    }
+                    resolve();
                 }
             } else {
                 // TODO
@@ -467,6 +459,7 @@ export default {
             const user = { userID: _localCoreUser.userID, userName: _localCoreUser.userName };
             const config = { isUserStatusNotify: true }
             ZegoExpressEngine.instance().loginRoom(roomID, user, config).then(() => {
+                zloginfo('Join room success.')
                 _currentRoomID = roomID;
                 resolve();
             }).catch((error) => {
