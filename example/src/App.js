@@ -18,30 +18,32 @@ export default function App() {
         ZegoUIKit.joinRoom('123456')
       });
 
-    return () => {
-      ZegoUIKit.disconnectSDK();
-    }
+      
+    // return () => {
+    //   ZegoUIKit.disconnectSDK();
+    // }
   }, []);
 
   const reconnect = () => {
-    ZegoUIKit.disconnectSDK();
-    ZegoUIKit.connectSDK(
-      1484647939,
-      '16e1c2b4d4c6345c8644546e8fe636d8b7e47d010e9b4a8825439ecd64ccee6f',
-      { userID: 'oliver', userName: 'Oliver' }).then(() => {
-        console.log('Try to join room...');
-        ZegoUIKit.joinRoom('123456')
-      });
+    ZegoUIKit.disconnectSDK().then(() => {
+      ZegoUIKit.connectSDK(
+        1484647939,
+        '16e1c2b4d4c6345c8644546e8fe636d8b7e47d010e9b4a8825439ecd64ccee6f',
+        { userID: 'oliver', userName: 'Oliver' }).then(() => {
+          console.log('Try to join room...');
+          ZegoUIKit.joinRoom('123456')
+        });
+    });
   }
   return (
     <View style={styles.container}>
-      <ZegoAudioVideoContainer style={styles.avView} config={{fillMode: 1}}/>
+      <ZegoAudioVideoContainer style={styles.avView} config={{ fillMode: 1 }} />
       <View style={styles.ctrlBar}>
         <ZegoToggleCameraButton />
         <ZegoToggleMicButton />
         <ZegoMicStatusIcon />
         <ZegoCameraStatusIcon />
-        <Button title='Reset' onPress={reconnect}/>
+        <Button title='Reset' onPress={reconnect} />
       </View>
     </View>
   );
@@ -62,7 +64,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 0,
     top: 0,
-    backgroundColor:'red'
+    backgroundColor: 'red'
   },
   ctrlBar: {
     flex: 1,

@@ -7,7 +7,13 @@ import ZegoUIKitInternal from "../../../core/internal/ZegoUIKitInternal";
 
 
 function MaskViewDefault(props) {
-    return (<View></View>);
+    const { userInfo } = props;
+    const { userName = '' } = userInfo;
+    return (<View style={styles.defaultMaskContainer}>
+        <View style={styles.defaultMaskNameLabelContainer}>
+            <Text style={styles.defaultMaskNameLabel}>{userName}</Text>
+        </View>
+    </View>);
 }
 
 export default function ZegoVideoView(props) {
@@ -18,6 +24,7 @@ export default function ZegoVideoView(props) {
     const [currentUserID, setCurrentUserID] = useState(userID);
     ZegoUIKitInternal.onUserInfoUpdate('ZegoVideoView', (userInfo) => {
         if (userInfo.userID == currentUserID) {
+            console.log('*************', userInfo.isCameraDeviceOn)
             setUserInfo(userInfo);
         }
     });
@@ -29,25 +36,29 @@ export default function ZegoVideoView(props) {
         }
     });
     return (<View style={styles.container}>
-        {/* <AudioContainer
-            style={styles.audioContainer}
-            userInfo={userInfo}
-            showSoundWave={showSoundWave}
-            audioViewBackgroudColor={audioViewBackgroudColor}
-            audioViewBackgroudImage={audioViewBackgroudImage}
-        /> */}
-        <VideoContainer
-            style={styles.videoContainer}
-            userID={currentUserID}
-            roomID={roomID}
-            videoFillMode={videoFillMode}
-        />
-        {/* <Delegate
+        {userInfo.isCameraDeviceOn ?
+            <VideoContainer
+                style={styles.videoContainer}
+                userID={currentUserID}
+                roomID={roomID}
+                fillMode={videoFillMode}
+            /> :
+            <AudioContainer
+                style={styles.audioContainer}
+                userInfo={userInfo}
+                showSoundWave={showSoundWave}
+                audioViewBackgroudColor={audioViewBackgroudColor}
+                audioViewBackgroudImage={audioViewBackgroudImage}
+            />
+        }
+
+
+        <Delegate
             style={styles.mask}
             to={maskViewBuilder}
             default={MaskViewDefault}
             props={{ userInfo }}
-        /> */}
+        />
     </View>)
 }
 
@@ -75,6 +86,32 @@ const styles = StyleSheet.create({
         flex: 1,
         width: '100%',
         height: '100%',
+        position: 'absolute',
         zIndex: 2,
+    },
+    defaultMaskContainer: {
+        flex: 1,
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+    },
+    defaultMaskNameLabelContainer: {
+        flex: 1,
+        backgroundColor: '#2A2A2A',
+        opacity: 0.5,
+        position: 'absolute',
+        alignSelf: 'center',
+        paddingLeft: 5,
+        paddingRight: 5,
+        paddingBottom: 3,
+        paddingTop: 3,
+        borderRadius: 6,
+        bottom: 5,
+        right: 5
+    },
+    defaultMaskNameLabel: {
+        flex: 1,
+        color: '#FFFFFF',
+        fontSize: 12
     }
 });

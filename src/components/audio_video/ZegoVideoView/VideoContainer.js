@@ -5,12 +5,17 @@ import ZegoUIKitInternal from "../../../core/internal/ZegoUIKitInternal";
 
 export default function VideoContainer(props) {
     const { userID, roomID, fillMode } = props;
+    console.log("################1,", fillMode)
     const viewRef = React.createRef();
 
     ZegoUIKitInternal.onSDKConnected('VideoContainer', () => {
         const viewID = findNodeHandle(viewRef.current);
         ZegoUIKitInternal.updateRenderingProperty(userID, viewID, fillMode);
     });
+    useEffect(() => {
+        const viewID = findNodeHandle(viewRef.current);
+        ZegoUIKitInternal.updateRenderingProperty(userID, viewID, fillMode);
+    }, [])
     return (<View style={styles.container}>
         <ZegoTextureView
             style={styles.videoContainer}
@@ -32,6 +37,5 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         zIndex: 1,
-        backgroundColor: 'gray'
     },
 });

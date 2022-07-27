@@ -16,6 +16,7 @@ var _onSDKConnectedCallbackMap = {};
 var _localCoreUser = _createCoreUser('', '', '', {});
 var _streamCoreUserMap = {}; // <streamID, CoreUser>
 var _coreUserMap = {}; // <userID, CoreUser>
+var _qualityUpdateLogCounter = 0;
 
 function _resetData() {
     zloginfo('Reset all data.')
@@ -26,13 +27,13 @@ function _resetData() {
     _currentRoomState = 7;
     _isRoomConnected = false;
 
-    _onMicDeviceOnCallbackMap = {};
-    _onCameraDeviceOnCallbackMap = {};
-    _onRoomStateChangedCallbackMap = {};
-    _onUserJoinCallbackMap = {};
-    _onUserLeaveCallbackMap = {};
-    _onUserInfoUpdateCallbackMap = {};
-    _onSDKConnectedCallbackMap = {};
+    // _onMicDeviceOnCallbackMap = {};
+    // _onCameraDeviceOnCallbackMap = {};
+    // _onRoomStateChangedCallbackMap = {};
+    // _onUserJoinCallbackMap = {};
+    // _onUserLeaveCallbackMap = {};
+    // _onUserInfoUpdateCallbackMap = {};
+    // _onSDKConnectedCallbackMap = {};
 }
 
 function _createCoreUser(userID, userName, profileUrl, extendInfo) {
@@ -198,7 +199,11 @@ function _registerEngineCallback() {
     ZegoExpressEngine.instance().on(
         'publisherQualityUpdate',
         (streamID, quality) => {
-            zloginfo('[publisherQualityUpdate callback]', streamID, quality);
+            if (_qualityUpdateLogCounter % 5 == 0) {
+                _qualityUpdateLogCounter = 0;
+                zloginfo('[publisherQualityUpdate callback]', streamID, quality);
+            }
+            _qualityUpdateLogCounter ++;
             if (streamID.split('_')[2] === 'main') {
                 _localCoreUser.publisherQuality = quality;
                 _coreUserMap[_localCoreUser.userID].publisherQuality = quality;
