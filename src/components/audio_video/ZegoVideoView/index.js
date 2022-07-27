@@ -22,21 +22,25 @@ export default function ZegoVideoView(props) {
 
     const [userInfo, setUserInfo] = useState({});
     const [currentUserID, setCurrentUserID] = useState(userID);
-    ZegoUIKitInternal.onUserInfoUpdate('ZegoVideoView', (userInfo) => {
-        if (userInfo.userID == currentUserID) {
-            console.log('*************', userInfo.isCameraDeviceOn)
-            setUserInfo(userInfo);
+    const [isCameraOn, setIsCameraOn] = useState(true);
+    ZegoUIKitInternal.onUserInfoUpdate('ZegoVideoView', (info) => {
+        if (info.userID == currentUserID) {
+            setIsCameraOn(info.isCameraDeviceOn);
+            setUserInfo(info);
+
         }
     });
     ZegoUIKitInternal.onRoomStateChanged('ZegoVideoView', (reason, errorCode, extendedData) => {
         if (ZegoUIKitInternal.isRoomConnected()) {
             if (!currentUserID || currentUserID === '') {
-                setCurrentUserID(ZegoUIKitInternal.getLocalUserInfo().userID);
+                const localUser = ZegoUIKitInternal.getLocalUserInfo();
+                setCurrentUserID(localUser.userID);
+                setIsCameraOn(localUser.isCameraDeviceOn);
             }
         }
     });
     return (<View style={styles.container}>
-        {userInfo.isCameraDeviceOn ?
+        {isCameraOn ?
             <VideoContainer
                 style={styles.videoContainer}
                 userID={currentUserID}
@@ -51,8 +55,6 @@ export default function ZegoVideoView(props) {
                 audioViewBackgroudImage={audioViewBackgroudImage}
             />
         }
-
-
         <Delegate
             style={styles.mask}
             to={maskViewBuilder}

@@ -5,7 +5,6 @@ import ZegoUIKitInternal from "../../../core/internal/ZegoUIKitInternal";
 
 export default function VideoContainer(props) {
     const { userID, roomID, fillMode } = props;
-    console.log("################1,", fillMode)
     const viewRef = React.createRef();
 
     ZegoUIKitInternal.onSDKConnected('VideoContainer', () => {
