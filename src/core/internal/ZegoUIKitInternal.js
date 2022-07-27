@@ -203,7 +203,7 @@ function _registerEngineCallback() {
                 _qualityUpdateLogCounter = 0;
                 zloginfo('[publisherQualityUpdate callback]', streamID, quality);
             }
-            _qualityUpdateLogCounter ++;
+            _qualityUpdateLogCounter++;
             if (streamID.split('_')[2] === 'main') {
                 _localCoreUser.publisherQuality = quality;
                 _coreUserMap[_localCoreUser.userID].publisherQuality = quality;
@@ -425,7 +425,10 @@ export default {
         });
     },
     isMicDeviceOn(userID) {
-        if (userID in _coreUserMap) {
+        if (!userID || userID === '') {
+            return _localCoreUser.isMicDeviceOn;
+        }
+        else if (userID in _coreUserMap) {
             return _coreUserMap[userID].isMicDeviceOn;
         } else {
             zlogwarning('Can not check mic device is on for user[', userID, '], because no record!');
@@ -433,7 +436,10 @@ export default {
         }
     },
     isCameraDeviceOn(userID) {
-        if (userID in _coreUserMap) {
+        if (!userID || userID === '') {
+            return _localCoreUser.isCameraDeviceOn;
+        }
+        else if (userID in _coreUserMap) {
             return _coreUserMap[userID].isCameraDeviceOn;
         } else {
             zlogwarning('Can not check camera device is on for user[', userID, '], because no record!');
@@ -500,7 +506,7 @@ export default {
 
                     _localCoreUser.isCameraDeviceOn = on;
                     _coreUserMap[_localCoreUser.userID].isCameraDeviceOn = on;
-                    _notifyUserInfoUpdate(_coreUserMap[userID]);
+                    _notifyUserInfoUpdate(_localCoreUser);
 
                     if (on) {
                         _tryStartPublishStream();

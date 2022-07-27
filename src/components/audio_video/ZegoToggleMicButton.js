@@ -13,18 +13,19 @@ export default function ZegoToggleMicButton(props) {
     const onPress = () => {
         ZegoUIKitInternal.turnMicDeviceOn(userID, !isOn);
     }
-    useEffect(() => {
-        ZegoUIKitInternal.onMicDeviceOn('ZegoToggleMicButton', (id, on) => {
-            if (userID === undefined || userID === '') { // local user
-                if (id == ZegoUIKitInternal.getLocalUserInfo().userID) {
-                    setIsOn(on);
-                }
-            }
-            else if (id == userID) {
+    ZegoUIKitInternal.onSDKConnected('ZegoToggleMicButton', () => {
+        setIsOn(ZegoUIKitInternal.isMicDeviceOn(userID))
+    });
+    ZegoUIKitInternal.onMicDeviceOn('ZegoToggleMicButton', (id, on) => {
+        if (userID === undefined || userID === '') { // local user
+            if (id == ZegoUIKitInternal.getLocalUserInfo().userID) {
                 setIsOn(on);
             }
-        });
-    }, []);
+        }
+        else if (id == userID) {
+            setIsOn(on);
+        }
+    });
 
     // TODO make style layout
     return (<View>

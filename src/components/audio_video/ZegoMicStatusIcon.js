@@ -10,18 +10,19 @@ export default function ZegoMicStatusIcon(props) {
         const pathOff = iconMicOff ? iconMicOff : require("../../core/resources/white_icon_video_mic_off.png");
         return isOn ? pathOn : pathOff;
     }
-    useEffect(() => {
-        ZegoUIKitInternal.onMicDeviceOn('ZegoMicStatusIcon', (id, on) => {
-            if (userID === undefined || userID === '') { // local user
-                if (id == ZegoUIKitInternal.getLocalUserInfo().userID) {
-                    setIsOn(on);
-                }
-            }
-            else if (id == userID) {
+    ZegoUIKitInternal.onSDKConnected('ZegoMicStatusIcon', () => {
+        setIsOn(ZegoUIKitInternal.isMicDeviceOn(userID))
+    });
+    ZegoUIKitInternal.onMicDeviceOn('ZegoMicStatusIcon', (id, on) => {
+        if (userID === undefined || userID === '') { // local user
+            if (id == ZegoUIKitInternal.getLocalUserInfo().userID) {
                 setIsOn(on);
             }
-        });
-    }, []);
+        }
+        else if (id == userID) {
+            setIsOn(on);
+        }
+    });
 
     // TODO make style layout
     return (<View>
