@@ -264,7 +264,7 @@ function _tryStartPublishStream() {
     if (_localCoreUser.isMicDeviceOn || _localCoreUser.isCameraDeviceOn) {
         zloginfo('_tryStartPublishStream', _localCoreUser.isMicDeviceOn, _localCoreUser.isCameraDeviceOn, _localCoreUser.streamID);
         ZegoExpressEngine.instance().startPublishingStream(_localCoreUser.streamID);
-        zloginfo('ZegoExpressEngine startPreview:', _localCoreUser.viewID, _localCoreUser.fillMode);
+        zloginfo('ZegoExpressEngine startPreview:', _localCoreUser);
         if (_localCoreUser.viewID > 0) {
             ZegoExpressEngine.instance().startPreview({
                 'reactTag': _localCoreUser.viewID,
