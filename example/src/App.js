@@ -5,6 +5,7 @@ import ZegoUIKit, {
   ZegoAudioVideoContainer,
   ZegoToggleCameraButton,
   ZegoToggleMicButton,
+  ZegoQuitButton,
 
 } from 'react-native-zego-uikit-rn';
 
@@ -13,7 +14,7 @@ export default function App() {
     ZegoUIKit.connectSDK(
       1484647939,
       '16e1c2b4d4c6345c8644546e8fe636d8b7e47d010e9b4a8825439ecd64ccee6f',
-      { userID: 'jack', userName: 'Jack' }).then(() => {
+      { userID: 'oliver', userName: 'oliver' }).then(() => {
         ZegoUIKit.joinRoom('123456')
       });
 
@@ -28,7 +29,7 @@ export default function App() {
       ZegoUIKit.connectSDK(
         1484647939,
         '16e1c2b4d4c6345c8644546e8fe636d8b7e47d010e9b4a8825439ecd64ccee6f',
-        { userID: 'oliver', userName: 'Oliver' }).then(() => {
+        { userID: 'oliver', userName: 'oliver' }).then(() => {
           console.log('Try to join room...');
           ZegoUIKit.joinRoom('123456')
         });
@@ -40,6 +41,7 @@ export default function App() {
       <View style={styles.ctrlBar}>
         <ZegoToggleCameraButton style={styles.ctrlBtn} />
         <ZegoToggleMicButton style={styles.ctrlBtn} />
+        <ZegoQuitButton />
         <Button style={styles.ctrlBtn} title='Reset' onPress={reconnect} />
       </View>
     </View>

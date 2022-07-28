@@ -576,7 +576,7 @@ export default {
                 zlogwarning('You are not join in any room, no need to leave room.');
                 resolve();
             } else {
-                ZegoExpressEngine.instance().logoutRoom(roomID).then(() => {
+                ZegoExpressEngine.instance().logoutRoom(_currentRoomID).then(() => {
                     _currentRoomID = '';
                     resolve();
                 }).catch((error) => {

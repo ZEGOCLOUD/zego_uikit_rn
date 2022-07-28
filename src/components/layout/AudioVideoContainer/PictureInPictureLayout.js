@@ -31,6 +31,7 @@ export default function PictureInPictureLayout(props) {
         }
     })
     ZegoUIKitInternal.onUserJoin('PictureInPictureLayout', (userList) => {
+        console.log('>>>>>>>>>>> join', userList)
         if (userList.length == 1) {
             setRemoteUser(userList[0]);
         } else {
@@ -38,6 +39,7 @@ export default function PictureInPictureLayout(props) {
         }
     });
     ZegoUIKitInternal.onUserLeave('PictureInPictureLayout', (userList) => {
+        console.log('<<<<<<<<<<<<<< leave', userList)
         if (userList.length == 1) {
             setRemoteUser({});
         } else {

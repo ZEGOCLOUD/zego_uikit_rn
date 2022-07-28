@@ -7,6 +7,7 @@ import ZegoToggleMicButton from './components/audio_video/ZegoToggleMicButton'
 import ZegoToggleCameraButton from './components/audio_video/ZegoToggleCameraButton'
 import ZegoToggleAudioOutputButton from './components/audio_video/ZegoToggleAudioOutputButton'
 import ZegoAudioVideoContainer from './components/layout/AudioVideoContainer'
+import ZegoQuitButton from './components/audio_video/ZegoQuitButton'
 
 export default {
     connectSDK: ZegoUIKitInternal.connectSDK,
@@ -36,6 +37,7 @@ export {
     ZegoToggleCameraButton,
     ZegoToggleAudioOutputButton,
     ZegoAudioVideoContainer,
+    ZegoQuitButton,
 }
 
 
