@@ -199,7 +199,7 @@ function _registerEngineCallback() {
     ZegoExpressEngine.instance().on(
         'publisherQualityUpdate',
         (streamID, quality) => {
-            if (_qualityUpdateLogCounter % 5 == 0) {
+            if (_qualityUpdateLogCounter % 10 == 0) {
                 _qualityUpdateLogCounter = 0;
                 zloginfo('[publisherQualityUpdate callback]', streamID, quality);
             }

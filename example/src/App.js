@@ -5,8 +5,7 @@ import ZegoUIKit, {
   ZegoAudioVideoContainer,
   ZegoToggleCameraButton,
   ZegoToggleMicButton,
-  ZegoMicStatusIcon,
-  ZegoCameraStatusIcon
+
 } from 'react-native-zego-uikit-rn';
 
 export default function App() {
@@ -14,11 +13,11 @@ export default function App() {
     ZegoUIKit.connectSDK(
       1484647939,
       '16e1c2b4d4c6345c8644546e8fe636d8b7e47d010e9b4a8825439ecd64ccee6f',
-      { userID: 'oliver', userName: 'Oliver' }).then(() => {
+      { userID: 'jack', userName: 'Jack' }).then(() => {
         ZegoUIKit.joinRoom('123456')
       });
 
-      
+
     // return () => {
     //   ZegoUIKit.disconnectSDK();
     // }
@@ -39,11 +38,9 @@ export default function App() {
     <View style={styles.container}>
       <ZegoAudioVideoContainer style={styles.avView} config={{ fillMode: 1 }} />
       <View style={styles.ctrlBar}>
-        <ZegoToggleCameraButton />
-        <ZegoToggleMicButton />
-        <ZegoMicStatusIcon />
-        <ZegoCameraStatusIcon />
-        <Button title='Reset' onPress={reconnect} />
+        <ZegoToggleCameraButton style={styles.ctrlBtn} />
+        <ZegoToggleMicButton style={styles.ctrlBtn} />
+        <Button style={styles.ctrlBtn} title='Reset' onPress={reconnect} />
       </View>
     </View>
   );
@@ -76,4 +73,11 @@ const styles = StyleSheet.create({
     height: 50,
     zIndex: 2
   },
+  ctrlBtn: {
+    flex: 1,
+    width: 48,
+    height: 48,
+    marginLeft: 37 / 2,
+    position: 'absolute'
+  }
 });

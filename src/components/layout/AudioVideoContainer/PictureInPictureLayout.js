@@ -1,13 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ZegoUIKitInternal from "../../../core/internal/ZegoUIKitInternal";
 import ZegoVideoView from "../../audio_video/ZegoVideoView";
 import { StyleSheet, View } from 'react-native'
 
 export default function PictureInPictureLayout(props) {
     const { config = {}, maskViewBuilder } = props;
-    const { audioViewBackgroudColor = '', audioViewBackgroudImage = '', showSoundWave = true, videoFillMode = 1 } = config;
+    const {
+        audioViewBackgroudColor = '',
+        audioViewBackgroudImage = '',
+        showSoundWave = true,
+        videoFillMode = 1,
+        showSelfViewWithVideoOnly = false,
+        smallViewDefaultPosition = 0,
+        isSmallViewDraggable = false,
+    } = config;
     const [localUser, setLocalUser] = useState({});
     const [remoteUser, setRemoteUser] = useState({});
+
     ZegoUIKitInternal.onRoomStateChanged('PictureInPictureLayout', (reason, errorCode, extendedData) => {
         if (reason == 1 || reason == 4) {
             setLocalUser(ZegoUIKitInternal.getLocalUserInfo());
@@ -35,23 +44,43 @@ export default function PictureInPictureLayout(props) {
             //TODO
         }
     });
+    /*
+    enum {
+        topLeft = 0,
+        topRight = 1,
+        bottomLeft = 2,
+        bottomRight = 3
+    }
+    */
+    const getSmallViewPostStyle = () => {
+        const styleList = [styles.smallViewPostTopLeft, styles.smallViewPostTopRight, styles.smallViewPostBottomLeft, styles.smallViewPostBottomRgith];
+        if (smallViewDefaultPosition >= 0 && smallViewDefaultPosition <= 3) {
+            return styleList[smallViewDefaultPosition];
+        } else {
+            return styles.smallViewPostTopLeft;
+        }
+    }
     return (<View style={styles.container}>
-        <View style={styles.smallView}
-            userID={Object.keys(localUser).length === 0 ? '' : localUser.userID}
-            audioViewBackgroudColor={audioViewBackgroudColor}
-            audioViewBackgroudImage={audioViewBackgroudImage}
-            showSoundWave={showSoundWave}
-            videoFillMode={videoFillMode}
-            maskViewBuilder={maskViewBuilder}
-        />
-        <ZegoVideoView style={styles.bigView}
-            userID={Object.keys(remoteUser).length === 0 ? '' : remoteUser.userID}
-            audioViewBackgroudColor={audioViewBackgroudColor}
-            audioViewBackgroudImage={audioViewBackgroudImage}
-            showSoundWave={showSoundWave}
-            videoFillMode={videoFillMode}
-            maskViewBuilder={maskViewBuilder}
-        />
+        <View style={[styles.smallView, getSmallViewPostStyle()]}>
+            <ZegoVideoView
+                userID={Object.keys(localUser).length === 0 ? '' : localUser.userID}
+                audioViewBackgroudColor={audioViewBackgroudColor}
+                audioViewBackgroudImage={audioViewBackgroudImage}
+                showSoundWave={showSoundWave}
+                videoFillMode={videoFillMode}
+                maskViewBuilder={maskViewBuilder}
+            />
+        </View>
+        <View style={styles.bigView}>
+            <ZegoVideoView
+                userID={Object.keys(remoteUser).length === 0 ? undefined : localUser.userID}
+                audioViewBackgroudColor={audioViewBackgroudColor}
+                audioViewBackgroudImage={audioViewBackgroudImage}
+                showSoundWave={showSoundWave}
+                videoFillMode={videoFillMode}
+                maskViewBuilder={maskViewBuilder}
+            />
+        </View>
     </View>)
 }
 
@@ -60,21 +89,39 @@ const styles = StyleSheet.create({
         flex: 1,
         width: '100%',
         height: '100%',
-        position: 'absolute',
-  
-      },
+    },
     bigView: {
+        flex: 1,
         width: '100%',
         height: '100%',
         position: 'absolute',
-        zIndex: 0,
+        zIndex: 1,
     },
     smallView: {
-        height: '25%',
-        width: '40%',
+        flex: 1,
+        height: 169,
+        width: 95,
         position: 'absolute',
-        top: 80,
-        right: 20,
+        top: 70,
+        right: 12,
         zIndex: 2,
+        borderRadius: 10,
+        overflow: 'hidden'
+    },
+    smallViewPostTopLeft: {
+        top: 70,
+        left: 12,
+    },
+    smallViewPostTopRight: {
+        top: 70,
+        right: 12,
+    },
+    smallViewPostBottomLeft: {
+        bottom: 70,
+        left: 12,
+    },
+    smallViewPostBottomRgith: {
+        bottom: 70,
+        right: 12,
     },
 })

@@ -47,9 +47,9 @@ const styles = StyleSheet.create({
     },
     avatar: {
         flex: 1,
-        width: 129,
-        height: 129,
-        borderRadius: 129 / 2,
+        width: (129 / 375 * 100).toString() + '%',
+        aspectRatio: 1,
+        borderRadius: 1000,
         backgroundColor: '#DBDDE3',
         position: 'absolute',
         alignSelf: 'center',

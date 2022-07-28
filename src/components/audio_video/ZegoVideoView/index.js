@@ -23,16 +23,16 @@ export default function ZegoVideoView(props) {
     const [userInfo, setUserInfo] = useState({});
     const [currentUserID, setCurrentUserID] = useState(userID);
     const [isCameraOn, setIsCameraOn] = useState(true);
-    ZegoUIKitInternal.onUserInfoUpdate('ZegoVideoView', (info) => {
+    ZegoUIKitInternal.onUserInfoUpdate('ZegoVideoView' + String(userID), (info) => {
         if (info.userID == currentUserID) {
             setIsCameraOn(info.isCameraDeviceOn);
             setUserInfo(info);
 
         }
     });
-    ZegoUIKitInternal.onRoomStateChanged('ZegoVideoView', (reason, errorCode, extendedData) => {
+    ZegoUIKitInternal.onRoomStateChanged('ZegoVideoView' + String(userID), (reason, errorCode, extendedData) => {
         if (ZegoUIKitInternal.isRoomConnected()) {
-            if (!currentUserID || currentUserID === '') {
+            if (currentUserID === '') {
                 const localUser = ZegoUIKitInternal.getLocalUserInfo();
                 setCurrentUserID(localUser.userID);
                 setIsCameraOn(localUser.isCameraDeviceOn);
