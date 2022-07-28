@@ -3,10 +3,7 @@ import { useId } from 'react';
 
 import { StyleSheet, View, Text, Button } from 'react-native';
 import ZegoUIKit, {
-    ZegoAudioVideoContainer,
-    ZegoToggleCameraButton,
-    ZegoToggleMicrophoneButton,
-    ZegoQuitButton,
+    ZegoUIKitPrebuiltCall
 
 } from 'react-native-zego-uikit-rn';
 
@@ -15,27 +12,18 @@ export default function CallPage(props) {
     const { params } = route;
     const { userID, userName } = params;
 
-    useEffect(() => {
-        ZegoUIKit.connectSDK(
-            1484647939,
-            '16e1c2b4d4c6345c8644546e8fe636d8b7e47d010e9b4a8825439ecd64ccee6f',
-            { userID: userID, userName: userName }).then(() => {
-                ZegoUIKit.joinRoom('123456')
-            });
-
-        return () => {
-            ZegoUIKit.disconnectSDK();
-        }
-    }, []);
-
     return (
         <View style={styles.container}>
-            <ZegoAudioVideoContainer style={styles.avView} config={{ fillMode: 1 }} />
-            <View style={styles.ctrlBar}>
-                <ZegoToggleCameraButton style={styles.ctrlBtn} />
-                <ZegoToggleMicrophoneButton style={styles.ctrlBtn} />
-                <ZegoQuitButton onPostQuit={() => {props.navigation.navigate('HomePage')}} />
-            </View>
+            <ZegoUIKitPrebuiltCall
+                appID={1484647939}
+                appSign='16e1c2b4d4c6345c8644546e8fe636d8b7e47d010e9b4a8825439ecd64ccee6f'
+                userID={userID}
+                userName={userName}
+                roomID='rn12345678'
+                config={{
+                    onPostQuit: () => {props.navigation.navigate('HomePage')}
+                }}
+            />
         </View>
     );
 }

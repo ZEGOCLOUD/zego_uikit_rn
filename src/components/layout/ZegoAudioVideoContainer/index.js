@@ -9,28 +9,32 @@ LayoutMode {
 }
 */
 export default function ZegoAudioVideoContainer(props) {
-    const { maskViewBuilder, layoutMode, layoutConfig = {} } = props;
-    return (<View style={styles.container}>
-        {layoutMode == 0 ? <PictureInPictureWindow cinfog={layoutConfig} maskViewBuilder={maskViewBuilder}/> : <PictureInPictureWindow />}
-    </View>)
+  const { foregroundBuilder, layoutMode, layoutConfig = {} } = props;
+  return (<View style={styles.container}>
+    {layoutMode == 0 ?
+      <PictureInPictureWindow
+        cinfog={layoutConfig}
+        foregroundBuilder={foregroundBuilder} /> :
+      <PictureInPictureWindow />
+    }
+  </View>)
 }
 
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      width: '100%',
-      height: '100%',
-      position: 'absolute',
+  container: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
 
-    },
-    avView: {
-      flex: 1,
-      width: '100%',
-      height: '100%',
-      position: 'absolute',
-      backgroundColor:'red',
-      zIndex: 1,
-    },
-  });
-  
+  },
+  avView: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+    backgroundColor: 'red',
+    zIndex: 1,
+  },
+});

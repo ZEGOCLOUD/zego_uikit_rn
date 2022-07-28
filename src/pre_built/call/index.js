@@ -2,6 +2,11 @@ import React, { useEffect } from 'react';
 import { useId } from 'react';
 
 import { StyleSheet, View, Text, Button } from 'react-native';
+import ZegoQuitButton from '../../components/audio_video/ZegoQuitButton';
+import ZegoToggleCameraButton from '../../components/audio_video/ZegoToggleCameraButton';
+import ZegoToggleMicrophoneButton from '../../components/audio_video/ZegoToggleMicrophoneButton';
+import ZegoAudioVideoContainer from '../../components/layout/ZegoAudioVideoContainer';
+import ZegoUIKit from '../../core/internal/ZegoUIKitInternal';
 
 
 export default function ZegoUIKitPrebuiltCall(props) {
@@ -37,15 +42,29 @@ export default function ZegoUIKitPrebuiltCall(props) {
         foregroundBuilder,
     } = config;
 
+    useEffect(() => {
+        ZegoUIKit.connectSDK(
+            appID,
+            appSign,
+            { userID: userID, userName: userName }).then(() => {
+                ZegoUIKit.joinRoom(roomID)
+            });
+
+        return () => {
+            ZegoUIKit.disconnectSDK();
+        }
+    }, []);
+
     return (
         <View style={styles.container}>
             <ZegoAudioVideoContainer style={styles.avView}
-                config={{ fillMode: 1 }}
+                config={{ videoFillMode: 1 }}
+                foregroundBuilder={foregroundBuilder}
             />
             <View style={styles.ctrlBar}>
-                <ZegoToggleCameraButton />
-                <ZegoToggleMicButton />
-                <ZegoQuitButton onPreQuit={onPreQuit} onPostQuit={onPostQuit} />
+                <ZegoToggleCameraButton style={styles.ctrlBtn}/>
+                <ZegoToggleMicrophoneButton style={styles.ctrlBtn}/>
+                <ZegoQuitButton style={styles.ctrlBtn} onPreQuit={onPreQuit} onPostQuit={onPostQuit} />
             </View>
         </View>
     );
@@ -66,15 +85,16 @@ const styles = StyleSheet.create({
         position: 'absolute',
         right: 0,
         top: 0,
-        backgroundColor: 'red'
     },
     ctrlBar: {
         flex: 1,
+        position: 'absolute',
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'flex-end',
         marginBottom: 50,
         width: '100%',
+        bottom: 0,
         height: 50,
         zIndex: 2
     },
@@ -83,6 +103,6 @@ const styles = StyleSheet.create({
         width: 48,
         height: 48,
         marginLeft: 37 / 2,
-        position: 'absolute'
+        position: 'absolute',
     }
 });

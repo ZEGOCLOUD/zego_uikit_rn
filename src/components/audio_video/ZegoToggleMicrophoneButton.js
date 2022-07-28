@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Image, TouchableOpacity, View } from "react-native";
 import ZegoUIKitInternal from "../../core/internal/ZegoUIKitInternal";
 
-export default function ZegoToggleMicButton(props) {
+export default function ZegoToggleMicrophoneButton(props) {
     const { userID, iconMicOn, iconMicOff } = props;
     const [isOn, setIsOn] = useState(true);// Default on
     const getImageSourceByPath = () => {

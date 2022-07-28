@@ -11,17 +11,12 @@ export default function HomePage(props) {
             userName: userName
         })
     }
-    useEffect(() => {
-        return () => {
-            console.log('+++++++destroy home')
-        }
-    }, [])
     return (
-    <View style={styles.container}>
-        <Button title="Join As Oliver" onPress={() => {onJoinPress('oliver', 'Oliver')}} />
-        <Button title="Join As Jack" onPress={() => {onJoinPress('jack', 'Jack')}} />
-        <Button title="Reset SDK" onPress={() => {ZegoUIKit.disconnectSDK()}} />
-    </View>)
+        <View style={styles.container}>
+            <Button title="Join As Oliver" onPress={() => { onJoinPress('oliver', 'Oliver') }} />
+            <Button title="Join As Jack" onPress={() => { onJoinPress('jack', 'Jack') }} />
+            <Button title="Disconnect SDK" onPress={() => { ZegoUIKit.disconnectSDK() }} />
+        </View>)
 }
 
 const styles = StyleSheet.create({

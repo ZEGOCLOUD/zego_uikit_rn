@@ -4,7 +4,7 @@ import ZegoAudioVideoView from "../../audio_video/ZegoAudioVideoView";
 import { StyleSheet, View } from 'react-native'
 
 export default function PictureInPictureLayout(props) {
-    const { config = {}, maskViewBuilder } = props;
+    const { config = {}, foregroundBuilder } = props;
     const {
         audioViewBackgroudColor = '',
         audioViewBackgroudImage = '',
@@ -70,7 +70,7 @@ export default function PictureInPictureLayout(props) {
                 audioViewBackgroudImage={audioViewBackgroudImage}
                 showSoundWave={showSoundWave}
                 videoFillMode={videoFillMode}
-                maskViewBuilder={maskViewBuilder}
+                foregroundBuilder={foregroundBuilder}
             />
         </View>
         <View style={styles.bigView}>
@@ -80,7 +80,7 @@ export default function PictureInPictureLayout(props) {
                 audioViewBackgroudImage={audioViewBackgroudImage}
                 showSoundWave={showSoundWave}
                 videoFillMode={videoFillMode}
-                maskViewBuilder={maskViewBuilder}
+                foregroundBuilder={foregroundBuilder}
             />
         </View>
     </View>)
