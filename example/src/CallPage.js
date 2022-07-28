@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useId } from 'react';
 
 import { StyleSheet, View, Text, Button } from 'react-native';
 import ZegoUIKit, {
@@ -18,7 +19,7 @@ export default function CallPage(props) {
         ZegoUIKit.connectSDK(
             1484647939,
             '16e1c2b4d4c6345c8644546e8fe636d8b7e47d010e9b4a8825439ecd64ccee6f',
-            { userID: 'oliver', userName: 'Oliver' }).then(() => {
+            { userID: userID, userName: userName }).then(() => {
                 ZegoUIKit.joinRoom('123456')
             });
 

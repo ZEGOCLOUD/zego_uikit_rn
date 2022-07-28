@@ -201,7 +201,7 @@ function _registerEngineCallback() {
         (streamID, quality) => {
             if (_qualityUpdateLogCounter % 10 == 0) {
                 _qualityUpdateLogCounter = 0;
-                zloginfo('[publisherQualityUpdate callback]', streamID, quality);
+                // zloginfo('[publisherQualityUpdate callback]', streamID, quality);
             }
             _qualityUpdateLogCounter++;
             if (streamID.split('_')[2] === 'main') {
