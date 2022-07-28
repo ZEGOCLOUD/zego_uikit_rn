@@ -96,9 +96,9 @@ function _onRoomUserUpdate(roomID, updateType, userList) {
                 delete _coreUserMap[user.userID];
             }
         });
-        _onUserLeaveCallbacks.forEach(callback => {
-            callback(userInfoList);
-        });
+        Object.keys(_onUserLeaveCallbackMap).forEach(callbackID => {
+            _onUserLeaveCallbackMap[callbackID](userInfoList);
+        })
     }
 }
 function _onRoomStreamUpdate(roomID, updateType, streamList) {
