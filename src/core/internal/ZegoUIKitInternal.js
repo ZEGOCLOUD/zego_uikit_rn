@@ -321,7 +321,12 @@ export default {
         return _isRoomConnected;
     },
     updateRenderingProperty(userID, viewID, fillMode) {
-        if (!userID || userID === '') {
+        console.log(userID, viewID, fillMode, '<<<<<<<<<<<<<<<<<<<<<<<<<<')
+        if (userID === undefined) {
+            zlogwarning('updateRenderingProperty: ignore undifine useid. Use empty string for local user.')
+            return;
+        }
+        if (userID === '') {
             userID = _localCoreUser.userID;
         }
         if (userID in _coreUserMap) {
@@ -425,7 +430,7 @@ export default {
         });
     },
     isMicDeviceOn(userID) {
-        if (!userID || userID === '') {
+        if (!userID) {
             return _localCoreUser.isMicDeviceOn;
         }
         else if (userID in _coreUserMap) {
@@ -436,7 +441,7 @@ export default {
         }
     },
     isCameraDeviceOn(userID) {
-        if (!userID || userID === '') {
+        if (!userID) {
             return _localCoreUser.isCameraDeviceOn;
         }
         else if (userID in _coreUserMap) {

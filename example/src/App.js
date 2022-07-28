@@ -18,7 +18,6 @@ export default function App() {
         ZegoUIKit.joinRoom('123456')
       });
 
-
     // return () => {
     //   ZegoUIKit.disconnectSDK();
     // }
