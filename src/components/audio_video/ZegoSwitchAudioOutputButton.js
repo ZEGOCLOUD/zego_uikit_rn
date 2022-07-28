@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Image, TouchableOpacity, View } from "react-native";
 import ZegoUIKitInternal from "../../core/internal/ZegoUIKitInternal";
 
-export default function ZegoToggleAudioOutputButton(props) {
+export default function ZegoSwitchAudioOutputButton(props) {
     // ZegoAudioRouteSpeaker=(0) ZegoAudioRouteHeadphone=(1) ZegoAudioRouteBluetooth=(2) ZegoAudioRouteReceiver=(3) ZegoAudioRouteExternalUSB=(4) ZegoAudioRouteAirPlay=(5)
     const { iconSpeaker, iconEarpiece, iconBluetooth } = props;
     const [currentDevice, setCurrentDevice] = useState(0);// Default on

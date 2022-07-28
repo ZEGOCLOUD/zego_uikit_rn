@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ZegoUIKitInternal from "../../../core/internal/ZegoUIKitInternal";
-import ZegoVideoView from "../../audio_video/ZegoVideoView";
+import ZegoAudioVideoView from "../../audio_video/ZegoAudioVideoView";
 import { StyleSheet, View } from 'react-native'
 
 export default function PictureInPictureLayout(props) {
@@ -64,7 +64,7 @@ export default function PictureInPictureLayout(props) {
     }
     return (<View style={styles.container}>
         <View style={[styles.smallView, getSmallViewPostStyle()]}>
-            <ZegoVideoView
+            <ZegoAudioVideoView
                 userID={Object.keys(localUser).length === 0 ? '' : localUser.userID}
                 audioViewBackgroudColor={audioViewBackgroudColor}
                 audioViewBackgroudImage={audioViewBackgroudImage}
@@ -74,7 +74,7 @@ export default function PictureInPictureLayout(props) {
             />
         </View>
         <View style={styles.bigView}>
-            <ZegoVideoView
+            <ZegoAudioVideoView
                 userID={Object.keys(remoteUser).length === 0 ? undefined : localUser.userID}
                 audioViewBackgroudColor={audioViewBackgroudColor}
                 audioViewBackgroudImage={audioViewBackgroudImage}

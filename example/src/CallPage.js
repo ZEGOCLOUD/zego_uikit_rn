@@ -5,7 +5,7 @@ import { StyleSheet, View, Text, Button } from 'react-native';
 import ZegoUIKit, {
     ZegoAudioVideoContainer,
     ZegoToggleCameraButton,
-    ZegoToggleMicButton,
+    ZegoToggleMicrophoneButton,
     ZegoQuitButton,
 
 } from 'react-native-zego-uikit-rn';
@@ -33,8 +33,8 @@ export default function CallPage(props) {
             <ZegoAudioVideoContainer style={styles.avView} config={{ fillMode: 1 }} />
             <View style={styles.ctrlBar}>
                 <ZegoToggleCameraButton style={styles.ctrlBtn} />
-                <ZegoToggleMicButton style={styles.ctrlBtn} />
-                <ZegoQuitButton onPressed={() => {props.navigation.navigate('HomePage')}} />
+                <ZegoToggleMicrophoneButton style={styles.ctrlBtn} />
+                <ZegoQuitButton onPostQuit={() => {props.navigation.navigate('HomePage')}} />
             </View>
         </View>
     );

@@ -1,8 +1,14 @@
 import { View, StyleSheet, Text, ImageBackground } from "react-native";
 import React, { useEffect } from 'react'
 
-export default function AudioContainer(props) {
-    const { userInfo, showSoundWave, audioViewBackgroudColor, audioViewBackgroudImage } = props;
+export default function AudioFrame(props) {
+    const {
+        userInfo,
+        showSoundWave,
+        audioViewBackgroudColor,
+        audioViewBackgroudImage
+    } = props;
+
     const getShotName = (name) => {
         if (!name) {
             return '';
@@ -16,9 +22,15 @@ export default function AudioContainer(props) {
         });
         return shotName;
     }
+
     return (
         <View style={cstyle(audioViewBackgroudColor ? audioViewBackgroudColor : '#4A4B4D').container}>
-            <ImageBackground source={audioViewBackgroudImage ? { uri: audioViewBackgroudImage } : ''} resizeMode="cover" style={styles.imgBackground}>
+            <ImageBackground
+                source={audioViewBackgroudImage
+                    ? { uri: audioViewBackgroudImage }
+                    : ''} resizeMode="cover"
+                style={styles.imgBackground}
+            >
                 <View style={styles.avatar}>
                     <Text style={styles.nameLabel}>{getShotName(userInfo.userName)}</Text>
                 </View>

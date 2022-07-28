@@ -1,12 +1,12 @@
 import ZegoUIKitInternal from './core/internal/ZegoUIKitInternal'
-import ZegoVideoView from './components/audio_video/ZegoVideoView'
+import ZegoAudioVideoView from './components/audio_video/ZegoAudioVideoView'
 import ZegoCameraStatusIcon from './components/audio_video/ZegoCameraStatusIcon'
-import ZegoMicStatusIcon from './components/audio_video/ZegoMicStatusIcon'
+import ZegoMicrophoneStatusIcon from './components/audio_video/ZegoMicophoneStatusIcon'
 import ZegoSwitchCameraFacingButton from './components/audio_video/ZegoSwitchCameraFacingButton'
-import ZegoToggleMicButton from './components/audio_video/ZegoToggleMicButton'
+import ZegoToggleMicrophoneButton from './components/audio_video/ZegoToggleMicrophoneButton'
 import ZegoToggleCameraButton from './components/audio_video/ZegoToggleCameraButton'
-import ZegoToggleAudioOutputButton from './components/audio_video/ZegoToggleAudioOutputButton'
-import ZegoAudioVideoContainer from './components/layout/AudioVideoContainer'
+import ZegoSwitchAudioOutputButton from './components/audio_video/ZegoSwitchAudioOutputButton'
+import ZegoAudioVideoContainer from './components/layout/ZegoAudioVideoContainer'
 import ZegoQuitButton from './components/audio_video/ZegoQuitButton'
 
 export default {
@@ -29,13 +29,13 @@ export default {
 }
 
 export {
-    ZegoVideoView,
+    ZegoAudioVideoView,
     ZegoCameraStatusIcon,
-    ZegoMicStatusIcon,
+    ZegoMicrophoneStatusIcon,
     ZegoSwitchCameraFacingButton,
-    ZegoToggleMicButton,
+    ZegoToggleMicrophoneButton,
     ZegoToggleCameraButton,
-    ZegoToggleAudioOutputButton,
+    ZegoSwitchAudioOutputButton,
     ZegoAudioVideoContainer,
     ZegoQuitButton,
 }
