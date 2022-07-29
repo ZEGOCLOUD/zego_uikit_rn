@@ -62,8 +62,8 @@ export default function ZegoUIKitPrebuiltCall(props) {
                 foregroundBuilder={foregroundBuilder}
             />
             <View style={styles.ctrlBar}>
-                <ZegoToggleCameraButton style={styles.ctrlBtn}/>
-                <ZegoToggleMicrophoneButton style={styles.ctrlBtn}/>
+                <ZegoToggleCameraButton />
+                <ZegoToggleMicrophoneButton style={styles.ctrlBtn} />
                 <ZegoQuitButton style={styles.ctrlBtn} onPreQuit={onPreQuit} onPostQuit={onPostQuit} />
             </View>
         </View>
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
         flex: 1,
         width: 48,
         height: 48,
-        marginLeft: 37 / 2,
-        position: 'absolute',
+        padding: 0,
+        // position: 'absolute',
     }
 });

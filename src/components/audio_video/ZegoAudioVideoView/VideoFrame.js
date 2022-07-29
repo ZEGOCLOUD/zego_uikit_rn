@@ -7,13 +7,23 @@ export default function VideoFrame(props) {
     const { userID, roomID, fillMode } = props;
     const viewRef = React.createRef();
 
-    ZegoUIKitInternal.onSDKConnected('VideoContainer' + userID, () => {
+    const updateRenderingProperty = () => {
+
         const viewID = findNodeHandle(viewRef.current);
         ZegoUIKitInternal.updateRenderingProperty(userID, viewID, fillMode);
+    }
+    ZegoUIKitInternal.onSDKConnected('VideoContainer' + userID, () => {
+        updateRenderingProperty();
+    });
+    ZegoUIKitInternal.onUserJoin('VideoContainer' + userID, (userInfoList) => {
+        userInfoList.forEach(user => {
+            if (user.userID == userID) {
+                updateRenderingProperty()
+            }
+        })
     });
     useEffect(() => {
-        const viewID = findNodeHandle(viewRef.current);
-        ZegoUIKitInternal.updateRenderingProperty(userID, viewID, fillMode);
+        updateRenderingProperty();
     }, []);
 
     return (

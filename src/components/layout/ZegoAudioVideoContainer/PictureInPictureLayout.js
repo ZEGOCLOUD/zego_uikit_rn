@@ -15,7 +15,7 @@ export default function PictureInPictureLayout(props) {
         isSmallViewDraggable = false,
     } = config;
     const [localUser, setLocalUser] = useState({});
-    const [remoteUser, setRemoteUser] = useState({});
+    const [remoteUserID, setRemoteUserID] = useState('');
 
     ZegoUIKitInternal.onRoomStateChanged('PictureInPictureLayout', (reason, errorCode, extendedData) => {
         if (reason == 1 || reason == 4) {
@@ -27,13 +27,13 @@ export default function PictureInPictureLayout(props) {
             // ZegoRoomStateChangedReasonLogout
             // ZegoRoomStateChangedReasonLogoutFailed
             setLocalUser({});
-            setRemoteUser({});
+            setRemoteUserID('');
         }
     })
     ZegoUIKitInternal.onUserJoin('PictureInPictureLayout', (userList) => {
         console.log('>>>>>>>>>>> join', userList)
         if (userList.length == 1) {
-            setRemoteUser(userList[0]);
+            setRemoteUserID(userList[0].userID);
         } else {
             //TODO
         }
@@ -41,7 +41,7 @@ export default function PictureInPictureLayout(props) {
     ZegoUIKitInternal.onUserLeave('PictureInPictureLayout', (userList) => {
         console.log('<<<<<<<<<<<<<< leave', userList)
         if (userList.length == 1) {
-            setRemoteUser({});
+            setRemoteUserID('');
         } else {
             //TODO
         }
@@ -74,14 +74,17 @@ export default function PictureInPictureLayout(props) {
             />
         </View>
         <View style={styles.bigView}>
-            <ZegoAudioVideoView
-                userID={Object.keys(remoteUser).length === 0 ? undefined : localUser.userID}
-                audioViewBackgroudColor={audioViewBackgroudColor}
-                audioViewBackgroudImage={audioViewBackgroudImage}
-                showSoundWave={showSoundWave}
-                videoFillMode={videoFillMode}
-                foregroundBuilder={foregroundBuilder}
-            />
+            {remoteUserID ?
+                <ZegoAudioVideoView
+                    userID={remoteUserID}
+                    audioViewBackgroudColor={audioViewBackgroudColor}
+                    audioViewBackgroudImage={audioViewBackgroudImage}
+                    showSoundWave={showSoundWave}
+                    videoFillMode={videoFillMode}
+                    foregroundBuilder={foregroundBuilder}
+                /> :
+                <View />
+            }
         </View>
     </View>)
 }

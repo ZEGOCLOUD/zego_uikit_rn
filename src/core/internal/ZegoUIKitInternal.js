@@ -57,6 +57,7 @@ function _isLocalUser(userID) {
 
 function _onRoomUserUpdate(roomID, updateType, userList) {
     // No need for roomID, does not support multi-room right now.
+    zloginfo('_onRoomUserUpdate: ', roomID, updateType, userList)
     const userInfoList = [];
     if (updateType == 0) {
         userList.forEach(user => {
@@ -102,6 +103,7 @@ function _onRoomUserUpdate(roomID, updateType, userList) {
     }
 }
 function _onRoomStreamUpdate(roomID, updateType, streamList) {
+    zloginfo('_onRoomStreamUpdate: ', roomID, updateType, streamList)
     if (updateType == 0) { // Add
         streamList.forEach(stream => {
             const userID = stream.user.userID;
@@ -214,7 +216,7 @@ function _registerEngineCallback() {
     ZegoExpressEngine.instance().on(
         'playerQualityUpdate',
         (streamID, quality) => {
-            zloginfo('[playerQualityUpdate callback]', streamID, quality);
+            // zloginfo('[playerQualityUpdate callback]', streamID, quality);
             // TODO
         },
     );
@@ -283,6 +285,7 @@ function _tryStopPublishStream(force = false) {
 function _tryStartPlayStream(userID) {
     if (userID in _coreUserMap) {
         const user = _coreUserMap[userID];
+        zloginfo('_tryStartPlayStream: ', user)
         if (user.viewID > 0 && user.streamID !== '') {
             ZegoExpressEngine.instance().startPlayingStream(user.streamID, {
                 'reactTag': user.viewID,
