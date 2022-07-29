@@ -6,6 +6,8 @@ import ZegoUIKit, {
     ZegoUIKitPrebuiltCall
 
 } from 'react-native-zego-uikit-rn';
+// import ZegoUIKit, {ZegoToggleCameraButton} from @zego-uikit/components-rn
+// import {ZegoUIKitPrebuiltCall} from @zego-uikit/prebuilt-call-rn
 
 export default function CallPage(props) {
     const { route } = props;

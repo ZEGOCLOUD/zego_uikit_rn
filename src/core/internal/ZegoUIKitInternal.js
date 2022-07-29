@@ -11,6 +11,7 @@ var _onRoomStateChangedCallbackMap = {};
 var _onUserJoinCallbackMap = {};
 var _onUserLeaveCallbackMap = {};
 var _onUserInfoUpdateCallbackMap = {};
+var _onSoundLevelUpdateCallbackMap = {};
 var _onSDKConnectedCallbackMap = {};
 
 var _localCoreUser = _createCoreUser('', '', '', {});
@@ -35,7 +36,6 @@ function _resetData() {
     // _onUserInfoUpdateCallbackMap = {};
     // _onSDKConnectedCallbackMap = {};
 }
-
 function _createCoreUser(userID, userName, profileUrl, extendInfo) {
     return {
         userID: userID,
@@ -49,10 +49,20 @@ function _createCoreUser(userID, userName, profileUrl, extendInfo) {
         isCameraDeviceOn: true,
         audioOutputType: 0,
         publisherQuality: 0,
+        soundLevel: 0,
     }
 }
 function _isLocalUser(userID) {
     return userID === undefined || userID === '' || _localCoreUser.userID === userID;
+}
+function _setLocalUserInfo(userInfo) {
+    _localCoreUser.userID = userInfo.userID;
+    _localCoreUser.userName = userInfo.userName;
+    _localCoreUser.profileUrl = userInfo.profileUrl;
+    _localCoreUser.extendInfo = userInfo.extendInfo;
+    if (!(userInfo.userID in _coreUserMap)) {
+        _coreUserMap[userInfo.userID] = _localCoreUser;
+    }
 }
 
 function _onRoomUserUpdate(roomID, updateType, userList) {
@@ -237,6 +247,29 @@ function _registerEngineCallback() {
             _onRemoteMicStateUpdate(streamID, state);
         },
     );
+    ZegoExpressEngine.instance().on(
+        'remoteSoundLevelUpdate',
+        (soundLevels) => {
+            // {streamID, soundLavel} value from 0.0 to 100.0
+            // zloginfo('[remoteSoundLevelUpdate callback]', streamID, state);
+            _onSoundLevelUpdate(soundLevels);
+            Object.keys(soundLevels).forEach(streamID => {
+                const userID = _getUserIDByStreamID(streamID);
+                if (userID in _coreUserMap) {
+                    _coreUserMap[userID].soundLevel = soundLevels[streamID];
+                    _notifySoundLevelUpdate(userID, soundLevels[streamID]);
+                }
+            })
+        },
+    );
+    ZegoExpressEngine.instance().on(
+        'capturedSoundLevelUpdate',
+        (soundLevel) => {
+            _localCoreUser.soundLevel = soundLevel;
+            _coreUserMap[_localCoreUser.userID].soundLevel = soundLevel;
+            _notifySoundLevelUpdate(_localCoreUser.userID, soundLevel);
+        },
+    );
     // https://doc-en-api.zego.im/ReactNative/enums/_zegoexpressdefines_.zegoroomstatechangedreason.html
     ZegoExpressEngine.instance().on(
         'roomStateChanged',
@@ -254,6 +287,8 @@ function _unregisterEngineCallback() {
     ZegoExpressEngine.instance().off('playerQualityUpdate');
     ZegoExpressEngine.instance().off('remoteCameraStateUpdate');
     ZegoExpressEngine.instance().off('remoteMicStateUpdate');
+    ZegoExpressEngine.instance().off('remoteSoundLevelUpdate');
+    ZegoExpressEngine.instance().off('capturedSoundLevelUpdate');
     ZegoExpressEngine.instance().off('roomStateChanged');
 }
 
@@ -314,14 +349,10 @@ function _notifyUserInfoUpdate(userInfo) {
         _onUserInfoUpdateCallbackMap[callbackID](userInfo);
     })
 }
-function _setLocalUserInfo(userInfo) {
-    _localCoreUser.userID = userInfo.userID;
-    _localCoreUser.userName = userInfo.userName;
-    _localCoreUser.profileUrl = userInfo.profileUrl;
-    _localCoreUser.extendInfo = userInfo.extendInfo;
-    if (!(userInfo.userID in _coreUserMap)) {
-        _coreUserMap[userInfo.userID] = _localCoreUser;
-    }
+function _notifySoundLevelUpdate(userID, soundLevel) {
+    Object.keys(_onSoundLevelUpdateCallbackMap).forEach(callbackID => {
+        _onSoundLevelUpdateCallbackMap[callbackID](userID, soundLevel);
+    });
 }
 
 export default {
@@ -330,7 +361,7 @@ export default {
         return _isRoomConnected;
     },
     updateRenderingProperty(userID, viewID, fillMode) {
-        zloginfo('updateRenderingProperty: ',userID, viewID, fillMode, '<<<<<<<<<<<<<<<<<<<<<<<<<<')
+        zloginfo('updateRenderingProperty: ', userID, viewID, fillMode, '<<<<<<<<<<<<<<<<<<<<<<<<<<')
         if (userID === undefined) {
             zlogwarning('updateRenderingProperty: ignore undifine useid. Use empty string for local user.')
             return;
@@ -364,11 +395,21 @@ export default {
     onUserInfoUpdate(callbackID, callback) {
         if (typeof callback !== 'function') {
             if (callbackID in _onUserInfoUpdateCallbackMap) {
-                zloginfo('[onCameraDeviceOn] Remove callback for: [', callbackID, '] because callback is not a valid function!');
+                zloginfo('[onUserInfoUpdate] Remove callback for: [', callbackID, '] because callback is not a valid function!');
                 delete _onUserInfoUpdateCallbackMap[callbackID];
             }
         } else {
             _onUserInfoUpdateCallbackMap[callbackID] = callback;
+        }
+    },
+    onSoundLevelUpdate(callbackID, callback) {
+        if (typeof callback !== 'function') {
+            if (callbackID in _onSoundLevelUpdateCallbackMap) {
+                zloginfo('[onSoundLevelUpdate] Remove callback for: [', callbackID, '] because callback is not a valid function!');
+                delete _onSoundLevelUpdateCallbackMap[callbackID];
+            }
+        } else {
+            _onSoundLevelUpdateCallbackMap[callbackID] = callback;
         }
     },
     onSDKConnected(callbackID, callback) {
@@ -384,6 +425,13 @@ export default {
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SDK <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     connectSDK(appID, appSign, userInfo) {
         return new Promise((resolve, reject) => {
+            // set advancedConfig to monitor remote user's device changed
+            ZegoExpressEngine.setEngineConfig({
+                advancedConfig: {
+                    'notify_remote_device_unknown_status': 'true',
+                    'notify_remote_device_init_status': 'true',
+                }
+            });
             const engineProfile = {
                 appID: appID,
                 appSign: appSign,
@@ -391,6 +439,7 @@ export default {
             }
             ZegoExpressEngine.createEngineWithProfile(engineProfile).then((engine) => {
                 zloginfo('Create ZegoExpressEngine succeed!');
+
                 _unregisterEngineCallback();
                 _registerEngineCallback();
 

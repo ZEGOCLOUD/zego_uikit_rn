@@ -4,28 +4,29 @@ import ZegoUIKitInternal from "../../core/internal/ZegoUIKitInternal";
 import { zloginfo } from "../../utils/logger";
 
 export default function ZegoToggleCameraButton(props) {
-    const { userID, iconCameraOn, iconCameraOff } = props;
-    const [isOn, setIsOn] = useState(true);// Default on
+    const { userID, iconCameraOn, iconCameraOff, isOn } = props;
+    const [isCurrentOn, setIsCurrentOn] = useState(true);// Default on
     const getImageSourceByPath = () => {
         const pathOn = iconCameraOn ? iconCameraOn : require("../../core/resources/white_button_camera_on.png");
         const pathOff = iconCameraOff ? iconCameraOff : require("../../core/resources/white_button_camera_off.png");
-        return isOn ? pathOn : pathOff;
+        return isCurrentOn ? pathOn : pathOff;
     }
     const onPress = () => {
-        ZegoUIKitInternal.turnCameraDeviceOn(userID, !isOn);
+        ZegoUIKitInternal.turnCameraDeviceOn(userID, !isCurrentOn);
     }
     ZegoUIKitInternal.onSDKConnected('ZegoToggleCameraButton', () => {
-        setIsOn(ZegoUIKitInternal.isCameraDeviceOn(userID))
+        ZegoUIKitInternal.turnCameraDeviceOn(userID, isOn);
+        setIsCurrentOn(ZegoUIKitInternal.isCameraDeviceOn(userID))
     });
     useEffect(() => {
         ZegoUIKitInternal.onCameraDeviceOn('ZegoToggleCameraButton', (id, on) => {
             if (userID === undefined || userID === '') { // local user
                 if (id == ZegoUIKitInternal.getLocalUserInfo().userID) {
-                    setIsOn(on);
+                    setIsCurrentOn(on);
                 }
             }
             else if (id == userID) {
-                setIsOn(on);
+                setIsCurrentOn(on);
             }
         })
     }, []);

@@ -7,6 +7,7 @@ import ZegoToggleCameraButton from '../../components/audio_video/ZegoToggleCamer
 import ZegoToggleMicrophoneButton from '../../components/audio_video/ZegoToggleMicrophoneButton';
 import ZegoAudioVideoContainer from '../../components/layout/ZegoAudioVideoContainer';
 import ZegoUIKit from '../../core/internal/ZegoUIKitInternal';
+import AudioVideoForegroundView from './AudioVideoForegroundView';
 
 
 export default function ZegoUIKitPrebuiltCall(props) {
@@ -58,12 +59,27 @@ export default function ZegoUIKitPrebuiltCall(props) {
     return (
         <View style={styles.container}>
             <ZegoAudioVideoContainer style={styles.avView}
-                config={{ videoFillMode: 1 }}
-                foregroundBuilder={foregroundBuilder}
+                layoutMode={0} // P-i-P
+                layoutConfig={{
+                    videoFillMode: 1,
+                    soundWaveType: soundWaveType,
+                    showSelfViewWithVideoOnly: showSelfViewWithVideoOnly,
+                    audioViewBackgroundColor: audioViewBackgroundColor,
+                    audioViewBackgroundImage: audioViewBackgroundImage,
+                    smallViewDefaultPosition: smallViewDefaultPosition,
+                    isSmallViewDraggable: isSmallViewDraggable,
+                }}
+                foregroundBuilder={foregroundBuilder ? foregroundBuilder :
+                    <AudioVideoForegroundView
+                        showMicrophoneStateOnView={showMicrophoneStateOnView}
+                        showCameraStateOnView={showCameraStateOnView}
+                        showUserNameOnView={showUserNameOnView}
+                    />
+                }
             />
             <View style={styles.ctrlBar}>
-                <ZegoToggleCameraButton />
-                <ZegoToggleMicrophoneButton style={styles.ctrlBtn} />
+                <ZegoToggleCameraButton isOn={turnOnCameraWhenJoining} />
+                <ZegoToggleMicrophoneButton style={styles.ctrlBtn} isOn={turnOnMicrophoneWhenJoining} />
                 <ZegoQuitButton style={styles.ctrlBtn} onPreQuit={onPreQuit} onPostQuit={onPostQuit} />
             </View>
         </View>
