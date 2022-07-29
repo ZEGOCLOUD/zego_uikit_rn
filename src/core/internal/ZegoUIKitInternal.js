@@ -57,12 +57,15 @@ function _isLocalUser(userID) {
 
 function _onRoomUserUpdate(roomID, updateType, userList) {
     // No need for roomID, does not support multi-room right now.
-    zloginfo('_onRoomUserUpdate: ', roomID, updateType, userList)
     const userInfoList = [];
     if (updateType == 0) {
         userList.forEach(user => {
             const coreUser = _createCoreUser(user.userID, user.userName);
             _coreUserMap[user.userID] = coreUser;
+            const streamID = _getStreamIDByUserID(user.userID);
+            if (streamID in _streamCoreUserMap) {
+                _coreUserMap[user.userID].streamID = streamID;
+            }
             _notifyUserInfoUpdate(_coreUserMap[user.userID]);
 
             const userInfo = {
@@ -262,6 +265,9 @@ function _getUserIDByStreamID(streamID) {
 function _getPublishStreamID() {
     return _currentRoomID + '_' + _localCoreUser.userID + '_main';
 }
+function _getStreamIDByUserID(userID) {
+    return _currentRoomID + '_' + userID + '_main';
+}
 function _tryStartPublishStream() {
     if (_localCoreUser.isMicDeviceOn || _localCoreUser.isCameraDeviceOn) {
         zloginfo('_tryStartPublishStream', _localCoreUser.isMicDeviceOn, _localCoreUser.isCameraDeviceOn, _localCoreUser.streamID);
@@ -324,7 +330,7 @@ export default {
         return _isRoomConnected;
     },
     updateRenderingProperty(userID, viewID, fillMode) {
-        console.log(userID, viewID, fillMode, '<<<<<<<<<<<<<<<<<<<<<<<<<<')
+        zloginfo('updateRenderingProperty: ',userID, viewID, fillMode, '<<<<<<<<<<<<<<<<<<<<<<<<<<')
         if (userID === undefined) {
             zlogwarning('updateRenderingProperty: ignore undifine useid. Use empty string for local user.')
             return;
