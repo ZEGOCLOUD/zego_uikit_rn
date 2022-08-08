@@ -155,10 +155,12 @@ function _onRemoteCameraStateUpdate(streamID, state) {
             _onCameraDeviceOnCallbackMap[callbackID](userID, isOn);
         });
 
-        if (isOn) {
-            _tryStartPlayStream(userID);
-        } else {
-            _tryStopPlayStream(userID);
+        if (userID != _localCoreUser.userID) {
+            if (isOn) {
+                _tryStartPlayStream(userID);
+            } else {
+                _tryStopPlayStream(userID);
+            }
         }
     }
 }
@@ -173,10 +175,12 @@ function _onRemoteMicStateUpdate(streamID, state) {
             _onMicDeviceOnCallbackMap[callbackID](userID, isOn);
         });
 
-        if (isOn) {
-            _tryStartPlayStream(userID);
-        } else {
-            _tryStopPlayStream(userID);
+        if (userID != _localCoreUser.userID) {
+            if (isOn) {
+                _tryStartPlayStream(userID);
+            } else {
+                _tryStopPlayStream(userID);
+            }
         }
     }
 }
@@ -538,7 +542,7 @@ export default {
 
                     _localCoreUser.isMicDeviceOn = on;
                     _coreUserMap[_localCoreUser.userID].isMicDeviceOn = on;
-                    _notifyUserInfoUpdate(_coreUserMap[userID]);
+                    _notifyUserInfoUpdate(_localCoreUser);
 
                     if (on) {
                         _tryStartPublishStream();
