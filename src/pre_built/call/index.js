@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useId } from 'react';
+import { PermissionsAndroid } from 'react-native';
 
 import { StyleSheet, View, Text, Button } from 'react-native';
 import ZegoQuitButton from '../../components/audio_video/ZegoQuitButton';
@@ -43,12 +43,56 @@ export default function ZegoUIKitPrebuiltCall(props) {
         foregroundBuilder,
     } = config;
 
+    grantPermissions = async (callback) => {
+        // Android: Dynamically obtaining device permissions
+        if (Platform.OS === 'android') {
+            // Check if permission granted
+            let grantedAudio = PermissionsAndroid.check(
+                PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+            );
+            let grantedCamera = PermissionsAndroid.check(
+                PermissionsAndroid.PERMISSIONS.CAMERA,
+            );
+            const ungrantedPermissions = [];
+            try {
+                const isAudioGranted = await grantedAudio;
+                const isVideoGranted = await grantedCamera;
+                if (!isAudioGranted) {
+                    ungrantedPermissions.push(
+                        PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+                    );
+                }
+                if (!isVideoGranted) {
+                    ungrantedPermissions.push(PermissionsAndroid.PERMISSIONS.CAMERA);
+                }
+            } catch (error) {
+                ungrantedPermissions.push(
+                    PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+                    PermissionsAndroid.PERMISSIONS.CAMERA,
+                );
+            }
+            // If not, request it
+            return PermissionsAndroid.requestMultiple(ungrantedPermissions).then(
+                data => {
+                    console.warn('requestMultiple', data);
+                    if (callback) {
+                        callback();
+                    }
+                },
+            );
+        } else if (callback) {
+            callback();
+        }
+    }
+
     useEffect(() => {
         ZegoUIKit.connectSDK(
             appID,
             appSign,
             { userID: userID, userName: userName }).then(() => {
-                ZegoUIKit.joinRoom(roomID)
+                grantPermissions(() => {
+                    ZegoUIKit.joinRoom(roomID);
+                });
             });
 
         return () => {
@@ -69,8 +113,9 @@ export default function ZegoUIKitPrebuiltCall(props) {
                     smallViewDefaultPosition: smallViewDefaultPosition,
                     isSmallViewDraggable: isSmallViewDraggable,
                 }}
-                foregroundBuilder={foregroundBuilder ? foregroundBuilder :
+                foregroundBuilder={foregroundBuilder ? foregroundBuilder : ({ userInfo }) =>
                     <AudioVideoForegroundView
+                        userInfo={userInfo}
                         showMicrophoneStateOnView={showMicrophoneStateOnView}
                         showCameraStateOnView={showCameraStateOnView}
                         showUserNameOnView={showUserNameOnView}

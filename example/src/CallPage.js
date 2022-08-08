@@ -22,6 +22,7 @@ export default function CallPage(props) {
                 userID={userID}
                 userName={userName}
                 roomID='rn12345678'
+                
                 config={{
                     onPostQuit: () => {props.navigation.navigate('HomePage')}
                 }}

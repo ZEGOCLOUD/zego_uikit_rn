@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Image, View } from "react-native";
 import ZegoUIKitInternal from "../../core/internal/ZegoUIKitInternal";
 
-export default function ZegoMicStatusIcon(props) {
+export default function ZegoMicrophoneStatusIcon(props) {
     const { userID, iconMicrophoneOn, iconMicrophoneOff } = props;
     const [isOn, setIsOn] = useState(true);
     const getImageSourceByPath = () => {

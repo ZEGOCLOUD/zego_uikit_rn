@@ -479,7 +479,7 @@ export default {
     useFrontFacingCamera(isFrontFacing) {
         return new Promise((resolve, reject) => {
             if (!_isRoomConnected) {
-                zlogerror('You are not connected to any room.')
+                zlogerror('You are not connect to any room.')
                 reject();
             } else {
                 ZegoExpressEngine.instance().useFrontCamera(isFrontFacing, 0);
@@ -513,7 +513,7 @@ export default {
         // TODO
         return new Promise((resolve, reject) => {
             if (!_isRoomConnected) {
-                zlogerror('You are not connected to any room.')
+                zlogerror('You are not connect to any room.')
                 reject();
             } else {
                 ZegoExpressEngine.instance().muteSpeaker(!enable);
