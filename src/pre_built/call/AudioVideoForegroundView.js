@@ -8,13 +8,16 @@ export default function AudioVideoForegroundView(props) {
     const { userID = '', userName = '' } = userInfo;
 
     return (
-        <View style={styles.defaultMaskContainer}>
+        <View style={styles.foregroundViewContainer}>
             <View style={styles.bottomContainer}>
-                <View style={styles.defaultMaskNameLabelContainer}>
-                    <Text style={styles.defaultMaskNameLabel}>{userName}</Text>
-                </View>
-                <ZegoCameraStatusIcon userID={userID} style={styles.deviceIcon} />
-                <ZegoMicrophoneStatusIcon userID={userID} style={styles.deviceIcon} />
+                {showUserNameOnView ?
+                    <View style={styles.nameLabelContainer}>
+                        <Text style={styles.nameLabel}>{userName}</Text>
+                    </View> :
+                    <View />
+                }
+                {showCameraStateOnView ? <ZegoCameraStatusIcon userID={userID} style={styles.deviceIcon} /> : <View />}
+                {showMicrophoneStateOnView ? <ZegoMicrophoneStatusIcon userID={userID} style={styles.deviceIcon} /> : <View />}
             </View>
         </View>
     );
@@ -22,7 +25,7 @@ export default function AudioVideoForegroundView(props) {
 
 
 const styles = StyleSheet.create({
-    defaultMaskContainer: {
+    foregroundViewContainer: {
         flex: 1,
         position: 'absolute',
         width: '100%',
@@ -45,10 +48,10 @@ const styles = StyleSheet.create({
         bottom: 5,
         right: 5
     },
-    defaultMaskNameLabelContainer: {
+    nameLabelContainer: {
         alignSelf: 'center',
     },
-    defaultMaskNameLabel: {
+    nameLabel: {
         color: '#FFFFFF',
         fontSize: 12,
     },

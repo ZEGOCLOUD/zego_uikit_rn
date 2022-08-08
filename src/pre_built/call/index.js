@@ -21,7 +21,7 @@ export default function ZegoUIKitPrebuiltCall(props) {
     } = props;
     const {
         showMicrophoneStateOnView = true,
-        showCameraStateOnView = true,
+        showCameraStateOnView = false,
         showUserNameOnView = true,
         soundWaveType = 1, // enum {none, aroundAvatar}
         showSelfViewWithVideoOnly = true,
