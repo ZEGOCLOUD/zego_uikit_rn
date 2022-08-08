@@ -60,9 +60,8 @@ function _setLocalUserInfo(userInfo) {
     _localCoreUser.userName = userInfo.userName;
     _localCoreUser.profileUrl = userInfo.profileUrl;
     _localCoreUser.extendInfo = userInfo.extendInfo;
-    if (!(userInfo.userID in _coreUserMap)) {
-        _coreUserMap[userInfo.userID] = _localCoreUser;
-    }
+    
+    _coreUserMap[userInfo.userID] = _localCoreUser;
 }
 
 function _onRoomUserUpdate(roomID, updateType, userList) {
@@ -310,6 +309,9 @@ function _getStreamIDByUserID(userID) {
 function _tryStartPublishStream() {
     if (_localCoreUser.isMicDeviceOn || _localCoreUser.isCameraDeviceOn) {
         zloginfo('_tryStartPublishStream', _localCoreUser.isMicDeviceOn, _localCoreUser.isCameraDeviceOn, _localCoreUser.streamID);
+        if (!_localCoreUser.streamID) {
+            return;
+        }
         ZegoExpressEngine.instance().startPublishingStream(_localCoreUser.streamID);
         zloginfo('ZegoExpressEngine startPreview:', _localCoreUser);
         if (_localCoreUser.viewID > 0) {
@@ -452,6 +454,7 @@ export default {
                 }
 
                 Object.keys(_onSDKConnectedCallbackMap).forEach(callbackID => {
+                    // TODO cause  WARN  Possible Unhandled Promise Rejection (id: 56)
                     _onSDKConnectedCallbackMap[callbackID]();
                 });
                 resolve();
@@ -509,7 +512,7 @@ export default {
         else if (userID in _coreUserMap) {
             return _coreUserMap[userID].isCameraDeviceOn;
         } else {
-            zlogwarning('Can not check camera device is on for user[', userID, '], because no record!');
+            zlogwarning('No record for user: ', userID, '. Can not check camera device is on.')
             return true;
         }
     },

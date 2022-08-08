@@ -28,7 +28,7 @@ export default function AudioFrame(props) {
             <ImageBackground
                 source={audioViewBackgroudImage
                     ? { uri: audioViewBackgroudImage }
-                    : ''} resizeMode="cover"
+                    : null} resizeMode="cover"
                 style={styles.imgBackground}
             >
                 <View style={styles.avatar}>

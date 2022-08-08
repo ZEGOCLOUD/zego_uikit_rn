@@ -14,7 +14,7 @@ export default function ZegoToggleMicrophoneButton(props) {
         ZegoUIKitInternal.turnMicDeviceOn(userID, !isCurrentOn);
     }
     ZegoUIKitInternal.onSDKConnected('ZegoToggleMicButton', () => {
-        ZegoUIKitInternal.turnMicDeviceOn(isOn);
+        ZegoUIKitInternal.turnMicDeviceOn(userID, isOn);
         setIsCurrentOn(ZegoUIKitInternal.isMicDeviceOn(userID))
     });
     ZegoUIKitInternal.onMicDeviceOn('ZegoToggleMicButton', (id, on) => {
