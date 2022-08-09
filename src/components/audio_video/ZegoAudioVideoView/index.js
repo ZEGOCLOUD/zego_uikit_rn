@@ -3,7 +3,7 @@ import { View, StyleSheet, Text } from "react-native";
 import Delegate from "react-delegate-component";
 import AudioFrame from "./AudioFrame";
 import VideoFrame from "./VideoFrame";
-import ZegoUIKitInternal from "../../../core/internal/ZegoUIKitInternal";
+import ZegoUIKitInternal from "../../internal/ZegoUIKitInternal";
 
 
 function MaskViewDefault(props) {

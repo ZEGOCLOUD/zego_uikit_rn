@@ -60,7 +60,7 @@ function _setLocalUserInfo(userInfo) {
     _localCoreUser.userName = userInfo.userName;
     _localCoreUser.profileUrl = userInfo.profileUrl;
     _localCoreUser.extendInfo = userInfo.extendInfo;
-    
+
     _coreUserMap[userInfo.userID] = _localCoreUser;
 }
 
@@ -540,26 +540,21 @@ export default {
     turnMicDeviceOn(userID, on) {
         return new Promise((resolve, reject) => {
             if (_isLocalUser(userID)) {
-                if (!_isRoomConnected) {
-                    zlogerror('You are not connected to any room.')
-                    reject();
+                zloginfo('turnMicDeviceOn: ', userID, on);
+                ZegoExpressEngine.instance().muteMicrophone(!on);
+
+                _onRemoteMicStateUpdate(_getPublishStreamID(), on ? 0 : 10); // 0 for open, 10 for mute
+
+                _localCoreUser.isMicDeviceOn = on;
+                _coreUserMap[_localCoreUser.userID].isMicDeviceOn = on;
+                _notifyUserInfoUpdate(_localCoreUser);
+
+                if (on) {
+                    _tryStartPublishStream();
                 } else {
-                    zloginfo('turnMicDeviceOn: ', userID, on);
-                    ZegoExpressEngine.instance().muteMicrophone(!on);
-
-                    _onRemoteMicStateUpdate(_getPublishStreamID(), on ? 0 : 10); // 0 for open, 10 for mute
-
-                    _localCoreUser.isMicDeviceOn = on;
-                    _coreUserMap[_localCoreUser.userID].isMicDeviceOn = on;
-                    _notifyUserInfoUpdate(_localCoreUser);
-
-                    if (on) {
-                        _tryStartPublishStream();
-                    } else {
-                        _tryStopPublishStream();
-                    }
-                    resolve();
+                    _tryStopPublishStream();
                 }
+                resolve();
             } else {
                 // TODO
                 zlogwarning("Can not turn on other's mic device on this version");
@@ -570,27 +565,22 @@ export default {
     turnCameraDeviceOn(userID, on) {
         return new Promise((resolve, reject) => {
             if (_isLocalUser(userID)) {
-                if (!_isRoomConnected) {
-                    zlogerror('You are not connected to any room.')
-                    reject();
+                // Default to Main Channel
+                zloginfo('turnCameraDeviceOn: ', userID, on);
+                ZegoExpressEngine.instance().enableCamera(on, 0);
+
+                _onRemoteCameraStateUpdate(_getPublishStreamID(), on ? 0 : 10); // 0 for open, 10 for mute
+
+                _localCoreUser.isCameraDeviceOn = on;
+                _coreUserMap[_localCoreUser.userID].isCameraDeviceOn = on;
+                _notifyUserInfoUpdate(_localCoreUser);
+
+                if (on) {
+                    _tryStartPublishStream();
                 } else {
-                    // Default to Main Channel
-                    zloginfo('turnCameraDeviceOn: ', userID, on);
-                    ZegoExpressEngine.instance().enableCamera(on, 0);
-
-                    _onRemoteCameraStateUpdate(_getPublishStreamID(), on ? 0 : 10); // 0 for open, 10 for mute
-
-                    _localCoreUser.isCameraDeviceOn = on;
-                    _coreUserMap[_localCoreUser.userID].isCameraDeviceOn = on;
-                    _notifyUserInfoUpdate(_localCoreUser);
-
-                    if (on) {
-                        _tryStartPublishStream();
-                    } else {
-                        _tryStopPublishStream();
-                    }
-                    resolve();
+                    _tryStopPublishStream();
                 }
+                resolve();
             } else {
                 // TODO
                 zlogwarning("Can not turn on other's camera device on this version");

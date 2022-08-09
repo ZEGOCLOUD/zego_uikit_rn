@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Image, TouchableOpacity, View } from "react-native";
-import ZegoUIKitInternal from "../../core/internal/ZegoUIKitInternal";
+import ZegoUIKitInternal from "../internal/ZegoUIKitInternal";
 
 export default function ZegoSwitchAudioOutputButton(props) {
     // ZegoAudioRouteSpeaker=(0) ZegoAudioRouteHeadphone=(1) ZegoAudioRouteBluetooth=(2) ZegoAudioRouteReceiver=(3) ZegoAudioRouteExternalUSB=(4) ZegoAudioRouteAirPlay=(5)
@@ -10,11 +10,11 @@ export default function ZegoSwitchAudioOutputButton(props) {
     const getImageSourceByPath = () => {
         const path = "";
         if (currentDevice == 0) {
-            path = iconSpeaker ? iconSpeaker : require("../../core/resources/white_button_speaker_on.png");
+            path = iconSpeaker ? iconSpeaker : require("../internal/resources/white_button_speaker_on.png");
         } else if (currentDevice == 2) {
-            path = iconBluetooth ? iconBluetooth : require("../../core/resources/white_button_bluetooth_off.png");
+            path = iconBluetooth ? iconBluetooth : require("../internal/resources/white_button_bluetooth_off.png");
         } else {
-            path = iconEarpiece ? iconEarpiece : require("../../core/resources/white_button_speaker_off.png");
+            path = iconEarpiece ? iconEarpiece : require("../internal/resources/white_button_speaker_off.png");
         }
         return path;
     }

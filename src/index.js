@@ -1,4 +1,4 @@
-import ZegoUIKitInternal from './core/internal/ZegoUIKitInternal'
+import ZegoUIKitInternal from './components/internal/ZegoUIKitInternal'
 import ZegoAudioVideoView from './components/audio_video/ZegoAudioVideoView'
 import ZegoCameraStatusIcon from './components/audio_video/ZegoCameraStatusIcon'
 import ZegoMicrophoneStatusIcon from './components/audio_video/ZegoMicophoneStatusIcon'
@@ -6,9 +6,9 @@ import ZegoSwitchCameraFacingButton from './components/audio_video/ZegoSwitchCam
 import ZegoToggleMicrophoneButton from './components/audio_video/ZegoToggleMicrophoneButton'
 import ZegoToggleCameraButton from './components/audio_video/ZegoToggleCameraButton'
 import ZegoSwitchAudioOutputButton from './components/audio_video/ZegoSwitchAudioOutputButton'
-import ZegoAudioVideoContainer from './components/layout/ZegoAudioVideoContainer'
+import ZegoAudioVideoContainer from './components/audio_video_container/ZegoAudioVideoContainer'
 import ZegoQuitButton from './components/audio_video/ZegoQuitButton'
-import ZegoUIKitPrebuiltCall from './pre_built/call'
+import ZegoUIKitPrebuiltCall from './prebuilts/call'
 
 export default {
     connectSDK: ZegoUIKitInternal.connectSDK,

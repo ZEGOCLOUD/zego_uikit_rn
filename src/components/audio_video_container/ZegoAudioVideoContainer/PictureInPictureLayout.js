@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import ZegoUIKitInternal from "../../../core/internal/ZegoUIKitInternal";
+import ZegoUIKitInternal from "../../internal/ZegoUIKitInternal";
 import ZegoAudioVideoView from "../../audio_video/ZegoAudioVideoView";
 import { StyleSheet, View } from 'react-native'
 

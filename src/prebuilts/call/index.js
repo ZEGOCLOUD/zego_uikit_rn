@@ -5,8 +5,8 @@ import { StyleSheet, View, Text, Button } from 'react-native';
 import ZegoQuitButton from '../../components/audio_video/ZegoQuitButton';
 import ZegoToggleCameraButton from '../../components/audio_video/ZegoToggleCameraButton';
 import ZegoToggleMicrophoneButton from '../../components/audio_video/ZegoToggleMicrophoneButton';
-import ZegoAudioVideoContainer from '../../components/layout/ZegoAudioVideoContainer';
-import ZegoUIKit from '../../core/internal/ZegoUIKitInternal';
+import ZegoAudioVideoContainer from '../../components/audio_video_container/ZegoAudioVideoContainer';
+import ZegoUIKit from '../../components/internal/ZegoUIKitInternal';
 import AudioVideoForegroundView from './AudioVideoForegroundView';
 
 
