@@ -10,21 +10,27 @@ export default function ZegoMicrophoneStatusIcon(props) {
         const pathOff = iconMicrophoneOff ? iconMicrophoneOff : require("../internal/resources/white_icon_video_mic_off.png");
         return isOn ? pathOn : pathOff;
     }
-    ZegoUIKitInternal.onSDKConnected('ZegoMicStatusIcon', () => {
-        setIsOn(ZegoUIKitInternal.isMicDeviceOn(userID))
-    });
-    ZegoUIKitInternal.onMicDeviceOn('ZegoMicStatusIcon', (id, on) => {
-        if (userID === undefined || userID === '') { // local user
-            if (id == ZegoUIKitInternal.getLocalUserInfo().userID) {
+
+    useEffect(() => {
+        const callbackID = 'ZegoMicrophoneStatusIcon' + String(Math.floor(Math.random() * 10000));
+        ZegoUIKitInternal.onSDKConnected(callbackID, () => {
+            setIsOn(ZegoUIKitInternal.isMicDeviceOn(userID))
+        });
+        ZegoUIKitInternal.onMicDeviceOn(callbackID, (id, on) => {
+            if (userID === undefined || userID === '') { // local user
+                if (id == ZegoUIKitInternal.getLocalUserInfo().userID) {
+                    setIsOn(on);
+                }
+            }
+            else if (id == userID) {
                 setIsOn(on);
             }
+        });
+        return () => {
+            ZegoUIKitInternal.onSDKConnected(callbackID);
+            ZegoUIKitInternal.onMicDeviceOn(callbackID);
         }
-        else if (id == userID) {
-            setIsOn(on);
-        }
-    });
-
-    // TODO make style layout
+    }, []);
     return (<View>
         <Image source={getImageSourceByPath()} />
     </View>)

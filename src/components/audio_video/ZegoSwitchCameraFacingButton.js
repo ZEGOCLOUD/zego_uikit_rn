@@ -15,10 +15,8 @@ export default function ZegoSwitchCameraFacingButton(props) {
         setIsFront(!isFront);
     }
 
-    // TODO make style layout
     return (<View>
         <TouchableOpacity
-            // style={styles.micCon}
             onPress={onPress}>
             <Image source={getImageSourceByPath()} />
         </TouchableOpacity>

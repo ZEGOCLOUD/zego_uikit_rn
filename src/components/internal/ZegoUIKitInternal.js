@@ -260,7 +260,7 @@ function _registerEngineCallback() {
         'remoteSoundLevelUpdate',
         (soundLevels) => {
             // {streamID, soundLavel} value from 0.0 to 100.0
-            zloginfo('[remoteSoundLevelUpdate callback]', soundLevels);
+            // zloginfo('[remoteSoundLevelUpdate callback]', soundLevels);
             Object.keys(soundLevels).forEach(streamID => {
                 const userID = _getUserIDByStreamID(streamID);
                 if (userID in _coreUserMap) {
@@ -676,6 +676,9 @@ export default {
             profileUrl: _localCoreUser.profileUrl,
             extendInfo: _localCoreUser.extendInfo,
         };
+    },
+    getUser(userID) {
+        return _coreUserMap[userID];
     },
     onUserJoin(callbackID, callback) {
         if (typeof callback !== 'function') {

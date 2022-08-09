@@ -14,12 +14,10 @@ export default function ZegoToggleCameraButton(props) {
     const onPress = () => {
         ZegoUIKitInternal.turnCameraDeviceOn(userID, !isCurrentOn);
     }
-    ZegoUIKitInternal.onSDKConnected('ZegoToggleCameraButton', () => {
-        ZegoUIKitInternal.turnCameraDeviceOn(userID, isOn);
-        setIsCurrentOn(ZegoUIKitInternal.isCameraDeviceOn(userID))
-    });
+
     useEffect(() => {
-        ZegoUIKitInternal.onCameraDeviceOn('ZegoToggleCameraButton', (id, on) => {
+        const callbackID = 'ZegoToggleCameraButton' + String(Math.floor(Math.random() * 10000));
+        ZegoUIKitInternal.onCameraDeviceOn(callbackID, (id, on) => {
             if (userID === undefined || userID === '') { // local user
                 if (id == ZegoUIKitInternal.getLocalUserInfo().userID) {
                     setIsCurrentOn(on);
@@ -28,7 +26,15 @@ export default function ZegoToggleCameraButton(props) {
             else if (id == userID) {
                 setIsCurrentOn(on);
             }
-        })
+        });
+        ZegoUIKitInternal.onSDKConnected(callbackID, () => {
+            ZegoUIKitInternal.turnCameraDeviceOn(userID, isOn);
+            setIsCurrentOn(ZegoUIKitInternal.isCameraDeviceOn(userID))
+        });
+        return () => {
+            ZegoUIKitInternal.onCameraDeviceOn(callbackID);
+            ZegoUIKitInternal.onSDKConnected(callbackID);
+        }
     }, []);
 
     // TODO make style layout

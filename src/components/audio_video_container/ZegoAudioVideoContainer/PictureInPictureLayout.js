@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ZegoUIKitInternal from "../../internal/ZegoUIKitInternal";
 import ZegoAudioVideoView from "../../audio_video/ZegoAudioVideoView";
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, View, TouchableOpacity, Text } from 'react-native'
 
 export default function PictureInPictureLayout(props) {
     const { config = {}, foregroundBuilder } = props;
@@ -13,9 +13,11 @@ export default function PictureInPictureLayout(props) {
         showSelfViewWithVideoOnly = false,
         smallViewDefaultPosition = 0,
         isSmallViewDraggable = false,
+        switchLargeOrSmallViewByClick = true,
     } = config;
     const [localUserID, setLocalUserID] = useState('');
     const [remoteUserID, setRemoteUserID] = useState('');
+    const [showMeOnSmallView, setShowMeOnSmallView] = useState(true);
 
     ZegoUIKitInternal.onSDKConnected('PictureInPictureLayout', () => {
         setLocalUserID(ZegoUIKitInternal.getLocalUserInfo().userID);
@@ -65,32 +67,71 @@ export default function PictureInPictureLayout(props) {
             return styles.smallViewPostTopLeft;
         }
     }
-    return (<View style={styles.container}>
-        <View style={[styles.smallView, getSmallViewPostStyle()]}>
-            {localUserID ?
-                <ZegoAudioVideoView
-                    userID={localUserID}
-                    audioViewBackgroudColor={audioViewBackgroudColor}
-                    audioViewBackgroudImage={audioViewBackgroudImage}
-                    showSoundWave={showSoundWave}
-                    videoFillMode={videoFillMode}
-                    foregroundBuilder={foregroundBuilder}
-                /> :
-                <View />
-            }
+    const getSmallViewBorderStyle = () => {
+        if (showMeOnSmallView) {
+            return localUserID ? styles.smallViewBorder : ''
+        } else {
+            return remoteUserID ? styles.smallViewBorder : ''
+        }
+    }
+    const switchLargeOrSmallView = () => {
+        if (switchLargeOrSmallViewByClick) {
+            setShowMeOnSmallView(!showMeOnSmallView);
+        }
+    }
 
+    return (<View style={styles.container}>
+        <View style={[styles.smallView, getSmallViewPostStyle(), getSmallViewBorderStyle()]}>
+            <TouchableOpacity style={styles.smallViewTouchableOpacity} onPress={switchLargeOrSmallView} />
+            {showMeOnSmallView ?
+                (localUserID ?
+                    <ZegoAudioVideoView
+                        key={localUserID}
+                        userID={localUserID}
+                        audioViewBackgroudColor={audioViewBackgroudColor}
+                        audioViewBackgroudImage={audioViewBackgroudImage}
+                        showSoundWave={showSoundWave}
+                        videoFillMode={videoFillMode}
+                        foregroundBuilder={foregroundBuilder}
+                    /> :
+                    <View />) :
+                (remoteUserID ?
+                    <ZegoAudioVideoView
+                        key={remoteUserID}
+                        userID={remoteUserID}
+                        audioViewBackgroudColor={audioViewBackgroudColor}
+                        audioViewBackgroudImage={audioViewBackgroudImage}
+                        showSoundWave={showSoundWave}
+                        videoFillMode={videoFillMode}
+                        foregroundBuilder={foregroundBuilder}
+                    /> :
+                    <View />)
+            }
         </View>
         <View style={styles.bigView}>
-            {remoteUserID ?
-                <ZegoAudioVideoView
-                    userID={remoteUserID}
-                    audioViewBackgroudColor={audioViewBackgroudColor}
-                    audioViewBackgroudImage={audioViewBackgroudImage}
-                    showSoundWave={showSoundWave}
-                    videoFillMode={videoFillMode}
-                    foregroundBuilder={foregroundBuilder}
-                /> :
-                <View />
+            {showMeOnSmallView ?
+                (remoteUserID ?
+                    <ZegoAudioVideoView
+                        key={remoteUserID}
+                        userID={remoteUserID}
+                        audioViewBackgroudColor={audioViewBackgroudColor}
+                        audioViewBackgroudImage={audioViewBackgroudImage}
+                        showSoundWave={showSoundWave}
+                        videoFillMode={videoFillMode}
+                        foregroundBuilder={foregroundBuilder}
+                    /> :
+                    <View />) :
+                (localUserID ?
+                    <ZegoAudioVideoView
+                        key={localUserID}
+                        userID={localUserID}
+                        audioViewBackgroudColor={audioViewBackgroudColor}
+                        audioViewBackgroudImage={audioViewBackgroudImage}
+                        showSoundWave={showSoundWave}
+                        videoFillMode={videoFillMode}
+                        foregroundBuilder={foregroundBuilder}
+                    /> :
+                    <View />)
             }
         </View>
     </View>)
@@ -118,9 +159,11 @@ const styles = StyleSheet.create({
         right: 12,
         zIndex: 2,
         borderRadius: 10,
+        overflow: 'hidden'
+    },
+    smallViewBorder: {
         borderWidth: 0.5,
         borderColor: '#A4A4A4',
-        overflow: 'hidden'
     },
     smallViewPostTopLeft: {
         top: 70,
@@ -138,4 +181,9 @@ const styles = StyleSheet.create({
         bottom: 70,
         right: 12,
     },
+    smallViewTouchableOpacity: {
+        width: '100%',
+        height: '100%',
+        zIndex: 3,
+    }
 })

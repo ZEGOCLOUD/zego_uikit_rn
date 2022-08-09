@@ -13,22 +13,29 @@ export default function ZegoToggleMicrophoneButton(props) {
     const onPress = () => {
         ZegoUIKitInternal.turnMicDeviceOn(userID, !isCurrentOn);
     }
-    ZegoUIKitInternal.onSDKConnected('ZegoToggleMicButton', () => {
-        ZegoUIKitInternal.turnMicDeviceOn(userID, isOn);
-        setIsCurrentOn(ZegoUIKitInternal.isMicDeviceOn(userID))
-    });
-    ZegoUIKitInternal.onMicDeviceOn('ZegoToggleMicButton', (id, on) => {
-        if (userID === undefined || userID === '') { // local user
-            if (id == ZegoUIKitInternal.getLocalUserInfo().userID) {
+    
+
+    useEffect(() => {
+        const callbackID = 'ZegoToggleMicrophoneButton' + String(Math.floor(Math.random() * 10000));
+        ZegoUIKitInternal.onSDKConnected(callbackID, () => {
+            ZegoUIKitInternal.turnMicDeviceOn(userID, isOn);
+            setIsCurrentOn(ZegoUIKitInternal.isMicDeviceOn(userID))
+        });
+        ZegoUIKitInternal.onMicDeviceOn(callbackID, (id, on) => {
+            if (userID === undefined || userID === '') { // local user
+                if (id == ZegoUIKitInternal.getLocalUserInfo().userID) {
+                    setIsCurrentOn(on);
+                }
+            }
+            else if (id == userID) {
                 setIsCurrentOn(on);
             }
+        });
+        return () => {
+            ZegoUIKitInternal.onSDKConnected(callbackID);
+            ZegoUIKitInternal.onMicDeviceOn(callbackID);
         }
-        else if (id == userID) {
-            setIsCurrentOn(on);
-        }
-    });
-
-    // TODO make style layout
+    }, [])
     return (<View>
         <TouchableOpacity
             // style={styles.micCon}

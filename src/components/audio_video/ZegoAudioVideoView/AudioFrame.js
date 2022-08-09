@@ -1,5 +1,5 @@
 import { View, StyleSheet, Text, ImageBackground } from "react-native";
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import ZegoUIKitInternal from "../../internal/ZegoUIKitInternal";
 
 export default function AudioFrame(props) {
@@ -26,11 +26,17 @@ export default function AudioFrame(props) {
         return shotName;
     }
 
-    ZegoUIKitInternal.onSoundLevelUpdate('AudioFrame' + userInfo.userID, (userID, soundLevel) => {
-        if (userInfo.userID == userID) {
-            setHasSound(soundLevel > 5);
+
+    useEffect(() => {
+        ZegoUIKitInternal.onSoundLevelUpdate('AudioFrame' + userInfo.userID, (userID, soundLevel) => {
+            if (userInfo.userID == userID) {
+                setHasSound(soundLevel > 5);
+            }
+        });
+        return () => {
+            ZegoUIKitInternal.onSoundLevelUpdate('AudioFrame' + userInfo.userID);
         }
-    });
+    }, [])
 
     return (
         <View style={cstyle(audioViewBackgroudColor ? audioViewBackgroudColor : '#4A4B4D').container}>

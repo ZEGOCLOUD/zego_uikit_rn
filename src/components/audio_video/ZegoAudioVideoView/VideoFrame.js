@@ -8,22 +8,26 @@ export default function VideoFrame(props) {
     const viewRef = React.createRef();
 
     const updateRenderingProperty = () => {
-
         const viewID = findNodeHandle(viewRef.current);
         ZegoUIKitInternal.updateRenderingProperty(userID, viewID, fillMode);
     }
-    ZegoUIKitInternal.onSDKConnected('VideoFrame' + userID, () => {
-        updateRenderingProperty();
-    });
-    ZegoUIKitInternal.onUserJoin('VideoFrame' + userID, (userInfoList) => {
-        userInfoList.forEach(user => {
-            if (user.userID == userID) {
-                updateRenderingProperty()
-            }
-        })
-    });
     useEffect(() => {
         updateRenderingProperty();
+
+        ZegoUIKitInternal.onSDKConnected('VideoFrame' + userID, () => {
+            updateRenderingProperty();
+        });
+        ZegoUIKitInternal.onUserJoin('VideoFrame' + userID, (userInfoList) => {
+            userInfoList.forEach(user => {
+                if (user.userID == userID) {
+                    updateRenderingProperty()
+                }
+            })
+        });
+        return () => {
+            ZegoUIKitInternal.onSDKConnected('VideoFrame' + userID);
+            ZegoUIKitInternal.onUserJoin('VideoFrame' + userID);
+        }
     }, []);
 
     return (
