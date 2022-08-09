@@ -260,8 +260,7 @@ function _registerEngineCallback() {
         'remoteSoundLevelUpdate',
         (soundLevels) => {
             // {streamID, soundLavel} value from 0.0 to 100.0
-            // zloginfo('[remoteSoundLevelUpdate callback]', streamID, state);
-            _onSoundLevelUpdate(soundLevels);
+            zloginfo('[remoteSoundLevelUpdate callback]', soundLevels);
             Object.keys(soundLevels).forEach(streamID => {
                 const userID = _getUserIDByStreamID(streamID);
                 if (userID in _coreUserMap) {
@@ -277,6 +276,7 @@ function _registerEngineCallback() {
             _localCoreUser.soundLevel = soundLevel;
             _coreUserMap[_localCoreUser.userID].soundLevel = soundLevel;
             _notifySoundLevelUpdate(_localCoreUser.userID, soundLevel);
+            // zloginfo('capturedSoundLevelUpdate', soundLevel)
         },
     );
     // https://doc-en-api.zego.im/ReactNative/enums/_zegoexpressdefines_.zegoroomstatechangedreason.html
@@ -625,6 +625,7 @@ export default {
             const config = { isUserStatusNotify: true }
             ZegoExpressEngine.instance().loginRoom(roomID, user, config).then(() => {
                 zloginfo('Join room success.', user)
+                ZegoExpressEngine.instance().startSoundLevelMonitor();
                 _currentRoomID = roomID;
 
                 _localCoreUser.streamID = _getPublishStreamID();
@@ -643,6 +644,7 @@ export default {
                 resolve();
             } else {
                 ZegoExpressEngine.instance().logoutRoom(_currentRoomID).then(() => {
+                    ZegoExpressEngine.instance().stopSoundLevelMonitor();
                     _currentRoomID = '';
                     resolve();
                 }).catch((error) => {

@@ -1,5 +1,6 @@
 import { View, StyleSheet, Text, ImageBackground } from "react-native";
-import React, { useEffect } from 'react'
+import React, { useState } from 'react'
+import ZegoUIKitInternal from "../../internal/ZegoUIKitInternal";
 
 export default function AudioFrame(props) {
     const {
@@ -8,6 +9,8 @@ export default function AudioFrame(props) {
         audioViewBackgroudColor,
         audioViewBackgroudImage
     } = props;
+
+    const [hasSound, setHasSound] = useState(false);
 
     const getShotName = (name) => {
         if (!name) {
@@ -23,6 +26,12 @@ export default function AudioFrame(props) {
         return shotName;
     }
 
+    ZegoUIKitInternal.onSoundLevelUpdate('AudioFrame' + userInfo.userID, (userID, soundLevel) => {
+        if (userInfo.userID == userID) {
+            setHasSound(soundLevel > 5);
+        }
+    });
+
     return (
         <View style={cstyle(audioViewBackgroudColor ? audioViewBackgroudColor : '#4A4B4D').container}>
             <ImageBackground
@@ -31,6 +40,13 @@ export default function AudioFrame(props) {
                     : null} resizeMode="cover"
                 style={styles.imgBackground}
             >
+                {showSoundWave && hasSound ?
+                    <View style={waveStyle(164, '#515155').circleWave}>
+                        <View style={waveStyle(153, '#636266').subCircleWave} />
+                        <View style={waveStyle(141, '#6B6A71').subCircleWave} />
+                    </View> :
+                    <View />
+                }
                 <View style={styles.avatar}>
                     <Text style={styles.nameLabel}>{getShotName(userInfo.userName)}</Text>
                 </View>
@@ -49,6 +65,32 @@ const cstyle = (bgColor) => StyleSheet.create({
         backgroundColor: bgColor,
     },
 })
+const waveStyle = (w, color) => StyleSheet.create({
+    circleWave: {
+        flex: 1,
+        position: 'absolute',
+        alignSelf: 'center',
+        width: (w / 375 * 100).toString() + '%',
+        aspectRatio: 1,
+        borderRadius: 1000,
+        backgroundColor: color,
+        zIndex: 0,
+        justifyContent: 'center',
+        alignContent: 'center'
+
+    },
+    subCircleWave: {
+        flex: 1,
+        position: 'absolute',
+        alignSelf: 'center',
+        width: (w / 164 * 100).toString() + '%',
+        aspectRatio: 1,
+        borderRadius: 1000,
+        backgroundColor: color,
+        zIndex: 0,
+
+    },
+});
 const styles = StyleSheet.create({
     imgBackground: {
         flex: 1,
@@ -67,7 +109,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         alignItems: 'center',
         justifyContent: 'center',
-        zIndex: 1,
+        zIndex: 2,
     },
     nameLabel: {
         flex: 1,

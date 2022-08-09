@@ -12,10 +12,10 @@ export default function VideoFrame(props) {
         const viewID = findNodeHandle(viewRef.current);
         ZegoUIKitInternal.updateRenderingProperty(userID, viewID, fillMode);
     }
-    ZegoUIKitInternal.onSDKConnected('VideoContainer' + userID, () => {
+    ZegoUIKitInternal.onSDKConnected('VideoFrame' + userID, () => {
         updateRenderingProperty();
     });
-    ZegoUIKitInternal.onUserJoin('VideoContainer' + userID, (userInfoList) => {
+    ZegoUIKitInternal.onUserJoin('VideoFrame' + userID, (userInfoList) => {
         userInfoList.forEach(user => {
             if (user.userID == userID) {
                 updateRenderingProperty()
