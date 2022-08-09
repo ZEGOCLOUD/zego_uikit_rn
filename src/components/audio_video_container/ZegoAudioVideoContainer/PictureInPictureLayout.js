@@ -118,6 +118,8 @@ const styles = StyleSheet.create({
         right: 12,
         zIndex: 2,
         borderRadius: 10,
+        borderWidth: 0.5,
+        borderColor: '#A4A4A4',
         overflow: 'hidden'
     },
     smallViewPostTopLeft: {
