@@ -146,7 +146,7 @@ function _onRoomStreamUpdate(roomID, updateType, streamList) {
 function _onRemoteCameraStateUpdate(streamID, state) {
     const userID = _getUserIDByStreamID(streamID);
     if (userID in _coreUserMap) {
-        const isOn = state == 10; // 10 for Open
+        const isOn = state == 0; // 0 for Open
         _coreUserMap[userID].isCameraDeviceOn = isOn;
         _notifyUserInfoUpdate(_coreUserMap[userID]);
 
@@ -166,7 +166,7 @@ function _onRemoteCameraStateUpdate(streamID, state) {
 function _onRemoteMicStateUpdate(streamID, state) {
     const userID = _getUserIDByStreamID(streamID);
     if (userID in _coreUserMap) {
-        const isOn = state == 10; // 10 for Open
+        const isOn = state == 0; // 0 for Open
         _coreUserMap[userID].isMicDeviceOn = isOn;
         _notifyUserInfoUpdate(_coreUserMap[userID]);
 
@@ -248,6 +248,12 @@ function _registerEngineCallback() {
         (streamID, state) => {
             zloginfo('[remoteMicStateUpdate callback]', streamID, state);
             _onRemoteMicStateUpdate(streamID, state);
+        },
+    );
+    ZegoExpressEngine.instance().on(
+        'playerStateUpdate',
+        (streamID, state, errorCode, extendedData) => {
+            zloginfo('[playerStateUpdate callback]', streamID, state, errorCode, extendedData);
         },
     );
     ZegoExpressEngine.instance().on(
@@ -541,7 +547,7 @@ export default {
                     zloginfo('turnMicDeviceOn: ', userID, on);
                     ZegoExpressEngine.instance().muteMicrophone(!on);
 
-                    _onRemoteMicStateUpdate(_getPublishStreamID(), on ? 10 : 1); // 10 for open, 1 for disable
+                    _onRemoteMicStateUpdate(_getPublishStreamID(), on ? 0 : 10); // 0 for open, 10 for mute
 
                     _localCoreUser.isMicDeviceOn = on;
                     _coreUserMap[_localCoreUser.userID].isMicDeviceOn = on;
@@ -572,7 +578,7 @@ export default {
                     zloginfo('turnCameraDeviceOn: ', userID, on);
                     ZegoExpressEngine.instance().enableCamera(on, 0);
 
-                    _onRemoteCameraStateUpdate(_getPublishStreamID(), on ? 10 : 1); // 10 for open, 1 for disable
+                    _onRemoteCameraStateUpdate(_getPublishStreamID(), on ? 0 : 10); // 0 for open, 10 for mute
 
                     _localCoreUser.isCameraDeviceOn = on;
                     _coreUserMap[_localCoreUser.userID].isCameraDeviceOn = on;

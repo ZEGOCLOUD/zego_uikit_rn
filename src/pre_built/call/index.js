@@ -43,7 +43,7 @@ export default function ZegoUIKitPrebuiltCall(props) {
         foregroundBuilder,
     } = config;
 
-    grantPermissions = async (callback) => {
+    const grantPermissions = async (callback) => {
         // Android: Dynamically obtaining device permissions
         if (Platform.OS === 'android') {
             // Check if permission granted
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
         flex: 1,
         position: 'absolute',
         flexDirection: 'row',
-        justifyContent: 'center',
+        justifyContent: 'space-around',
         alignItems: 'flex-end',
         marginBottom: 50,
         width: '100%',
