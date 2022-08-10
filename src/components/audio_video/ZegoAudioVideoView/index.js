@@ -25,7 +25,7 @@ export default function ZegoVideoView(props) {
         audioViewBackgroudColor,
         audioViewBackgroudImage,
         showSoundWave,
-        videoFillMode,
+        useVideoViewAspectFill,
         foregroundBuilder
     } = props;
 
@@ -67,7 +67,7 @@ export default function ZegoVideoView(props) {
                     style={styles.videoContainer}
                     userID={currentUserID}
                     roomID={roomID}
-                    fillMode={videoFillMode}
+                    fillMode={useVideoViewAspectFill ? 1 : 0} // 1:AspectFill, 0:AspectFit
                 /> :
                 <AudioFrame
                     style={styles.audioContainer}

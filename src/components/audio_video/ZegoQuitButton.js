@@ -3,21 +3,21 @@ import { Image, TouchableOpacity, View } from "react-native";
 import ZegoUIKitInternal from "../internal/ZegoUIKitInternal";
 
 export default function ZegoQuitButton(props) {
-    const { iconQuit, onPreQuit, onPostQuit } = props;
+    const { iconQuit, onLeaveConfirming, onPressed } = props;
     const onPress = () => {
-        if (onPreQuit instanceof Promise) {
-            onPreQuit().then((accept) => {
+        if (onLeaveConfirming instanceof Promise) {
+            onLeaveConfirming().then((accept) => {
                 if (accept) {
                     ZegoUIKitInternal.leaveRoom();
-                    if (typeof onPostQuit == 'function') {
-                        onPostQuit();
+                    if (typeof onPressed == 'function') {
+                        onPressed();
                     }
                 }
             });
         } else {
             ZegoUIKitInternal.leaveRoom();
-            if (typeof onPostQuit == 'function') {
-                onPostQuit();
+            if (typeof onPressed == 'function') {
+                onPressed();
             }
         }
     }

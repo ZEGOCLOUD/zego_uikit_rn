@@ -24,7 +24,7 @@ export default function CallPage(props) {
                 roomID='rn12345678'
                 
                 config={{
-                    onPostQuit: () => {props.navigation.navigate('HomePage')}
+                    onHangUp: () => {props.navigation.navigate('HomePage')}
                 }}
             />
         </View>

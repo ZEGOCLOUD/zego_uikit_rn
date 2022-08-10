@@ -3,54 +3,74 @@ import ZegoUIKitInternal from "../../internal/ZegoUIKitInternal";
 import ZegoAudioVideoView from "../../audio_video/ZegoAudioVideoView";
 import { StyleSheet, View, TouchableOpacity, Text } from 'react-native'
 
+// enum ZegoViewPostion {
+//     topLeft = 0,
+//     topRight = 1,
+//     bottomLeft = 2,
+//     bottomRight = 3
+//     }
 export default function PictureInPictureLayout(props) {
-    const { config = {}, foregroundBuilder } = props;
+    const { config = {}, foregroundBuilder, audioVideoConfig = {} } = props;
     const {
-        audioViewBackgroudColor = '',
-        audioViewBackgroudImage = '',
-        showSoundWave = true,
-        videoFillMode = 1,
-        showSelfViewWithVideoOnly = false,
-        smallViewDefaultPosition = 0,
-        isSmallViewDraggable = false,
+        isSmallViewDraggable = false, // TODO
+        showMyViewWithVideoOnly = false,
+        smallViewBackgroundColor = '',
+        largeViewBackgroundColor = '',
+        smallViewBackgroundImage = '',
+        largeViewBackgroundImage = '',
+        smallViewPostion = 1,
         switchLargeOrSmallViewByClick = true,
     } = config;
+    const {
+        useVideoViewAspectFill = false,
+        showSoundWaveOnAudioView = true,
+    } = audioVideoConfig;
+
     const [localUserID, setLocalUserID] = useState('');
     const [remoteUserID, setRemoteUserID] = useState('');
     const [showMeOnSmallView, setShowMeOnSmallView] = useState(true);
 
-    ZegoUIKitInternal.onSDKConnected('PictureInPictureLayout', () => {
-        setLocalUserID(ZegoUIKitInternal.getLocalUserInfo().userID);
-    });
-    ZegoUIKitInternal.onRoomStateChanged('PictureInPictureLayout', (reason, errorCode, extendedData) => {
-        if (reason == 1 || reason == 4) {
+    useEffect(() => {
+        const callbackID = 'PictureInPictureLayout' + String(Math.floor(Math.random() * 10000));
+        ZegoUIKitInternal.onSDKConnected(callbackID, () => {
             setLocalUserID(ZegoUIKitInternal.getLocalUserInfo().userID);
-        } else if (reason == 2 || reason == 5 || reason == 6 || reason == 7) {
-            // ZegoRoomStateChangedReasonLoginFailed
-            // ZegoRoomStateChangedReasonReconnectFailed
-            // ZegoRoomStateChangedReasonKickOut
-            // ZegoRoomStateChangedReasonLogout
-            // ZegoRoomStateChangedReasonLogoutFailed
-            setLocalUserID('');
-            setRemoteUserID('');
+        });
+        ZegoUIKitInternal.onRoomStateChanged(callbackID, (reason, errorCode, extendedData) => {
+            if (reason == 1 || reason == 4) {
+                setLocalUserID(ZegoUIKitInternal.getLocalUserInfo().userID);
+            } else if (reason == 2 || reason == 5 || reason == 6 || reason == 7) {
+                // ZegoRoomStateChangedReasonLoginFailed
+                // ZegoRoomStateChangedReasonReconnectFailed
+                // ZegoRoomStateChangedReasonKickOut
+                // ZegoRoomStateChangedReasonLogout
+                // ZegoRoomStateChangedReasonLogoutFailed
+                setLocalUserID('');
+                setRemoteUserID('');
+            }
+        })
+        ZegoUIKitInternal.onUserJoin(callbackID, (userList) => {
+            console.log('>>>>>>>>>>> join', userList)
+            if (userList.length == 1) {
+                setRemoteUserID(userList[0].userID);
+            } else {
+                //TODO
+            }
+        });
+        ZegoUIKitInternal.onUserLeave(callbackID, (userList) => {
+            console.log('<<<<<<<<<<<<<< leave', userList)
+            if (userList.length == 1) {
+                setRemoteUserID('');
+            } else {
+                //TODO
+            }
+        });
+        return () => {
+            ZegoUIKitInternal.onSDKConnected(callbackID);
+            ZegoUIKitInternal.onRoomStateChanged(callbackID);
+            ZegoUIKitInternal.onUserJoin(callbackID);
+            ZegoUIKitInternal.onUserLeave(callbackID);
         }
-    })
-    ZegoUIKitInternal.onUserJoin('PictureInPictureLayout', (userList) => {
-        console.log('>>>>>>>>>>> join', userList)
-        if (userList.length == 1) {
-            setRemoteUserID(userList[0].userID);
-        } else {
-            //TODO
-        }
-    });
-    ZegoUIKitInternal.onUserLeave('PictureInPictureLayout', (userList) => {
-        console.log('<<<<<<<<<<<<<< leave', userList)
-        if (userList.length == 1) {
-            setRemoteUserID('');
-        } else {
-            //TODO
-        }
-    });
+    }, [])
     /*
     enum {
         topLeft = 0,
@@ -61,8 +81,8 @@ export default function PictureInPictureLayout(props) {
     */
     const getSmallViewPostStyle = () => {
         const styleList = [styles.smallViewPostTopLeft, styles.smallViewPostTopRight, styles.smallViewPostBottomLeft, styles.smallViewPostBottomRgith];
-        if (smallViewDefaultPosition >= 0 && smallViewDefaultPosition <= 3) {
-            return styleList[smallViewDefaultPosition];
+        if (smallViewPostion >= 0 && smallViewPostion <= 3) {
+            return styleList[smallViewPostion];
         } else {
             return styles.smallViewPostTopLeft;
         }
@@ -88,10 +108,10 @@ export default function PictureInPictureLayout(props) {
                     <ZegoAudioVideoView
                         key={localUserID}
                         userID={localUserID}
-                        audioViewBackgroudColor={audioViewBackgroudColor}
-                        audioViewBackgroudImage={audioViewBackgroudImage}
-                        showSoundWave={showSoundWave}
-                        videoFillMode={videoFillMode}
+                        audioViewBackgroudColor={smallViewBackgroundColor}
+                        audioViewBackgroudImage={smallViewBackgroundImage}
+                        showSoundWave={showSoundWaveOnAudioView}
+                        useVideoViewAspectFill={useVideoViewAspectFill}
                         foregroundBuilder={foregroundBuilder}
                     /> :
                     <View />) :
@@ -99,10 +119,10 @@ export default function PictureInPictureLayout(props) {
                     <ZegoAudioVideoView
                         key={remoteUserID}
                         userID={remoteUserID}
-                        audioViewBackgroudColor={audioViewBackgroudColor}
-                        audioViewBackgroudImage={audioViewBackgroudImage}
-                        showSoundWave={showSoundWave}
-                        videoFillMode={videoFillMode}
+                        audioViewBackgroudColor={smallViewBackgroundColor}
+                        audioViewBackgroudImage={smallViewBackgroundImage}
+                        showSoundWave={showSoundWaveOnAudioView}
+                        useVideoViewAspectFill={useVideoViewAspectFill}
                         foregroundBuilder={foregroundBuilder}
                     /> :
                     <View />)
@@ -114,10 +134,10 @@ export default function PictureInPictureLayout(props) {
                     <ZegoAudioVideoView
                         key={remoteUserID}
                         userID={remoteUserID}
-                        audioViewBackgroudColor={audioViewBackgroudColor}
-                        audioViewBackgroudImage={audioViewBackgroudImage}
-                        showSoundWave={showSoundWave}
-                        videoFillMode={videoFillMode}
+                        audioViewBackgroudColor={largeViewBackgroundColor}
+                        audioViewBackgroudImage={largeViewBackgroundImage}
+                        showSoundWave={showSoundWaveOnAudioView}
+                        useVideoViewAspectFill={useVideoViewAspectFill}
                         foregroundBuilder={foregroundBuilder}
                     /> :
                     <View />) :
@@ -125,10 +145,10 @@ export default function PictureInPictureLayout(props) {
                     <ZegoAudioVideoView
                         key={localUserID}
                         userID={localUserID}
-                        audioViewBackgroudColor={audioViewBackgroudColor}
-                        audioViewBackgroudImage={audioViewBackgroudImage}
-                        showSoundWave={showSoundWave}
-                        videoFillMode={videoFillMode}
+                        audioViewBackgroudColor={largeViewBackgroundColor}
+                        audioViewBackgroudImage={largeViewBackgroundImage}
+                        showSoundWave={showSoundWaveOnAudioView}
+                        useVideoViewAspectFill={useVideoViewAspectFill}
                         foregroundBuilder={foregroundBuilder}
                     /> :
                     <View />)

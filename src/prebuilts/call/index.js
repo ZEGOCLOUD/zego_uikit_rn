@@ -23,23 +23,21 @@ export default function ZegoUIKitPrebuiltCall(props) {
         showMicrophoneStateOnView = true,
         showCameraStateOnView = false,
         showUserNameOnView = true,
-        soundWaveType = 1, // enum {none, aroundAvatar}
-        showSelfViewWithVideoOnly = true,
-        audioViewBackgroundColor = '#4A4B4D',
-        audioViewBackgroundImage,
-        smallViewDefaultPosition = 1, // enum { topLeft, topRight, bottomLeft, bottomRight }
-        isSmallViewDraggable = false,
+        showSoundWaveOnAudioView = true,
+        useVideoViewAspectFill = true,
         turnOnCameraWhenJoining = true,
         turnOnMicrophoneWhenJoining = true,
         useSpeakerWhenJoining = false,
-        menuBarButtonsLimitedCount = 5,
+        layout = {},
+        menuBarButtonsMaxCount = 5,
         menuBarButtons = [0, 1, 2], // enum { ZegoQuitButton, ZegoToggleCameraButton, ZegoToggleMicrophoneButton}
         menuBarExtendedButtons = [],
-        isMenuBarHideAutomatically = true,
-        isMenuBarHideByClick = true,
-        onPreQuit, // Call before do quit operation
-        onPostQuit, // Call after quitted
-        quitConfirmDialogInfo = {}, // {title: '', cancelButtonName: '', confirmButtonName: ''}
+        hideMenuBarAutomatically = true,
+        hideMenuBardByClick = true,
+        showHangUpConfirmDialog = false,
+        hangUpConfirmDialogInfo = {}, // {title: '', cancelButtonName: '', confirmButtonName: ''}
+        onHangUp,
+        onHangUpConfirming,
         foregroundBuilder,
     } = config;
 
@@ -103,16 +101,11 @@ export default function ZegoUIKitPrebuiltCall(props) {
     return (
         <View style={styles.container}>
             <ZegoAudioVideoContainer style={styles.avView}
-                layoutMode={0} // P-i-P
-                layoutConfig={{
-                    videoFillMode: 1,
-                    soundWaveType: soundWaveType,
-                    showSelfViewWithVideoOnly: showSelfViewWithVideoOnly,
-                    audioViewBackgroundColor: audioViewBackgroundColor,
-                    audioViewBackgroundImage: audioViewBackgroundImage,
-                    smallViewDefaultPosition: smallViewDefaultPosition,
-                    isSmallViewDraggable: isSmallViewDraggable,
+                audioVideoConfig={{
+                    showSoundWaveOnAudioView: showSoundWaveOnAudioView,
+                    useVideoViewAspectFill: useVideoViewAspectFill,
                 }}
+                layout={layout}
                 foregroundBuilder={foregroundBuilder ? foregroundBuilder : ({ userInfo }) =>
                     <AudioVideoForegroundView
                         userInfo={userInfo}
@@ -125,7 +118,7 @@ export default function ZegoUIKitPrebuiltCall(props) {
             <View style={styles.ctrlBar}>
                 <ZegoToggleCameraButton isOn={turnOnCameraWhenJoining} />
                 <ZegoToggleMicrophoneButton style={styles.ctrlBtn} isOn={turnOnMicrophoneWhenJoining} />
-                <ZegoQuitButton style={styles.ctrlBtn} onPreQuit={onPreQuit} onPostQuit={onPostQuit} />
+                <ZegoQuitButton style={styles.ctrlBtn} onLeaveConfirming={onHangUpConfirming} onPressed={onHangUp} />
             </View>
         </View>
     );

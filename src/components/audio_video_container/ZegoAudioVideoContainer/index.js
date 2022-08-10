@@ -9,11 +9,14 @@ LayoutMode {
 }
 */
 export default function ZegoAudioVideoContainer(props) {
-  const { foregroundBuilder, layoutMode, layoutConfig = {} } = props;
+  const { foregroundBuilder, layout, audioVideoConfig = {} } = props;
+  const { mode = 0, config } = layout;
+
   return (<View style={styles.container}>
-    {layoutMode == 0 ?
+    {mode == 0 ?
       <PictureInPictureWindow
-        cinfog={layoutConfig}
+        audioVideoConfig={audioVideoConfig}
+        cinfog={config}
         foregroundBuilder={foregroundBuilder} /> :
       <PictureInPictureWindow />
     }

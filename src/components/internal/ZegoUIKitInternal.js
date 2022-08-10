@@ -195,7 +195,11 @@ function _onRoomStateChanged(roomID, reason, errorCode, extendedData) {
     _currentRoomState = reason;
 
     Object.keys(_onRoomStateChangedCallbackMap).forEach(callbackID => {
-        _onRoomStateChangedCallbackMap[callbackID](reason, errorCode, extendedData);
+        // callback may remove from map during room state chaging
+        if (callbackID in _onRoomStateChangedCallbackMap) {
+            _onRoomStateChangedCallbackMap[callbackID](reason, errorCode, extendedData);
+            
+        }
     });
 }
 function _registerEngineCallback() {
@@ -643,12 +647,13 @@ export default {
                 zlogwarning('You are not join in any room, no need to leave room.');
                 resolve();
             } else {
+                zloginfo('leaveRoom: ', _currentRoomID)
                 ZegoExpressEngine.instance().logoutRoom(_currentRoomID).then(() => {
                     ZegoExpressEngine.instance().stopSoundLevelMonitor();
                     _currentRoomID = '';
                     resolve();
                 }).catch((error) => {
-                    zlogerror('Leave room falied: ', error);
+                    zlogerror('Leave room failed: ', error);
                     reject(error);
                 });
             }
