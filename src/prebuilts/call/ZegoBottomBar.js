@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
 import ZegoQuitButton from '../../components/audio_video/ZegoQuitButton';
 import ZegoSwitchAudioOutputButton from '../../components/audio_video/ZegoSwitchAudioOutputButton';
 import ZegoSwitchCameraFacingButton from '../../components/audio_video/ZegoSwitchCameraFacingButton';
@@ -17,9 +17,12 @@ export default function ZegoBottomBar(props) {
         turnOnCameraWhenJoining,
         turnOnMicrophoneWhenJoining,
         useSpeakerWhenJoining,
-        onMoreButtonPress
     } = props;
+    const [isNormalStyle, setIsNormalStyle] = useState(false);
 
+    const onMoreButtonPress = () => {
+        setIsNormalStyle(!isNormalStyle);
+    }
     // enum ZegoMenuBarButtonName {
     //     hangUpButton,
     //     toggleCameraButton,
@@ -38,7 +41,7 @@ export default function ZegoBottomBar(props) {
             case 3:
                 return <ZegoSwitchCameraFacingButton key={3} />
             case 4:
-                return <ZegoSwitchAudioOutputButton key={4} useSpeakerWhenJoining={useSpeakerWhenJoining}/>
+                return <ZegoSwitchAudioOutputButton key={4} useSpeakerWhenJoining={useSpeakerWhenJoining} />
         }
     }
     const getDisplayButtons = () => {
@@ -64,7 +67,7 @@ export default function ZegoBottomBar(props) {
             }
         });
         if (needMoreButton) {
-            firstLevelButtons.push(<ZegoMoreButton onPressed={onMoreButtonPress} />)
+            firstLevelButtons.push(<ZegoMoreButton onPress={() => { setIsNormalStyle(false) }} />)
         }
         return {
             firstLevelButtons: firstLevelButtons,
@@ -81,19 +84,31 @@ export default function ZegoBottomBar(props) {
     var secondLevelButtons = allButtons['secondLevelButtons']
 
     return (
-        <View style={styles.ctrlBar}>
-            {firstLevelButtons.map((button, index) => (
-                <View style={getButtonStyle()}>
-                    {button}
+        isNormalStyle ?
+            <View style={styles.normalBar}>
+                {firstLevelButtons.map((button, index) => (
+                    <View style={getButtonStyle()}>
+                        {button}
+                    </View>
+                ))}
+            </View> :
+            <View style={[styles.popupContainer, styles.fillParent]}>
+                <View style={[styles.popupMask, styles.fillParent]} >
+                    <TouchableOpacity style={styles.fillParent} onPress={() => { setIsNormalStyle(true) }} />
                 </View>
-            ))}
-        </View>
+                <View style={styles.popupBar}>
+                    {secondLevelButtons.map((button, index) => (
+                        <View style={{ marginBottom: 20, marginRight: 32 / 2, marginLeft: 32 / 2 }}>
+                            {button}
+                        </View>
+                    ))}
+                </View>
+            </View>
     );
 }
 
-
 const styles = StyleSheet.create({
-    ctrlBar: {
+    normalBar: {
         flex: 1,
         position: 'absolute',
         flexDirection: 'row',
@@ -103,7 +118,36 @@ const styles = StyleSheet.create({
         width: '100%',
         bottom: 0,
         height: 50,
-        zIndex: 2
+        zIndex: 2,
+    },
+    popupContainer: {
+        flex: 1,
+        justifyContent: 'flex-end',
+    },
+    fillParent: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+    },
+    popupMask: {
+        backgroundColor: '#262A2D',
+        opacity: 0.3,
+    },
+    popupBar: {
+        flex: 1,
+        paddingTop: 27,
+        paddingBottom: 3,
+        paddingLeft: 28.5,
+        paddingRight: 28.5,
+        position: 'absolute',
+        flexDirection: 'row',
+        flexWrap: "wrap",
+        justifyContent: 'flex-start',
+        alignItems: 'flex-end',
+        width: '100%',
+        bottom: 0,
+        zIndex: 2,
+        backgroundColor: '#262A2D'
     },
     ctrlBtn1: {
         marginLeft: 0,

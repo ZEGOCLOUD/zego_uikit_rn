@@ -277,6 +277,9 @@ function _registerEngineCallback() {
     ZegoExpressEngine.instance().on(
         'capturedSoundLevelUpdate',
         (soundLevel) => {
+            if (_localCoreUser.userID === "") {
+                return;
+            }
             _localCoreUser.soundLevel = soundLevel;
             _coreUserMap[_localCoreUser.userID].soundLevel = soundLevel;
             _notifySoundLevelUpdate(_localCoreUser.userID, soundLevel);
