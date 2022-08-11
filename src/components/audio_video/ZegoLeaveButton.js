@@ -3,15 +3,13 @@ import { Image, TouchableOpacity, View } from "react-native";
 import ZegoUIKitInternal from "../internal/ZegoUIKitInternal";
 
 export default function ZegoQuitButton(props) {
-    const { iconQuit, onLeaveConfirming, onPressed } = props;
+    const { iconLeave, onLeaveConfirming, onPressed } = props;
     const onPress = () => {
-        if (onLeaveConfirming instanceof Promise) {
-            onLeaveConfirming().then((accept) => {
-                if (accept) {
-                    ZegoUIKitInternal.leaveRoom();
-                    if (typeof onPressed == 'function') {
-                        onPressed();
-                    }
+        if (typeof onLeaveConfirming == 'function') {
+            onLeaveConfirming().then(() => {
+                ZegoUIKitInternal.leaveRoom();
+                if (typeof onPressed == 'function') {
+                    onPressed();
                 }
             });
         } else {
@@ -25,7 +23,7 @@ export default function ZegoQuitButton(props) {
     return (<View>
         <TouchableOpacity
             onPress={onPress}>
-            <Image source={iconQuit ? iconQuit : require("../internal/resources/white_button_hang_up.png")} />
+            <Image source={iconLeave ? iconLeave : require("../internal/resources/white_button_hang_up.png")} />
         </TouchableOpacity>
     </View>)
 }

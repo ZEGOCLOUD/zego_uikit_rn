@@ -1,12 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { PermissionsAndroid } from 'react-native';
+import { PermissionsAndroid, Alert } from 'react-native';
 
-import { StyleSheet, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import ZegoAudioVideoContainer from '../../components/audio_video_container/ZegoAudioVideoContainer';
 import ZegoUIKit from '../../components/internal/ZegoUIKitInternal';
 import AudioVideoForegroundView from './AudioVideoForegroundView';
 import ZegoBottomBar from './ZegoBottomBar';
-import ZegoMoreButton from './ZegoMoreButton';
 
 
 export default function ZegoUIKitPrebuiltCall(props) {
@@ -94,6 +93,38 @@ export default function ZegoUIKitPrebuiltCall(props) {
             callback();
         }
     }
+    // Default operation for click the leave button
+    const showLeaveAlert = () => {
+        return new Promise((resolve, reject) => {
+            if (showHangUpConfirmDialog) {
+                const { title = "Leave the call", message = "Are you sure to leave the call?", cancelButtonName = "Cancel", confirmButtonName = "Confirm" } = hangUpConfirmDialogInfo;
+                Alert.alert(
+                    title,
+                    message,
+                    [
+                        {
+                            text: cancelButtonName,
+                            onPress: () => {
+                                reject();
+                            },
+                            style: "cancel",
+                        },
+                        {
+                            text: confirmButtonName,
+                            onPress: () => {
+                                resolve();
+                            },
+                        },
+                    ],
+                    {
+                        cancelable: false,
+                    }
+                );
+            } else {
+                resolve();
+            }
+        });
+    }
 
     useEffect(() => {
         ZegoUIKit.connectSDK(
@@ -164,7 +195,7 @@ export default function ZegoUIKitPrebuiltCall(props) {
                     menuBarButtons={menuBarButtons}
                     menuBarExtendedButtons={menuBarExtendedButtons}
                     onHangUp={onHangUp}
-                    onHangUpConfirming={onHangUpConfirming}
+                    onHangUpConfirming={onHangUpConfirming ? onHangUpConfirming : showLeaveAlert}
                     turnOnCameraWhenJoining={turnOnCameraWhenJoining}
                     turnOnMicrophoneWhenJoining={turnOnMicrophoneWhenJoining}
                     useSpeakerWhenJoining={useSpeakerWhenJoining}

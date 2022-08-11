@@ -7,7 +7,7 @@ import ZegoToggleMicrophoneButton from './components/audio_video/ZegoToggleMicro
 import ZegoToggleCameraButton from './components/audio_video/ZegoToggleCameraButton'
 import ZegoSwitchAudioOutputButton from './components/audio_video/ZegoSwitchAudioOutputButton'
 import ZegoAudioVideoContainer from './components/audio_video_container/ZegoAudioVideoContainer'
-import ZegoQuitButton from './components/audio_video/ZegoQuitButton'
+import ZegoLeaveButton from './components/audio_video/ZegoLeaveButton'
 import ZegoUIKitPrebuiltCall from './prebuilts/call'
 
 export default {
@@ -38,7 +38,7 @@ export {
     ZegoToggleCameraButton,
     ZegoSwitchAudioOutputButton,
     ZegoAudioVideoContainer,
-    ZegoQuitButton,
+    ZegoLeaveButton,
 
     ZegoUIKitPrebuiltCall,
 }
