@@ -138,6 +138,7 @@ export default function ZegoUIKitPrebuiltCall(props) {
 
         return () => {
             // ZegoUIKit.disconnectSDK();
+            ZegoUIKit.leaveRoom();
         }
     }, []);
 

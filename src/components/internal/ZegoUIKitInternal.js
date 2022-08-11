@@ -27,15 +27,20 @@ function _resetData() {
     _currentRoomID = '';
     _currentRoomState = 7;
     _isRoomConnected = false;
-
-    // _onMicDeviceOnCallbackMap = {};
-    // _onCameraDeviceOnCallbackMap = {};
-    // _onRoomStateChangedCallbackMap = {};
-    // _onUserJoinCallbackMap = {};
-    // _onUserLeaveCallbackMap = {};
-    // _onUserInfoUpdateCallbackMap = {};
-    // _onSDKConnectedCallbackMap = {};
 }
+
+function _resetDataForLeavingRoom() {
+    zloginfo('Reset data for leaving room.')
+    _streamCoreUserMap = {};
+    _coreUserMap = {};
+    _currentRoomID = '';
+    _currentRoomState = 7;
+    _isRoomConnected = false;
+    const { userID, userName, profileUrl, extendInfo } = _localCoreUser;
+    _localCoreUser = _createCoreUser(userID, userName, profileUrl, extendInfo);
+    _coreUserMap[_localCoreUser.userID] = _localCoreUser;
+}
+
 function _createCoreUser(userID, userName, profileUrl, extendInfo) {
     return {
         userID: userID,
@@ -56,11 +61,7 @@ function _isLocalUser(userID) {
     return userID === undefined || userID === '' || _localCoreUser.userID === userID;
 }
 function _setLocalUserInfo(userInfo) {
-    _localCoreUser.userID = userInfo.userID;
-    _localCoreUser.userName = userInfo.userName;
-    _localCoreUser.profileUrl = userInfo.profileUrl;
-    _localCoreUser.extendInfo = userInfo.extendInfo;
-
+    _localCoreUser = _createCoreUser(userInfo.userID, userInfo.userName, userInfo.profileUrl, userInfo.extendInfo);
     _coreUserMap[userInfo.userID] = _localCoreUser;
 }
 
@@ -198,7 +199,7 @@ function _onRoomStateChanged(roomID, reason, errorCode, extendedData) {
         // callback may remove from map during room state chaging
         if (callbackID in _onRoomStateChangedCallbackMap) {
             _onRoomStateChangedCallbackMap[callbackID](reason, errorCode, extendedData);
-            
+
         }
     });
 }
@@ -277,7 +278,7 @@ function _registerEngineCallback() {
     ZegoExpressEngine.instance().on(
         'capturedSoundLevelUpdate',
         (soundLevel) => {
-            if (_localCoreUser.userID === "") {
+            if (_localCoreUser.userID === "" || !(_localCoreUser.userID in _coreUserMap)) {
                 return;
             }
             _localCoreUser.soundLevel = soundLevel;
@@ -462,9 +463,7 @@ export default {
                 _unregisterEngineCallback();
                 _registerEngineCallback();
 
-                if (_localCoreUser.userID === '') {
-                    _setLocalUserInfo(userInfo);
-                }
+                _setLocalUserInfo(userInfo);
 
                 Object.keys(_onSDKConnectedCallbackMap).forEach(callbackID => {
                     // TODO cause  WARN  Possible Unhandled Promise Rejection (id: 56)
@@ -652,8 +651,9 @@ export default {
             } else {
                 zloginfo('leaveRoom: ', _currentRoomID)
                 ZegoExpressEngine.instance().logoutRoom(_currentRoomID).then(() => {
+                    zloginfo('Leave room succeed.')
                     ZegoExpressEngine.instance().stopSoundLevelMonitor();
-                    _currentRoomID = '';
+                    _resetDataForLeavingRoom();
                     resolve();
                 }).catch((error) => {
                     zlogerror('Leave room failed: ', error);
