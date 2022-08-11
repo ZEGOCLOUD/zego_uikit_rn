@@ -17,12 +17,10 @@ export default function ZegoBottomBar(props) {
         turnOnCameraWhenJoining,
         turnOnMicrophoneWhenJoining,
         useSpeakerWhenJoining,
+        onMorePress,
     } = props;
-    const [isNormalStyle, setIsNormalStyle] = useState(false);
+    const [isNormalStyle, setIsNormalStyle] = useState(true);
 
-    const onMoreButtonPress = () => {
-        setIsNormalStyle(!isNormalStyle);
-    }
     // enum ZegoMenuBarButtonName {
     //     hangUpButton,
     //     toggleCameraButton,
@@ -67,7 +65,7 @@ export default function ZegoBottomBar(props) {
             }
         });
         if (needMoreButton) {
-            firstLevelButtons.push(<ZegoMoreButton onPress={() => { setIsNormalStyle(false) }} />)
+            firstLevelButtons.push(<ZegoMoreButton onPress={() => { setIsNormalStyle(false); if(onMorePress) onMorePress() }} />)
         }
         return {
             firstLevelButtons: firstLevelButtons,

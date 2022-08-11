@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { PermissionsAndroid } from 'react-native';
 
-import { StyleSheet, View, Text, Button } from 'react-native';
+import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import ZegoAudioVideoContainer from '../../components/audio_video_container/ZegoAudioVideoContainer';
 import ZegoUIKit from '../../components/internal/ZegoUIKitInternal';
 import AudioVideoForegroundView from './AudioVideoForegroundView';
 import ZegoBottomBar from './ZegoBottomBar';
+import ZegoMoreButton from './ZegoMoreButton';
 
 
 export default function ZegoUIKitPrebuiltCall(props) {
@@ -39,6 +40,19 @@ export default function ZegoUIKitPrebuiltCall(props) {
         foregroundBuilder,
     } = config;
 
+    const [isMenubarVisable, setIsMenubarVidable] = useState(true);
+    var hideCountdown = 5;
+
+    const onFullPageTouch = () => {
+        hideCountdown = 5;
+        if (isMenubarVisable) {
+            if (hideMenuBardByClick) {
+                setIsMenubarVidable(false);
+            }
+        } else {
+            setIsMenubarVidable(true);
+        }
+    }
     const grantPermissions = async (callback) => {
         // Android: Dynamically obtaining device permissions
         if (Platform.OS === 'android') {
@@ -92,37 +106,72 @@ export default function ZegoUIKitPrebuiltCall(props) {
             });
 
         return () => {
-            ZegoUIKit.disconnectSDK();
+            // ZegoUIKit.disconnectSDK();
         }
     }, []);
 
+    function useInterval(callback, delay) {
+        const savedCallback = useRef();
+
+        useEffect(() => {
+            savedCallback.current = callback;
+        });
+
+        useEffect(() => {
+            function tick() {
+                savedCallback.current();
+            }
+            if (delay !== null) {
+                let id = setInterval(tick, delay);
+                return () => clearInterval(id);
+            }
+        }, [delay]);
+    }
+
+
+    useInterval(() => {
+        hideCountdown--;
+        if (hideCountdown <= 0) {
+            hideCountdown = 5;
+            if (hideMenuBarAutomatically) {
+                setIsMenubarVidable(false);
+            }
+        }
+    }, 1000);
+
     return (
-        <View style={styles.container}>
-            <ZegoAudioVideoContainer style={styles.avView}
-                audioVideoConfig={{
-                    showSoundWaveOnAudioView: showSoundWaveOnAudioView,
-                    useVideoViewAspectFill: useVideoViewAspectFill,
-                }}
-                layout={layout}
-                foregroundBuilder={foregroundBuilder ? foregroundBuilder : ({ userInfo }) =>
-                    <AudioVideoForegroundView
-                        userInfo={userInfo}
-                        showMicrophoneStateOnView={showMicrophoneStateOnView}
-                        showCameraStateOnView={showCameraStateOnView}
-                        showUserNameOnView={showUserNameOnView}
-                    />
-                }
-            />
-            <ZegoBottomBar 
-                menuBarButtonsMaxCount={menuBarButtonsMaxCount}
-                menuBarButtons={menuBarButtons}
-                menuBarExtendedButtons={menuBarExtendedButtons}
-                onHangUp={onHangUp}
-                onHangUpConfirming={onHangUpConfirming}
-                turnOnCameraWhenJoining={turnOnCameraWhenJoining}
-                turnOnMicrophoneWhenJoining={turnOnMicrophoneWhenJoining}
-                useSpeakerWhenJoining={useSpeakerWhenJoining}
-            />
+        <View style={styles.container} >
+            <View style={styles.fillParent} pointerEvents='auto' onTouchStart={onFullPageTouch}>
+                <ZegoAudioVideoContainer style={[styles.avView, styles.fillParent]}
+                    audioVideoConfig={{
+                        showSoundWaveOnAudioView: showSoundWaveOnAudioView,
+                        useVideoViewAspectFill: useVideoViewAspectFill,
+                    }}
+                    layout={layout}
+                    foregroundBuilder={foregroundBuilder ? foregroundBuilder : ({ userInfo }) =>
+                        <AudioVideoForegroundView
+                            userInfo={userInfo}
+                            showMicrophoneStateOnView={showMicrophoneStateOnView}
+                            showCameraStateOnView={showCameraStateOnView}
+                            showUserNameOnView={showUserNameOnView}
+                        />
+                    }
+                />
+            </View>
+            {isMenubarVisable ?
+                <ZegoBottomBar
+                    menuBarButtonsMaxCount={menuBarButtonsMaxCount}
+                    menuBarButtons={menuBarButtons}
+                    menuBarExtendedButtons={menuBarExtendedButtons}
+                    onHangUp={onHangUp}
+                    onHangUpConfirming={onHangUpConfirming}
+                    turnOnCameraWhenJoining={turnOnCameraWhenJoining}
+                    turnOnMicrophoneWhenJoining={turnOnMicrophoneWhenJoining}
+                    useSpeakerWhenJoining={useSpeakerWhenJoining}
+                    onMorePress={() => { hideCountdown = 5; }}
+                /> :
+                <View />
+            }
         </View>
     );
 }
@@ -134,29 +183,15 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         zIndex: 0,
     },
-    avView: {
-        flex: 1,
+    fillParent: {
         width: '100%',
         height: '100%',
-        zIndex: 1,
         position: 'absolute',
+    },
+    avView: {
+        flex: 1,
+        zIndex: 2,
         right: 0,
         top: 0,
     },
-    ctrlBar: {
-        flex: 1,
-        position: 'absolute',
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'flex-end',
-        marginBottom: 50,
-        width: '100%',
-        bottom: 0,
-        height: 50,
-        zIndex: 2
-    },
-    ctrlBtn: {
-        marginLeft: 5,
-        marginRight: 5,
-    }
 });
