@@ -3,17 +3,20 @@ import { Image, TouchableOpacity, View } from "react-native";
 import ZegoUIKitInternal from "../internal/ZegoUIKitInternal";
 
 export default function ZegoToggleMicrophoneButton(props) {
-    const { userID, iconMicOn, iconMicOff, isOn } = props;
+    const { userID, iconMicOn, iconMicOff, isOn, onPress } = props;
     const [isCurrentOn, setIsCurrentOn] = useState(true);// Default on
     const getImageSourceByPath = () => {
         const pathOn = iconMicOn ? iconMicOn : require("../internal/resources/white_button_mic_on.png");
         const pathOff = iconMicOff ? iconMicOff : require("../internal/resources/white_button_mic_off.png");
         return isCurrentOn ? pathOn : pathOff;
     }
-    const onPress = () => {
+    const onButtonPress = () => {
         ZegoUIKitInternal.turnMicDeviceOn(userID, !isCurrentOn);
+        if (typeof onPress == 'function') {
+            onPress();
+        }
     }
-    
+
 
     useEffect(() => {
         setIsCurrentOn(ZegoUIKitInternal.isMicDeviceOn(userID));
@@ -41,8 +44,7 @@ export default function ZegoToggleMicrophoneButton(props) {
     }, [])
     return (<View>
         <TouchableOpacity
-            // style={styles.micCon}
-            onPress={onPress}>
+            onPress={onButtonPress}>
             <Image source={getImageSourceByPath()} />
         </TouchableOpacity>
     </View>)

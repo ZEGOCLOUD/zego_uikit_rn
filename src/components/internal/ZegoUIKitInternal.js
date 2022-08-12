@@ -498,15 +498,7 @@ export default {
 
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Audio Video <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     useFrontFacingCamera(isFrontFacing) {
-        return new Promise((resolve, reject) => {
-            if (!_isRoomConnected) {
-                zlogerror('You are not connect to any room.')
-                reject();
-            } else {
-                ZegoExpressEngine.instance().useFrontCamera(isFrontFacing, 0);
-                resolve();
-            }
-        });
+        return ZegoExpressEngine.instance().useFrontCamera(isFrontFacing, 0);
     },
     isMicDeviceOn(userID) {
         if (!userID) {
