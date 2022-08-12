@@ -3,12 +3,16 @@ import { Image, View } from "react-native";
 import ZegoUIKitInternal from "../internal/ZegoUIKitInternal";
 
 export default function ZegoMicrophoneStatusIcon(props) {
-    const { userID, iconMicrophoneOn, iconMicrophoneOff } = props;
+    const { userID, iconMicrophoneOn, iconMicrophoneOff, iconMicrophoneSpeaking } = props;
     const [isOn, setIsOn] = useState(true);
+    const [hasSound, setHasSound] = useState(false);
+
     const getImageSourceByPath = () => {
         const pathOn = iconMicrophoneOn ? iconMicrophoneOn : require("../internal/resources/white_icon_video_mic_on.png");
         const pathOff = iconMicrophoneOff ? iconMicrophoneOff : require("../internal/resources/white_icon_video_mic_off.png");
-        return isOn ? pathOn : pathOff;
+        const pathSpeaking = iconMicrophoneSpeaking ? iconMicrophoneSpeaking : require("../internal/resources/white_icon_video_mic_speaking.png");
+
+        return isOn ? (hasSound ? pathSpeaking : pathOn) : pathOff;
     }
 
     useEffect(() => {
@@ -29,9 +33,15 @@ export default function ZegoMicrophoneStatusIcon(props) {
                 setIsOn(on);
             }
         });
+        ZegoUIKitInternal.onSoundLevelUpdate(callbackID, (uid, soundLevel) => {
+            if (uid == userID) {
+                setHasSound(soundLevel > 5);
+            }
+        });
         return () => {
             ZegoUIKitInternal.onSDKConnected(callbackID);
             ZegoUIKitInternal.onMicDeviceOn(callbackID);
+            ZegoUIKitInternal.onSoundLevelUpdate(callbackID);
         }
     }, []);
     return (<View>

@@ -24,8 +24,8 @@ export default function ZegoVideoView(props) {
         roomID,
         audioViewBackgroudColor,
         audioViewBackgroudImage,
-        showSoundWave,
-        useVideoViewAspectFill,
+        showSoundWave = true,
+        useVideoViewAspectFill = false,
         foregroundBuilder
     } = props;
 
