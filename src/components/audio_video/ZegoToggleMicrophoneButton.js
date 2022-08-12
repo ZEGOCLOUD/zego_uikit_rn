@@ -16,6 +16,9 @@ export default function ZegoToggleMicrophoneButton(props) {
     
 
     useEffect(() => {
+        setIsCurrentOn(ZegoUIKitInternal.isMicDeviceOn(userID));
+    });
+    useEffect(() => {
         const callbackID = 'ZegoToggleMicrophoneButton' + String(Math.floor(Math.random() * 10000));
         ZegoUIKitInternal.onSDKConnected(callbackID, () => {
             ZegoUIKitInternal.turnMicDeviceOn(userID, isOn);

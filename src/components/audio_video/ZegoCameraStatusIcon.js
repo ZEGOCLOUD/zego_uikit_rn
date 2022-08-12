@@ -10,6 +10,10 @@ export default function ZegoCameraStatusIcon(props) {
         const pathOff = iconCameraOff ? iconCameraOff : require("../internal/resources/white_icon_video_camera_off.png");
         return isOn ? pathOn : pathOff
     }
+    
+    useEffect(() => {
+        setIsOn(ZegoUIKitInternal.isCameraDeviceOn(userID));
+    });
     useEffect(() => {
         const callbackID = 'ZegoCameraStatusIcon' + String(Math.floor(Math.random() * 10000));
         ZegoUIKitInternal.onSDKConnected(callbackID, () => {

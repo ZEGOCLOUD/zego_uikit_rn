@@ -12,6 +12,9 @@ export default function ZegoMicrophoneStatusIcon(props) {
     }
 
     useEffect(() => {
+        setIsOn(ZegoUIKitInternal.isMicDeviceOn(userID));
+    });
+    useEffect(() => {
         const callbackID = 'ZegoMicrophoneStatusIcon' + String(Math.floor(Math.random() * 10000));
         ZegoUIKitInternal.onSDKConnected(callbackID, () => {
             setIsOn(ZegoUIKitInternal.isMicDeviceOn(userID))

@@ -333,6 +333,8 @@ function _tryStartPublishStream() {
                 'reactTag': _localCoreUser.viewID,
                 'viewMode': _localCoreUser.fillMode,
                 'backgroundColor': 0
+            }).catch((error) => {
+                zlogerror(error);
             });
         }
     }
@@ -578,7 +580,10 @@ export default {
                 _onRemoteCameraStateUpdate(_getPublishStreamID(), on ? 0 : 10); // 0 for open, 10 for mute
 
                 _localCoreUser.isCameraDeviceOn = on;
-                _coreUserMap[_localCoreUser.userID].isCameraDeviceOn = on;
+                if (!on) {
+                    _localCoreUser.viewID = -1;
+                }
+                _coreUserMap[_localCoreUser.userID] = _localCoreUser;
                 _notifyUserInfoUpdate(_localCoreUser);
 
                 if (on) {
