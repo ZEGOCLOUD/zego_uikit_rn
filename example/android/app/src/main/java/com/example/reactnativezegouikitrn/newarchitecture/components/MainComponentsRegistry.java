@@ -1,4 +1,4 @@
-package com.example.reactnativezegouikitrn.newarchitecture.components;
+package com.example.zegouikitrn.newarchitecture.components;
 
 import com.facebook.jni.HybridData;
 import com.facebook.proguard.annotations.DoNotStrip;

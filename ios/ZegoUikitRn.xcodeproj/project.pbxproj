@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		F4FF95D7245B92E800C19C63 /* ZegoUikitRn.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4FF95D6245B92E800C19C63 /* ZegoUikitRn.swift */; };
+		F4FF95D7245B92E800C19C63 /* ZegoUIKitRN.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4FF95D6245B92E800C19C63 /* ZegoUIKitRN.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -24,10 +24,9 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libZegoUikitRn.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libZegoUikitRn.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		86ADE1372891152600555A9B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		B3E7B5891CC2AC0600A0062D /* ZegoUikitRn.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZegoUikitRn.m; sourceTree = "<group>"; };
-		F4FF95D5245B92E700C19C63 /* ZegoUikitRn-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ZegoUikitRn-Bridging-Header.h"; sourceTree = "<group>"; };
-		F4FF95D6245B92E800C19C63 /* ZegoUikitRn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZegoUikitRn.swift; sourceTree = "<group>"; };
+		B3E7B5891CC2AC0600A0062D /* ZegoUIKitRN.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZegoUIKitRN.m; sourceTree = "<group>"; };
+		F4FF95D5245B92E700C19C63 /* ZegoUIKitRN-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ZegoUIKitRN-Bridging-Header.h"; sourceTree = "<group>"; };
+		F4FF95D6245B92E800C19C63 /* ZegoUIKitRN.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZegoUIKitRN.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,10 +51,9 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
-				86ADE1372891152600555A9B /* Info.plist */,
-				F4FF95D6245B92E800C19C63 /* ZegoUikitRn.swift */,
-				B3E7B5891CC2AC0600A0062D /* ZegoUikitRn.m */,
-				F4FF95D5245B92E700C19C63 /* ZegoUikitRn-Bridging-Header.h */,
+				F4FF95D6245B92E800C19C63 /* ZegoUIKitRN.swift */,
+				B3E7B5891CC2AC0600A0062D /* ZegoUIKitRN.m */,
+				F4FF95D5245B92E700C19C63 /* ZegoUIKitRN-Bridging-Header.h */,
 				134814211AA4EA7D00B7C361 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -94,7 +92,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 58B511D61A9E6C8500147676 /* Build configuration list for PBXProject "ZegoUikitRn" */;
+			buildConfigurationList = 58B511D61A9E6C8500147676 /* Build configuration list for PBXProject "ZegoUIKitRN" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -117,7 +115,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F4FF95D7245B92E800C19C63 /* ZegoUikitRn.swift in Sources */,
+				F4FF95D7245B92E800C19C63 /* ZegoUIKitRN.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -259,7 +257,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		58B511D61A9E6C8500147676 /* Build configuration list for PBXProject "ZegoUikitRn" */ = {
+		58B511D61A9E6C8500147676 /* Build configuration list for PBXProject "ZegoUIKitRN" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				58B511ED1A9E6C8500147676 /* Debug */,

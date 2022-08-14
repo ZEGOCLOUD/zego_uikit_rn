@@ -1,4 +1,4 @@
-package com.example.reactnativezegouikitrn;
+package com.example.zegouikitrn;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;

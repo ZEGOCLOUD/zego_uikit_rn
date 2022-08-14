@@ -1,4 +1,4 @@
-package com.reactnativezegouikitrn;
+package com.zegouikitrn;
 
 import androidx.annotation.NonNull;
 
@@ -8,11 +8,11 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.module.annotations.ReactModule;
 
-@ReactModule(name = ZegoUikitRnModule.NAME)
-public class ZegoUikitRnModule extends ReactContextBaseJavaModule {
+@ReactModule(name = ZegoUIKitRNModule.NAME)
+public class ZegoUIKitRNModule extends ReactContextBaseJavaModule {
     public static final String NAME = "ZegoUikitRn";
 
-    public ZegoUikitRnModule(ReactApplicationContext reactContext) {
+    public ZegoUIKitRNModule(ReactApplicationContext reactContext) {
         super(reactContext);
     }
 

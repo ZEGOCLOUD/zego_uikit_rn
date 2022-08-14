@@ -132,6 +132,6 @@ if (isNewArchitectureEnabled()) {
   react {
     jsRootDir = file("../src/")
     libraryName = "ZegoUikitRn"
-    codegenJavaPackageName = "com.reactnativezegouikitrn"
+    codegenJavaPackageName = "com.zegouikitrn"
   }
 }

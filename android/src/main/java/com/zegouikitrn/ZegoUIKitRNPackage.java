@@ -1,4 +1,4 @@
-package com.reactnativezegouikitrn;
+package com.zegouikitrn;
 
 import androidx.annotation.NonNull;
 
@@ -11,12 +11,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ZegoUikitRnPackage implements ReactPackage {
+public class ZegoUIKitRNPackage implements ReactPackage {
     @NonNull
     @Override
     public List<NativeModule> createNativeModules(@NonNull ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
-        modules.add(new ZegoUikitRnModule(reactContext));
+        modules.add(new ZegoUIKitRNModule(reactContext));
         return modules;
     }
 

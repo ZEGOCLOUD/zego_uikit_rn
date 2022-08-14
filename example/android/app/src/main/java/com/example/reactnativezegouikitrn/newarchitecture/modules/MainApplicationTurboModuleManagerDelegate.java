@@ -1,4 +1,4 @@
-package com.example.reactnativezegouikitrn.newarchitecture.modules;
+package com.example.zegouikitrn.newarchitecture.modules;
 
 import com.facebook.jni.HybridData;
 import com.facebook.react.ReactPackage;

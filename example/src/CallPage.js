@@ -5,7 +5,7 @@ import { StyleSheet, View, Text, Button } from 'react-native';
 import ZegoUIKit, {
     ZegoUIKitPrebuiltCall
 
-} from 'react-native-zego-uikit-rn';
+} from 'zego-uikit-rn';
 // import ZegoUIKit, {ZegoToggleCameraButton} from @zego-uikit/components-rn
 // import {ZegoUIKitPrebuiltCall} from @zego-uikit/prebuilt-call-rn
 
