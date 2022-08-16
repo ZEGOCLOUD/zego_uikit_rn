@@ -14,6 +14,7 @@ cp LICENSE $PROJECT_ROOT
 cp -r package.json $PROJECT_ROOT
 cp zego-uikit-rn.podspec
 cp *.md $PROJECT_ROOT
+cp -r docs $PROJECT_ROOT
 cp -r src $PROJECT_ROOT
 
 zip -r $PROJECT_ROOT.zip $PROJECT_ROOT
