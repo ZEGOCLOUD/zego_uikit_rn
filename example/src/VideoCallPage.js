@@ -6,22 +6,23 @@ import ZegoUIKit, {
     ZegoUIKitPrebuiltCall
 
 } from 'zego-uikit-rn';
+import KeyCenter from './KeyCenter';
 // import ZegoUIKit, {ZegoToggleCameraButton} from @zego-uikit/components-rn
 // import {ZegoUIKitPrebuiltCall} from @zego-uikit/prebuilt-call-rn
 
-export default function CallPage(props) {
+export default function VideoCallPage(props) {
     const { route } = props;
     const { params } = route;
-    const { userID, userName } = params;
+    const { userID, userName, callID } = params;
 
     return (
         <View style={styles.container}>
             <ZegoUIKitPrebuiltCall
-                appID={1484647939}
-                appSign='16e1c2b4d4c6345c8644546e8fe636d8b7e47d010e9b4a8825439ecd64ccee6f'
+                appID={KeyCenter.appID}
+                appSign={KeyCenter.appSign}
                 userID={userID}
                 userName={userName}
-                roomID='rn12345678'
+                callID={callID}
 
                 config={{
                     onHangUp: () => { props.navigation.navigate('HomePage') },

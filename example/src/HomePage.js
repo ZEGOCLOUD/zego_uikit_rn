@@ -1,28 +1,103 @@
-import React, { useEffect } from "react";
-import { Button, View, StyleSheet } from 'react-native'
+import React, { useEffect, useState } from "react";
+import { Button, View, StyleSheet, Text, TextInput } from 'react-native'
 import { useNavigation } from '@react-navigation/native';
 import ZegoUIKit from 'zego-uikit-rn';
 
 export default function HomePage(props) {
     const navigation = useNavigation();
-    const onJoinPress = (userID, userName) => {
-        navigation.navigate('CallPage', {
+    const onJoinPress = (isVoiceCall) => {
+        navigation.navigate(isVoiceCall ? 'VoiceCallPage' : 'VideoCallPage', {
             userID: userID,
-            userName: userName
+            userName: userID,
+            callID: callID,
         })
     }
+    const [userID, setUserID] = useState('');
+    const [callID, setCallID] = useState('');
+    useEffect(() => {
+        setUserID(String(Math.floor(Math.random() * 100000)));
+        setCallID(String(Math.floor(Math.random() * 10000)));
+    }, [])
     return (
         <View style={styles.container}>
-            <Button title="Join As Oliver" onPress={() => { onJoinPress('oliver', 'Oliver') }} />
-            <Button title="Join As Jack" onPress={() => { onJoinPress('jack', 'Jack') }} />
-            <Button title="Disconnect SDK" onPress={() => { ZegoUIKit.disconnectSDK() }} />
+            <Text style={styles.userID}>Your User ID: {userID}</Text>
+            <Text style={[styles.simpleCallTitle, styles.leftPadding]}>
+                Start a call without waiting for response:
+            </Text>
+            <Text style={[styles.callID, styles.leftPadding]}>Call ID:</Text>
+            <TextInput
+                placeholder="Enter the Call ID. e.g. 6666"
+                style={[styles.input]}
+                onChangeText={text => setCallID(text)}
+            >
+                {callID}
+            </TextInput>
+            <View style={[styles.buttonLine, styles.leftPadding]}>
+                <Button style={styles.button} title="1 on 1 Voice Call" onPress={() => {onJoinPress(true)}} />
+                <View style={styles.buttonSpacing} />
+                <Button style={styles.button} title="1 on 1 Video Call" onPress={() => {onJoinPress(false)}} />
+            </View>
+            {/* <View style={styles.buttonLine}>
+                <Button title="Disconnect SDK" onPress={() => { ZegoUIKit.disconnectSDK() }} />
+            </View> */}
         </View>)
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'space-around',
-        alignItems: 'center'
+        justifyContent: 'flex-start',
+        alignItems: 'flex-start'
+    },
+    buttonLine: {
+        // flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        height: 42,
+    },
+    buttonSpacing: {
+        width: 13,
+    },
+    input: {
+        height: 42,
+        width: 305,
+        borderWidth: 1,
+        borderRadius: 9,
+        borderColor: '#333333',
+        paddingLeft: 16,
+        paddingRight: 16,
+        paddingTop: 10,
+        paddingBottom: 10,
+        marginLeft: 35,
+        marginBottom: 20,
+    },
+    userID: {
+        fontSize: 14,
+        color: '#2A2A2A',
+        marginBottom: 27,
+        paddingBottom: 12,
+        paddingTop: 12,
+        paddingLeft: 20,
+    },
+    callID: {
+        fontSize: 14,
+        color: '#2A2A2A',
+        marginBottom: 5,
+    },
+    simpleCallTitle: {
+        color: '#2A2A2A',
+        fontSize: 21,
+        width: 330,
+        fontWeight: 'bold',
+        marginBottom: 27,
+    },
+    button: {
+        height: 42,
+        borderRadius: 9,
+        backgroundColor: '#F4F7FB',
+    },
+    leftPadding: {
+        paddingLeft: 35,
     }
 })
