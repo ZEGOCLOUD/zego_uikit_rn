@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useId } from 'react';
+import { Alert } from 'react-native';
 
 import { StyleSheet, View, Text, Button } from 'react-native';
 import ZegoUIKit, {
@@ -28,6 +28,28 @@ export default function VoiceCallPage(props) {
                     onHangUp: () => { props.navigation.navigate('HomePage') },
                     menuBarButtons: [2, 0, 4],
                     turnOnCameraWhenJoining: false,
+                    onHangUpConfirming: () => {
+                        return new Promise((resolve, reject) => {
+                            Alert.alert(
+                                "Leave the call",
+                                "Are your sure to leave the call",
+                                [
+                                    {
+                                        text: "Cancel",
+                                        onPress: () => {
+                                            reject();
+                                        },
+                                        style: "cancel"
+                                    },
+                                    {
+                                        text: "Confirm", onPress: () => {
+                                            resolve();
+                                        }
+                                    }
+                                ]
+                            );
+                        })
+                    }
                 }}
             />
         </View>
