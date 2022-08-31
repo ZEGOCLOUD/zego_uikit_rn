@@ -2,7 +2,7 @@ import React from "react";
 import { Image, TouchableOpacity, View } from "react-native";
 import ZegoUIKitInternal from "../internal/ZegoUIKitInternal";
 
-export default function ZegoQuitButton(props) {
+export default function ZegoLeaveButton(props) {
     const { iconLeave, onLeaveConfirming, onPressed } = props;
     const onPress = () => {
         if (typeof onLeaveConfirming == 'function') {

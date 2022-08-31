@@ -16,13 +16,13 @@ export default {
     useFrontFacingCamera: ZegoUIKitInternal.useFrontFacingCamera,
     isMicrophoneOn: ZegoUIKitInternal.isMicDeviceOn,
     isCameraOn: ZegoUIKitInternal.isCameraDeviceOn,
-    // setAudioOutputToSpeaker
+    setAudioOutputToSpeaker: ZegoUIKitInternal.setAudioOutputToSpeaker,
     turnMicrophoneOn: ZegoUIKitInternal.turnMicDeviceOn,
     turnCameraOn: ZegoUIKitInternal.turnCameraDeviceOn,
     onMicrophoneOn: ZegoUIKitInternal.onMicDeviceOn,
     onCameraOn: ZegoUIKitInternal.onCameraDeviceOn,
-    // onAudioOutputDeviceChanged
-    // onSoundLevelUpdated
+    onAudioOutputDeviceChanged: ZegoUIKitInternal.onAudioOutputDeviceTypeChange,
+    onSoundLevelUpdated: ZegoUIKitInternal.onSoundLevelUpdate,
     // onAudioVideoAvailable
     // onAudioVideoUnavailable
     joinRoom: ZegoUIKitInternal.joinRoom,

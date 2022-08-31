@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, StyleSheet, TouchableOpacity } from "react-native";
-import ZegoQuitButton from '../../components/audio_video/ZegoLeaveButton';
+import ZegoLeaveButton from '../../components/audio_video/ZegoLeaveButton';
 import ZegoSwitchAudioOutputButton from '../../components/audio_video/ZegoSwitchAudioOutputButton';
 import ZegoSwitchCameraFacingButton from '../../components/audio_video/ZegoSwitchCameraButton';
 import ZegoToggleCameraButton from '../../components/audio_video/ZegoToggleCameraButton';
@@ -31,7 +31,7 @@ export default function ZegoBottomBar(props) {
     const getButtonByButtonIndex = (buttonIndex) => {
         switch (buttonIndex) {
             case 0:
-                return <ZegoQuitButton key={0} onLeaveConfirming={onHangUpConfirming} onPressed={onHangUp} />
+                return <ZegoLeaveButton key={0} onLeaveConfirming={onHangUpConfirming} onPressed={onHangUp} />
             case 1:
                 return <ZegoToggleCameraButton key={1} isOn={turnOnCameraWhenJoining} />;
             case 2:
@@ -39,7 +39,7 @@ export default function ZegoBottomBar(props) {
             case 3:
                 return <ZegoSwitchCameraFacingButton key={3} />
             case 4:
-                return <ZegoSwitchAudioOutputButton key={4} useSpeakerWhenJoining={useSpeakerWhenJoining} />
+                return <ZegoSwitchAudioOutputButton key={4} useSpeaker={useSpeakerWhenJoining} />
         }
     }
     const getDisplayButtons = () => {

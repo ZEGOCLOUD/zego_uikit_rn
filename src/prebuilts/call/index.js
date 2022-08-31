@@ -25,10 +25,10 @@ export default function ZegoUIKitPrebuiltCall(props) {
         useVideoViewAspectFill = true,
         turnOnCameraWhenJoining = true,
         turnOnMicrophoneWhenJoining = true,
-        useSpeakerWhenJoining = false,
+        useSpeakerWhenJoining = true,
         layout = {},
         menuBarButtonsMaxCount = 5,
-        menuBarButtons = [0, 1, 2, 3], // enum { ZegoQuitButton, ZegoToggleCameraButton, ZegoToggleMicrophoneButton}
+        menuBarButtons = [1, 2, 0, 3, 4], // enum { ZegoQuitButton, ZegoToggleCameraButton, ZegoToggleMicrophoneButton}
         menuBarExtendedButtons = [],
         hideMenuBarAutomatically = true,
         hideMenuBardByClick = true,
@@ -137,7 +137,6 @@ export default function ZegoUIKitPrebuiltCall(props) {
             });
 
         return () => {
-            // ZegoUIKit.disconnectSDK();
             ZegoUIKit.leaveRoom();
         }
     }, []);

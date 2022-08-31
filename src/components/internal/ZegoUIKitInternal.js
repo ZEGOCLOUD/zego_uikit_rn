@@ -4,6 +4,7 @@ import { zlogerror, zloginfo, zlogwarning } from '../../utils/logger';
 var _isRoomConnected = false;
 var _currentRoomState = 7; // Logout
 var _currentRoomID = '';
+var _audioOutputType = 0;
 
 var _onMicDeviceOnCallbackMap = {};
 var _onCameraDeviceOnCallbackMap = {};
@@ -13,6 +14,7 @@ var _onUserLeaveCallbackMap = {};
 var _onUserInfoUpdateCallbackMap = {};
 var _onSoundLevelUpdateCallbackMap = {};
 var _onSDKConnectedCallbackMap = {};
+var _onAudioOutputDeviceTypeChangeCallbackMap = {};
 
 var _localCoreUser = _createCoreUser('', '', '', {});
 var _streamCoreUserMap = {}; // <streamID, CoreUser>
@@ -27,6 +29,7 @@ function _resetData() {
     _currentRoomID = '';
     _currentRoomState = 7;
     _isRoomConnected = false;
+    _audioOutputType = 0;
 }
 
 function _resetDataForLeavingRoom() {
@@ -52,7 +55,6 @@ function _createCoreUser(userID, userName, profileUrl, extendInfo) {
         streamID: '',
         isMicDeviceOn: true,
         isCameraDeviceOn: true,
-        audioOutputType: 0,
         publisherQuality: 0,
         soundLevel: 0,
     }
@@ -163,6 +165,12 @@ function _onRemoteCameraStateUpdate(streamID, state) {
             }
         }
     }
+}
+function _onAudioRouteChange(type) {
+    Object.keys(_onAudioOutputDeviceTypeChangeCallbackMap).forEach(callbackID => {
+        _onAudioOutputDeviceTypeChangeCallbackMap[callbackID](type);
+    });
+    _audioOutputType = type;
 }
 function _onRemoteMicStateUpdate(streamID, state) {
     const userID = _getUserIDByStreamID(streamID);
@@ -295,6 +303,13 @@ function _registerEngineCallback() {
             _onRoomStateChanged(roomID, reason, errorCode, extendedData);
         },
     );
+    ZegoExpressEngine.instance().on(
+        'audioRouteChange',
+        (audioRoute) => {
+            zloginfo('[audioRouteChange callback]', audioRoute);
+            _onAudioRouteChange(audioRoute);
+        },
+    );
 }
 function _unregisterEngineCallback() {
     zloginfo('Unregister callback from ZegoExpressEngine...');
@@ -307,6 +322,7 @@ function _unregisterEngineCallback() {
     ZegoExpressEngine.instance().off('remoteSoundLevelUpdate');
     ZegoExpressEngine.instance().off('capturedSoundLevelUpdate');
     ZegoExpressEngine.instance().off('roomStateChanged');
+    ZegoExpressEngine.instance().off('audioRouteChange');
 }
 
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Stream Handling <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -535,7 +551,7 @@ export default {
         });
     },
     audioOutputDeviceType() {
-        // TODO
+        return _audioOutputType;
     },
     turnMicDeviceOn(userID, on) {
         return new Promise((resolve, reject) => {
@@ -611,8 +627,18 @@ export default {
             _onCameraDeviceOnCallbackMap[callbackID] = callback;
         }
     },
+    setAudioOutputToSpeaker(isSpeaker) {
+        ZegoExpressEngine.instance().setAudioRouteToSpeaker(isSpeaker);
+    },
     onAudioOutputDeviceTypeChange(callbackID, callback) {
-        // TODO SDK missing API for this callback
+        if (typeof callback !== 'function') {
+            if (callbackID in _onAudioOutputDeviceTypeChangeCallbackMap) {
+                zloginfo('[onAudioOutputDeviceTypeChange] Remove callback for: [', callbackID, '] because callback is not a valid function!');
+                delete _onAudioOutputDeviceTypeChangeCallbackMap[callbackID];
+            }
+        } else {
+            _onAudioOutputDeviceTypeChangeCallbackMap[callbackID] = callback;
+        }
     },
     setAudioConfig(config) {
         // TODO

@@ -22,9 +22,10 @@ export default function CallPage(props) {
                 userID={userID}
                 userName={userName}
                 roomID='rn12345678'
-                
+
                 config={{
-                    onHangUp: () => {props.navigation.navigate('HomePage')}
+                    onHangUp: () => { props.navigation.navigate('HomePage') },
+                    menuBarButtons: [1, 3, 0, 2, 4]
                 }}
             />
         </View>

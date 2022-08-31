@@ -4,11 +4,11 @@ import ZegoUIKitInternal from "../internal/ZegoUIKitInternal";
 
 export default function ZegoSwitchAudioOutputButton(props) {
     // ZegoAudioRouteSpeaker=(0) ZegoAudioRouteHeadphone=(1) ZegoAudioRouteBluetooth=(2) ZegoAudioRouteReceiver=(3) ZegoAudioRouteExternalUSB=(4) ZegoAudioRouteAirPlay=(5)
-    const { iconSpeaker, iconEarpiece, iconBluetooth } = props;
-    const [currentDevice, setCurrentDevice] = useState(0);// Default on
-    const [isOn, setIsOn] = useState(true);
+    const { iconSpeaker, iconEarpiece, iconBluetooth, useSpeaker = false } = props;
+    const [currentDevice, setCurrentDevice] = useState(0);// Default to speaker
+    const [enable, setEnable] = useState(true);
     const getImageSourceByPath = () => {
-        const path = "";
+        var path = "";
         if (currentDevice == 0) {
             path = iconSpeaker ? iconSpeaker : require("../internal/resources/white_button_speaker_on.png");
         } else if (currentDevice == 2) {
@@ -19,23 +19,37 @@ export default function ZegoSwitchAudioOutputButton(props) {
         return path;
     }
     const onPress = () => {
-        ZegoUIKitInternal.enableSpeaker(!isOn);
-        setIsOn(!isOn);
+        if (enable) {
+            var usingSpeaker = currentDevice == 0;
+            ZegoUIKitInternal.setAudioOutputToSpeaker(!usingSpeaker);
+        }
     }
+    const updateDeviceType = (type) => {
+        setCurrentDevice(type);
+        setEnable(type == 0 || type == 3);
+    }
+    useEffect(() => {
+        setCurrentDevice(ZegoUIKitInternal.audioOutputDeviceType());
+    });
     useEffect(() => {
         const callbackID = 'ZegoSwitchAudioOutputButton' + String(Math.floor(Math.random() * 10000));
         ZegoUIKitInternal.onAudioOutputDeviceTypeChange(callbackID, (type) => {
-            setCurrentDevice(type);
+            updateDeviceType(type);
+        });
+        ZegoUIKitInternal.onSDKConnected(callbackID, () => {
+            ZegoUIKitInternal.setAudioOutputToSpeaker(useSpeaker);
+            updateDeviceType(ZegoUIKitInternal.audioOutputDeviceType());
         });
         return () => {
             ZegoUIKitInternal.onAudioOutputDeviceTypeChange(callbackID);
+            ZegoUIKitInternal.onSDKConnected(callbackID);
         }
     }, []);
 
     // TODO make style layout
     return (<View>
         <TouchableOpacity
-            disabled={currentDevice == 0} // Only speaker can toggle enable
+            disabled={!enable} // Only speaker can toggle enable
             // style={styles.micCon}
             onPress={onPress}>
             <Image source={getImageSourceByPath()} />
