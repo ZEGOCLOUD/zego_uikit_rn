@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, StyleSheet, TouchableOpacity } from "react-native";
 import ZegoQuitButton from '../../components/audio_video/ZegoLeaveButton';
 import ZegoSwitchAudioOutputButton from '../../components/audio_video/ZegoSwitchAudioOutputButton';
-import ZegoSwitchCameraFacingButton from '../../components/audio_video/ZegoSwitchCameraFacingButton';
+import ZegoSwitchCameraFacingButton from '../../components/audio_video/ZegoSwitchCameraButton';
 import ZegoToggleCameraButton from '../../components/audio_video/ZegoToggleCameraButton';
 import ZegoToggleMicrophoneButton from '../../components/audio_video/ZegoToggleMicrophoneButton';
 import ZegoMoreButton from './ZegoMoreButton';

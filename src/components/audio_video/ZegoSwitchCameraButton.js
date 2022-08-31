@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Image, TouchableOpacity, View } from "react-native";
 import ZegoUIKitInternal from "../internal/ZegoUIKitInternal";
 
-export default function ZegoSwitchCameraFacingButton(props) {
+export default function ZegoSwitchCameraButton(props) {
     const { iconFrontFacingCamera, iconBackFacingCamera, useFrontFacingCamera = true, onPress } = props;
     const [isFront, setIsFront] = useState(useFrontFacingCamera);
     const getImageSourceByPath = () => {
@@ -19,7 +19,7 @@ export default function ZegoSwitchCameraFacingButton(props) {
     }
 
     useEffect(() => {
-        const callbackID = 'ZegoSwitchCameraFacingButton' + String(Math.floor(Math.random() * 10000));
+        const callbackID = 'ZegoSwitchCameraButton' + String(Math.floor(Math.random() * 10000));
         ZegoUIKitInternal.onSDKConnected(callbackID, () => {
             ZegoUIKitInternal.useFrontFacingCamera(useFrontFacingCamera);
         });

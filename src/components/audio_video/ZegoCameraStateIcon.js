@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Image, View } from "react-native";
 import ZegoUIKitInternal from "../internal/ZegoUIKitInternal";
 
-export default function ZegoCameraStatusIcon(props) {
+export default function ZegoCameraStateIcon(props) {
     const { userID, iconCameraOn, iconCameraOff } = props;
     const [isOn, setIsOn] = useState(true);// Default on
     const getImageSourceByPath = () => {
@@ -15,7 +15,7 @@ export default function ZegoCameraStatusIcon(props) {
         setIsOn(ZegoUIKitInternal.isCameraDeviceOn(userID));
     });
     useEffect(() => {
-        const callbackID = 'ZegoCameraStatusIcon' + String(Math.floor(Math.random() * 10000));
+        const callbackID = 'ZegoCameraStateIcon' + String(Math.floor(Math.random() * 10000));
         ZegoUIKitInternal.onSDKConnected(callbackID, () => {
             setIsOn(ZegoUIKitInternal.isCameraDeviceOn(userID))
         });

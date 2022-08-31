@@ -1,8 +1,8 @@
 import ZegoUIKitInternal from './components/internal/ZegoUIKitInternal'
 import ZegoAudioVideoView from './components/audio_video/ZegoAudioVideoView'
-import ZegoCameraStatusIcon from './components/audio_video/ZegoCameraStatusIcon'
-import ZegoMicrophoneStatusIcon from './components/audio_video/ZegoMicophoneStatusIcon'
-import ZegoSwitchCameraFacingButton from './components/audio_video/ZegoSwitchCameraFacingButton'
+import ZegoCameraStateIcon from './components/audio_video/ZegoCameraStateIcon'
+import ZegoMicrophoneStateIcon from './components/audio_video/ZegoMicrophoneStateIcon'
+import ZegoSwitchCameraButton from './components/audio_video/ZegoSwitchCameraButton'
 import ZegoToggleMicrophoneButton from './components/audio_video/ZegoToggleMicrophoneButton'
 import ZegoToggleCameraButton from './components/audio_video/ZegoToggleCameraButton'
 import ZegoSwitchAudioOutputButton from './components/audio_video/ZegoSwitchAudioOutputButton'
@@ -11,29 +11,36 @@ import ZegoLeaveButton from './components/audio_video/ZegoLeaveButton'
 import ZegoUIKitPrebuiltCall from './prebuilts/call'
 
 export default {
-    connectSDK: ZegoUIKitInternal.connectSDK,
-    disconnectSDK: ZegoUIKitInternal.disconnectSDK,
+    init: ZegoUIKitInternal.connectSDK,
+    uninit: ZegoUIKitInternal.disconnectSDK,
     useFrontFacingCamera: ZegoUIKitInternal.useFrontFacingCamera,
-    isMicDeviceOn: ZegoUIKitInternal.isMicDeviceOn,
-    isCameraDeviceOn: ZegoUIKitInternal.isCameraDeviceOn,
-    turnMicDeviceOn: ZegoUIKitInternal.turnMicDeviceOn,
-    turnCameraDeviceOn: ZegoUIKitInternal.turnCameraDeviceOn,
-    onMicDeviceOn: ZegoUIKitInternal.onMicDeviceOn,
-    onCameraDeviceOn: ZegoUIKitInternal.onCameraDeviceOn,
+    isMicrophoneOn: ZegoUIKitInternal.isMicDeviceOn,
+    isCameraOn: ZegoUIKitInternal.isCameraDeviceOn,
+    // setAudioOutputToSpeaker
+    turnMicrophoneOn: ZegoUIKitInternal.turnMicDeviceOn,
+    turnCameraOn: ZegoUIKitInternal.turnCameraDeviceOn,
+    onMicrophoneOn: ZegoUIKitInternal.onMicDeviceOn,
+    onCameraOn: ZegoUIKitInternal.onCameraDeviceOn,
+    // onAudioOutputDeviceChanged
+    // onSoundLevelUpdated
+    // onAudioVideoAvailable
+    // onAudioVideoUnavailable
     joinRoom: ZegoUIKitInternal.joinRoom,
     leaveRoom: ZegoUIKitInternal.leaveRoom,
+    // onOnlySelfInRoom
     onRoomStateChanged: ZegoUIKitInternal.onRoomStateChanged,
-    setLocalUserInfo: ZegoUIKitInternal.setLocalUserInfo,
-    getLocalUserInfo: ZegoUIKitInternal.getLocalUserInfo,
+    connectUser: ZegoUIKitInternal.connectUser,
+    disconnectUser: ZegoUIKitInternal.disconnectUser,
+    getUser: ZegoUIKitInternal.getUser,
     onUserJoin: ZegoUIKitInternal.onUserJoin,
     onUserLeave: ZegoUIKitInternal.onUserLeave,
 }
 
 export {
     ZegoAudioVideoView,
-    ZegoCameraStatusIcon,
-    ZegoMicrophoneStatusIcon,
-    ZegoSwitchCameraFacingButton,
+    ZegoCameraStateIcon,
+    ZegoMicrophoneStateIcon,
+    ZegoSwitchCameraButton,
     ZegoToggleMicrophoneButton,
     ZegoToggleCameraButton,
     ZegoSwitchAudioOutputButton,

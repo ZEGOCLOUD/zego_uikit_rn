@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Image, View } from "react-native";
 import ZegoUIKitInternal from "../internal/ZegoUIKitInternal";
 
-export default function ZegoMicrophoneStatusIcon(props) {
+export default function ZegoMicrophoneStateIcon(props) {
     const { userID, iconMicrophoneOn, iconMicrophoneOff, iconMicrophoneSpeaking } = props;
     const [isOn, setIsOn] = useState(true);
     const [hasSound, setHasSound] = useState(false);
@@ -19,7 +19,7 @@ export default function ZegoMicrophoneStatusIcon(props) {
         setIsOn(ZegoUIKitInternal.isMicDeviceOn(userID));
     });
     useEffect(() => {
-        const callbackID = 'ZegoMicrophoneStatusIcon' + String(Math.floor(Math.random() * 10000));
+        const callbackID = 'ZegoMicrophoneStateIcon' + String(Math.floor(Math.random() * 10000));
         ZegoUIKitInternal.onSDKConnected(callbackID, () => {
             setIsOn(ZegoUIKitInternal.isMicDeviceOn(userID))
         });

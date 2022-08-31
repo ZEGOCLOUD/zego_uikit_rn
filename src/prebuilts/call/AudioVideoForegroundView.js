@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native"
-import ZegoMicrophoneStatusIcon from "../../components/audio_video/ZegoMicophoneStatusIcon";
-import ZegoCameraStatusIcon from "../../components/audio_video/ZegoCameraStatusIcon";
+import ZegoMicrophoneStatusIcon from "../../components/audio_video/ZegoMicrophoneStateIcon";
+import ZegoCameraStatusIcon from "../../components/audio_video/ZegoCameraStateIcon";
 
 export default function AudioVideoForegroundView(props) {
     const { userInfo, showUserNameOnView, showCameraStateOnView, showMicrophoneStateOnView } = props;

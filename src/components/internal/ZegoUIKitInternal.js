@@ -671,8 +671,14 @@ export default {
     },
 
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> User <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    setLocalUserInfo(userInfo) {
-        _setLocalUserInfo(userInfo);
+    connectUser(userID, userName) {
+        _setLocalUserInfo({userID: userID, userName: userName});
+        // TODO ZIM login
+    },
+    disconnectUser() {
+        delete _coreUserMap[_localCoreUser.userID];
+        _localCoreUser = _createCoreUser('', '', '', {});
+        // TODO ZIM logout
     },
     getLocalUserInfo() {
         return {
