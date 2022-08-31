@@ -163,11 +163,15 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
     },
+    emptyView: {
+        backgroundColor: '#4A4B4D'
+    },
     bigView: {
         flex: 1,
         width: '100%',
         height: '100%',
         position: 'absolute',
+        backgroundColor: '#4A4B4D',
         zIndex: 1,
     },
     smallView: {
@@ -179,7 +183,8 @@ const styles = StyleSheet.create({
         right: 12,
         zIndex: 2,
         borderRadius: 10,
-        overflow: 'hidden'
+        overflow: 'hidden',
+        backgroundColor: '#4A4B4D',
     },
     smallViewBorder: {
         borderWidth: 0.5,
