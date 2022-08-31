@@ -131,13 +131,15 @@ export default function ZegoUIKitPrebuiltCall(props) {
             appID,
             appSign,
             { userID: userID, userName: userName }).then(() => {
-                grantPermissions(() => {
-                    ZegoUIKit.joinRoom(callID);
-                });
 
                 ZegoUIKit.turnCameraDeviceOn('', turnOnCameraWhenJoining);
                 ZegoUIKit.turnMicDeviceOn('', turnOnMicrophoneWhenJoining);
                 ZegoUIKit.setAudioOutputToSpeaker(useSpeakerWhenJoining);
+                
+                grantPermissions(() => {
+                    ZegoUIKit.joinRoom(callID);
+                });
+
             });
 
         return () => {

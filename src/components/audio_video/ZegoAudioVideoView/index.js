@@ -36,7 +36,7 @@ export default function ZegoVideoView(props) {
 
     useEffect(() => {
         setUserInfo(ZegoUIKitInternal.getUser(userID));
-        
+
         ZegoUIKitInternal.onUserInfoUpdate('ZegoVideoView' + String(userID),
             (info) => {
                 if (info.userID == currentUserID) {
@@ -48,11 +48,8 @@ export default function ZegoVideoView(props) {
         ZegoUIKitInternal.onRoomStateChanged('ZegoVideoView' + String(userID),
             (reason, errorCode, extendedData) => {
                 if (ZegoUIKitInternal.isRoomConnected()) {
-                    if (currentUserID === '') {
-                        const localUser = ZegoUIKitInternal.getLocalUserInfo();
-                        setCurrentUserID(localUser.userID);
-                        setIsCameraOn(localUser.isCameraDeviceOn);
-                    }
+                    const localUser = ZegoUIKitInternal.getLocalUserInfo();
+                    setIsCameraOn(localUser.isCameraDeviceOn);
                 }
             });
         return () => {

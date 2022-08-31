@@ -588,6 +588,7 @@ export default {
                 _onRemoteCameraStateUpdate(_getPublishStreamID(), on ? 0 : 10); // 0 for open, 10 for mute
 
                 _localCoreUser.isCameraDeviceOn = on;
+                console.log('&&&&&&', _localCoreUser.isCameraDeviceOn)
                 if (!on) {
                     _localCoreUser.viewID = -1;
                 }
@@ -707,12 +708,7 @@ export default {
         // TODO ZIM logout
     },
     getLocalUserInfo() {
-        return {
-            userID: _localCoreUser.userID,
-            userName: _localCoreUser.userName,
-            profileUrl: _localCoreUser.profileUrl,
-            extendInfo: _localCoreUser.extendInfo,
-        };
+        return _localCoreUser;
     },
     getUser(userID) {
         return _coreUserMap[userID];
