@@ -1,17 +1,15 @@
 {
   "name": "zego-uikit-rn",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "ZegoUIKit",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
   "react-native": "src/index",
   "source": "src/index",
   "files": [
-    "src",
     "lib",
     "android",
     "ios",
-    "cpp",
     "zego-uikit-rn.podspec",
     "!lib/typescript/example",
     "!android/build",
@@ -35,13 +33,13 @@
     "ios",
     "android"
   ],
-  "repository": "https://github.com/Match-Yang/zego-uikit-rn",
-  "author": "Oliver.Yeung <oliver.yeung.temp@gmail.com> (https://github.com/Match-Yang)",
+  "repository": "https://github.com/ZEGOCLOUD",
+  "author": "Oliver.Yeung <oliveryang@zego.im> (https://zegocloud.com)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/Match-Yang/zego-uikit-rn/issues"
   },
-  "homepage": "https://github.com/Match-Yang/zego-uikit-rn#readme",
+  "homepage": "https://zegocloud.com",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
