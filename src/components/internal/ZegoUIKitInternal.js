@@ -5,6 +5,7 @@ var _isRoomConnected = false;
 var _currentRoomState = 7; // Logout
 var _currentRoomID = '';
 var _audioOutputType = 0;
+var _usingFrontFacingCamera = true;
 
 var _onMicDeviceOnCallbackMap = {};
 var _onCameraDeviceOnCallbackMap = {};
@@ -520,7 +521,12 @@ export default {
 
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Audio Video <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     useFrontFacingCamera(isFrontFacing) {
+        zloginfo('Use front facing camera: ', isFrontFacing);
+        _usingFrontFacingCamera = isFrontFacing;
         return ZegoExpressEngine.instance().useFrontCamera(isFrontFacing, 0);
+    },
+    isUsingFrontFacingCamera() {
+        return _usingFrontFacingCamera;
     },
     isMicDeviceOn(userID) {
         if (!userID) {
