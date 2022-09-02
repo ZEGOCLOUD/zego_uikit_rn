@@ -27,6 +27,7 @@ export default function VideoFrame(props) {
         return () => {
             ZegoUIKitInternal.onSDKConnected('VideoFrame' + userID);
             ZegoUIKitInternal.onUserJoin('VideoFrame' + userID);
+            ZegoUIKitInternal.updateRenderingProperty(userID, -1, fillMode);
         }
     }, []);
 
@@ -35,6 +36,7 @@ export default function VideoFrame(props) {
             <ZegoTextureView
                 style={styles.videoContainer}
                 ref={viewRef}
+                collapsable={false}
             />
         </View>
     );

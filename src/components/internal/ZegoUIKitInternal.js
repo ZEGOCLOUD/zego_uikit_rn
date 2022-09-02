@@ -92,6 +92,7 @@ function _onRoomUserUpdate(roomID, updateType, userList) {
             _tryStartPlayStream(user.userID);
         });
 
+        zloginfo("User Join: ", userInfoList)
         Object.keys(_onUserJoinCallbackMap).forEach(callbackID => {
             _onUserJoinCallbackMap[callbackID](userInfoList);
         });
@@ -112,6 +113,7 @@ function _onRoomUserUpdate(roomID, updateType, userList) {
                 delete _coreUserMap[user.userID];
             }
         });
+        zloginfo("User Leave: ", userInfoList)
         Object.keys(_onUserLeaveCallbackMap).forEach(callbackID => {
             _onUserLeaveCallbackMap[callbackID](userInfoList);
         })
@@ -366,11 +368,15 @@ function _tryStartPlayStream(userID) {
         const user = _coreUserMap[userID];
         zloginfo('_tryStartPlayStream: ', user)
         if (user.viewID > 0 && user.streamID !== '') {
-            ZegoExpressEngine.instance().startPlayingStream(user.streamID, {
-                'reactTag': user.viewID,
-                'viewMode': user.fillMode,
-                'backgroundColor': 0
-            });
+            if (user.viewID < 0) {
+                ZegoExpressEngine.instance().startPlayingStream(user.streamID);
+            } else {
+                ZegoExpressEngine.instance().startPlayingStream(user.streamID, {
+                    'reactTag': user.viewID,
+                    'viewMode': user.fillMode,
+                    'backgroundColor': 0
+                });
+            }
         }
     }
 }
@@ -699,7 +705,7 @@ export default {
 
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> User <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     connectUser(userID, userName) {
-        _setLocalUserInfo({userID: userID, userName: userName});
+        _setLocalUserInfo({ userID: userID, userName: userName });
         // TODO ZIM login
     },
     disconnectUser() {
