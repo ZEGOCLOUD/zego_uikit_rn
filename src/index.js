@@ -26,7 +26,7 @@ export default {
     // onAudioVideoUnavailable
     joinRoom: ZegoUIKitInternal.joinRoom,
     leaveRoom: ZegoUIKitInternal.leaveRoom,
-    // onOnlySelfInRoom
+    onOnlySelfInRoom: ZegoUIKitInternal.onOnlySelfInRoom,
     onRoomStateChanged: ZegoUIKitInternal.onRoomStateChanged,
     connectUser: ZegoUIKitInternal.connectUser,
     disconnectUser: ZegoUIKitInternal.disconnectUser,

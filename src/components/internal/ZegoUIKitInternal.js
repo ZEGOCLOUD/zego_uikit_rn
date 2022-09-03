@@ -16,6 +16,7 @@ var _onUserInfoUpdateCallbackMap = {};
 var _onSoundLevelUpdateCallbackMap = {};
 var _onSDKConnectedCallbackMap = {};
 var _onAudioOutputDeviceTypeChangeCallbackMap = {};
+var _onOnlySelfInRoomCallbackMap = {};
 
 var _localCoreUser = _createCoreUser('', '', '', {});
 var _streamCoreUserMap = {}; // <streamID, CoreUser>
@@ -118,6 +119,13 @@ function _onRoomUserUpdate(roomID, updateType, userList) {
         Object.keys(_onUserLeaveCallbackMap).forEach(callbackID => {
             _onUserLeaveCallbackMap[callbackID](userInfoList);
         })
+        if (Object.keys(_coreUserMap).length <= 1) {
+            Object.keys(_onOnlySelfInRoomCallbackMap).forEach(callbackID => {
+                if (_onOnlySelfInRoomCallbackMap[callbackID]) {
+                    _onOnlySelfInRoomCallbackMap[callbackID]();
+                }
+            })
+        }
     }
 }
 function _onRoomStreamUpdate(roomID, updateType, streamList) {
@@ -745,6 +753,16 @@ export default {
             }
         } else {
             _onUserLeaveCallbackMap[callbackID] = callback;
+        }
+    },
+    onOnlySelfInRoom(callbackID, callback) {
+        if (typeof callback !== 'function') {
+            if (callbackID in _onOnlySelfInRoomCallbackMap) {
+                zloginfo('[onOnlySelfInRoom] Remove callback for: [', callbackID, '] because callback is not a valid function!');
+                delete _onOnlySelfInRoomCallbackMap[callbackID];
+            }
+        } else {
+            _onOnlySelfInRoomCallbackMap[callbackID] = callback;
         }
     }
 }
