@@ -163,8 +163,6 @@ function _onRemoteCameraStateUpdate(streamID, state) {
         if (userID != _localCoreUser.userID) {
             if (isOn) {
                 _tryStartPlayStream(userID);
-            } else {
-                _tryStopPlayStream(userID);
             }
         }
     }
@@ -189,8 +187,6 @@ function _onRemoteMicStateUpdate(streamID, state) {
         if (userID != _localCoreUser.userID) {
             if (isOn) {
                 _tryStartPlayStream(userID);
-            } else {
-                _tryStopPlayStream(userID);
             }
         }
     }
@@ -235,7 +231,7 @@ function _registerEngineCallback() {
         (streamID, quality) => {
             if (_qualityUpdateLogCounter % 10 == 0) {
                 _qualityUpdateLogCounter = 0;
-                // zloginfo('[publisherQualityUpdate callback]', streamID, quality);
+                zloginfo('[publisherQualityUpdate callback]', streamID, quality);
             }
             _qualityUpdateLogCounter++;
             if (streamID.split('_')[2] === 'main') {
@@ -245,10 +241,18 @@ function _registerEngineCallback() {
             }
         },
     );
+    // ZegoExpressEngine.instance().on(
+    //     'publisherStateUpdate',
+    //     (streamID, state, errorCode, extendedData) => {
+    //         zloginfo('publisherStateUpdate#################', streamID, state, errorCode)
+    //     },
+    // );
     ZegoExpressEngine.instance().on(
         'playerQualityUpdate',
         (streamID, quality) => {
-            // zloginfo('[playerQualityUpdate callback]', streamID, quality);
+            if (_qualityUpdateLogCounter % 10 == 0) {
+                zloginfo('[playerQualityUpdate callback]', streamID, quality);
+            }
             // TODO
         },
     );
@@ -384,7 +388,7 @@ function _tryStartPlayStream(userID) {
 function _tryStopPlayStream(userID, force = false) {
     if (userID in _coreUserMap) {
         const user = _coreUserMap[userID];
-        if (force || (user.viewID < 0 || (!user.isMicDeviceOn && !user.isCameraDeviceOn))) {
+        if (force || (!user.isMicDeviceOn && !user.isCameraDeviceOn)) {
             ZegoExpressEngine.instance().stopPlayingStream(user.streamID);
         }
     }
@@ -431,8 +435,6 @@ export default {
                 // Check if stream is ready to play for remote user
                 if (viewID > 0) {
                     _tryStartPlayStream(userID);
-                } else {
-                    _tryStopPlayStream(userID);
                 }
             }
         }
