@@ -35,14 +35,15 @@ export default function ZegoVideoView(props) {
 
 
     useEffect(() => {
-        setUserInfo(ZegoUIKitInternal.getUser(userID));
+        const user = ZegoUIKitInternal.getUser(userID);
+        setUserInfo(user);
+        setIsCameraOn(user.isCameraDeviceOn)
 
         ZegoUIKitInternal.onUserInfoUpdate('ZegoVideoView' + String(userID),
             (info) => {
                 if (info.userID == currentUserID) {
                     setIsCameraOn(info.isCameraDeviceOn);
                     setUserInfo(info);
-
                 }
             });
         ZegoUIKitInternal.onRoomStateChanged('ZegoVideoView' + String(userID),
@@ -59,21 +60,20 @@ export default function ZegoVideoView(props) {
     }, [])
     return (
         <View style={styles.container}>
-            {isCameraOn ?
-                <VideoFrame
-                    style={styles.videoContainer}
-                    userID={currentUserID}
-                    roomID={roomID}
-                    fillMode={useVideoViewAspectFill ? 1 : 0} // 1:AspectFill, 0:AspectFit
-                /> :
-                <AudioFrame
-                    style={styles.audioContainer}
+            <VideoFrame
+                style={styles.videoContainer}
+                userID={currentUserID}
+                roomID={roomID}
+                fillMode={useVideoViewAspectFill ? 1 : 0} // 1:AspectFill, 0:AspectFit
+            >
+                {!isCameraOn ? <AudioFrame
                     userInfo={userInfo}
                     showSoundWave={showSoundWave}
                     audioViewBackgroudColor={audioViewBackgroudColor}
                     audioViewBackgroudImage={audioViewBackgroudImage}
-                />
-            }
+                /> : null}
+            </VideoFrame>
+
             <Delegate
                 style={styles.mask}
                 to={foregroundBuilder}
@@ -91,12 +91,6 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         position: 'absolute',
-    },
-    audioContainer: {
-        flex: 1,
-        width: '100%',
-        height: '100%',
-        zIndex: 0,
     },
     videoContainer: {
         flex: 1,

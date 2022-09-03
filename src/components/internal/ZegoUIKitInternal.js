@@ -381,15 +381,11 @@ function _tryStartPlayStream(userID) {
         const user = _coreUserMap[userID];
         zloginfo('_tryStartPlayStream: ', user)
         if (user.viewID > 0 && user.streamID !== '') {
-            if (user.viewID < 0) {
-                ZegoExpressEngine.instance().startPlayingStream(user.streamID);
-            } else {
-                ZegoExpressEngine.instance().startPlayingStream(user.streamID, {
-                    'reactTag': user.viewID,
-                    'viewMode': user.fillMode,
-                    'backgroundColor': 0
-                });
-            }
+            ZegoExpressEngine.instance().startPlayingStream(user.streamID, {
+                'reactTag': user.viewID,
+                'viewMode': user.fillMode,
+                'backgroundColor': 0
+            });
         }
     }
 }
@@ -610,7 +606,6 @@ export default {
                 _onRemoteCameraStateUpdate(_getPublishStreamID(), on ? 0 : 10); // 0 for open, 10 for mute
 
                 _localCoreUser.isCameraDeviceOn = on;
-                console.log('&&&&&&', _localCoreUser.isCameraDeviceOn)
                 if (!on) {
                     _localCoreUser.viewID = -1;
                 }
