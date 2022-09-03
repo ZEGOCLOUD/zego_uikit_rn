@@ -96,7 +96,9 @@ function _onRoomUserUpdate(roomID, updateType, userList) {
 
         zloginfo("User Join: ", userInfoList)
         Object.keys(_onUserJoinCallbackMap).forEach(callbackID => {
-            _onUserJoinCallbackMap[callbackID](userInfoList);
+            if (_onUserJoinCallbackMap[callbackID]) {
+                _onUserJoinCallbackMap[callbackID](userInfoList);
+            }
         });
     } else {
         userList.forEach(user => {
@@ -117,7 +119,9 @@ function _onRoomUserUpdate(roomID, updateType, userList) {
         });
         zloginfo("User Leave: ", userInfoList)
         Object.keys(_onUserLeaveCallbackMap).forEach(callbackID => {
-            _onUserLeaveCallbackMap[callbackID](userInfoList);
+            if (_onUserLeaveCallbackMap[callbackID]) {
+                _onUserLeaveCallbackMap[callbackID](userInfoList);
+            }
         })
         if (Object.keys(_coreUserMap).length <= 1) {
             Object.keys(_onOnlySelfInRoomCallbackMap).forEach(callbackID => {
@@ -165,7 +169,9 @@ function _onRemoteCameraStateUpdate(streamID, state) {
         _notifyUserInfoUpdate(_coreUserMap[userID]);
 
         Object.keys(_onCameraDeviceOnCallbackMap).forEach(callbackID => {
-            _onCameraDeviceOnCallbackMap[callbackID](userID, isOn);
+            if (_onCameraDeviceOnCallbackMap[callbackID]) {
+                _onCameraDeviceOnCallbackMap[callbackID](userID, isOn);
+            }
         });
 
         if (userID != _localCoreUser.userID) {
@@ -177,7 +183,9 @@ function _onRemoteCameraStateUpdate(streamID, state) {
 }
 function _onAudioRouteChange(type) {
     Object.keys(_onAudioOutputDeviceTypeChangeCallbackMap).forEach(callbackID => {
-        _onAudioOutputDeviceTypeChangeCallbackMap[callbackID](type);
+        if (_onAudioOutputDeviceTypeChangeCallbackMap[callbackID]) {
+            _onAudioOutputDeviceTypeChangeCallbackMap[callbackID](type);
+        }
     });
     _audioOutputType = type;
 }
@@ -189,7 +197,9 @@ function _onRemoteMicStateUpdate(streamID, state) {
         _notifyUserInfoUpdate(_coreUserMap[userID]);
 
         Object.keys(_onMicDeviceOnCallbackMap).forEach(callbackID => {
-            _onMicDeviceOnCallbackMap[callbackID](userID, isOn);
+            if (_onMicDeviceOnCallbackMap[callbackID]) {
+                _onMicDeviceOnCallbackMap[callbackID](userID, isOn);
+            }
         });
 
         if (userID != _localCoreUser.userID) {
@@ -213,8 +223,9 @@ function _onRoomStateChanged(roomID, reason, errorCode, extendedData) {
     Object.keys(_onRoomStateChangedCallbackMap).forEach(callbackID => {
         // callback may remove from map during room state chaging
         if (callbackID in _onRoomStateChangedCallbackMap) {
-            _onRoomStateChangedCallbackMap[callbackID](reason, errorCode, extendedData);
-
+            if (_onRoomStateChangedCallbackMap[callbackID]) {
+                _onRoomStateChangedCallbackMap[callbackID](reason, errorCode, extendedData);
+            }
         }
     });
 }
@@ -399,12 +410,16 @@ function _tryStopPlayStream(userID, force = false) {
 }
 function _notifyUserInfoUpdate(userInfo) {
     Object.keys(_onUserInfoUpdateCallbackMap).forEach(callbackID => {
-        _onUserInfoUpdateCallbackMap[callbackID](userInfo);
+        if (_onUserInfoUpdateCallbackMap[callbackID]) {
+            _onUserInfoUpdateCallbackMap[callbackID](userInfo);
+        }
     })
 }
 function _notifySoundLevelUpdate(userID, soundLevel) {
     Object.keys(_onSoundLevelUpdateCallbackMap).forEach(callbackID => {
-        _onSoundLevelUpdateCallbackMap[callbackID](userID, soundLevel);
+        if (_onSoundLevelUpdateCallbackMap[callbackID]) {
+            _onSoundLevelUpdateCallbackMap[callbackID](userID, soundLevel);
+        }
     });
 }
 
@@ -498,7 +513,9 @@ export default {
 
                 Object.keys(_onSDKConnectedCallbackMap).forEach(callbackID => {
                     // TODO cause  WARN  Possible Unhandled Promise Rejection (id: 56)
-                    _onSDKConnectedCallbackMap[callbackID]();
+                    if (_onSDKConnectedCallbackMap[callbackID]) {
+                        _onSDKConnectedCallbackMap[callbackID]();
+                    }
                 });
                 resolve();
             }).catch((error) => {
