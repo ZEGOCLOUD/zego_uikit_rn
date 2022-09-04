@@ -3,10 +3,10 @@ import { Image, TouchableOpacity, View } from "react-native";
 import ZegoUIKitInternal from "../internal/ZegoUIKitInternal";
 
 export default function ZegoLeaveButton(props) {
-    const { iconLeave, onLeaveConfirming, onPressed } = props;
+    const { iconLeave, onLeaveConfirmation, onPressed } = props;
     const onPress = () => {
-        if (typeof onLeaveConfirming == 'function') {
-            onLeaveConfirming().then(() => {
+        if (typeof onLeaveConfirmation == 'function') {
+            onLeaveConfirmation().then(() => {
                 ZegoUIKitInternal.leaveRoom();
                 if (typeof onPressed == 'function') {
                     onPressed();
