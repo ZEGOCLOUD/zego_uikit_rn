@@ -16,7 +16,7 @@ export default function ZegoAudioVideoContainer(props) {
     {mode == 0 ?
       <PictureInPictureWindow
         audioVideoConfig={audioVideoConfig}
-        cinfog={config}
+        config={config}
         foregroundBuilder={foregroundBuilder} /> :
       <PictureInPictureWindow />
     }
