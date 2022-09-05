@@ -155,7 +155,10 @@ function _onRoomStreamUpdate(roomID, updateType, streamList) {
             const streamID = stream.streamID;
             if (userID in _coreUserMap) {
                 _tryStopPlayStream(userID, true);
+                _coreUserMap[userID].isCameraDeviceOn = false;
+                _coreUserMap[userID].isMicDeviceOn = false;
                 _coreUserMap[userID].streamID = '';
+                _notifyUserInfoUpdate(_coreUserMap[userID]);
                 delete _streamCoreUserMap[streamID];
             }
         })
@@ -623,9 +626,9 @@ export default {
                 _onRemoteCameraStateUpdate(_getPublishStreamID(), on ? 0 : 10); // 0 for open, 10 for mute
 
                 _localCoreUser.isCameraDeviceOn = on;
-                if (!on) {
-                    _localCoreUser.viewID = -1;
-                }
+                // if (!on) {
+                //     _localCoreUser.viewID = -1;
+                // }
                 _coreUserMap[_localCoreUser.userID] = _localCoreUser;
                 _notifyUserInfoUpdate(_localCoreUser);
 
