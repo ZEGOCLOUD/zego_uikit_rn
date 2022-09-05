@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { Alert } from 'react-native';
 
 import { StyleSheet, View, Text, Button } from 'react-native';
-// import ZegoUIKitPrebuiltCall from 'zego-uikit-prebuilt-call-rn'
 import ZegoUIKitPrebuiltCall from './call'
 import KeyCenter from './KeyCenter';
 // import ZegoUIKit, {ZegoToggleCameraButton} from @zego-uikit/components-rn
@@ -23,11 +22,13 @@ export default function VoiceCallPage(props) {
                 callID={callID}
 
                 config={{
+                    bottomMenuBarConfig: {
+                        buttons: [2, 0, 4]
+                    },
+                    turnOnCameraWhenJoining: false,
                     onOnlySelfInRoom: () => { props.navigation.navigate('HomePage') },
                     onHangUp: () => { props.navigation.navigate('HomePage') },
-                    menuBarButtons: [2, 0, 4],
-                    turnOnCameraWhenJoining: false,
-                    onHangUpConfirming: () => {
+                    onHangUpConfirmation: () => {
                         return new Promise((resolve, reject) => {
                             Alert.alert(
                                 "Leave the call",
