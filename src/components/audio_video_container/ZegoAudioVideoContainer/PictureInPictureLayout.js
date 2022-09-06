@@ -101,8 +101,8 @@ export default function PictureInPictureLayout(props) {
     }
 
     return (<View style={styles.container}>
-        <View style={[styles.smallView, getSmallViewPostStyle(), getSmallViewBorderStyle()]}>
-            <TouchableOpacity style={styles.smallViewTouchableOpacity} onPress={switchLargeOrSmallView} />
+
+        <View  pointerEvents='auto' onTouchStart={switchLargeOrSmallView} style={[styles.smallView, getSmallViewPostStyle(), getSmallViewBorderStyle()]}>
             {showMeOnSmallView ?
                 (localUserID ?
                     <ZegoAudioVideoView
@@ -205,10 +205,5 @@ const styles = StyleSheet.create({
     smallViewPostBottomRgith: {
         bottom: 70,
         right: 12,
-    },
-    smallViewTouchableOpacity: {
-        width: '100%',
-        height: '100%',
-        zIndex: 3,
     }
 })
