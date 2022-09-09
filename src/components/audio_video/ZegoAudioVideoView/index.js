@@ -35,27 +35,31 @@ export default function ZegoVideoView(props) {
 
 
     useEffect(() => {
-        const user = ZegoUIKitInternal.getUser(userID);
-        setUserInfo(user);
-        setIsCameraOn(user.isCameraDeviceOn)
+        const callbackID = 'ZegoVideoView' + String(userID);
 
-        ZegoUIKitInternal.onUserInfoUpdate('ZegoVideoView' + String(userID),
+        ZegoUIKitInternal.onSDKConnected(callbackID, () => {
+            const user = ZegoUIKitInternal.getUser(userID);
+            setUserInfo(user);
+            setIsCameraOn(user.isCameraDeviceOn);
+        });
+        ZegoUIKitInternal.onUserInfoUpdate(callbackID,
             (info) => {
                 if (info.userID == currentUserID) {
                     setIsCameraOn(info.isCameraDeviceOn);
                     setUserInfo(info);
                 }
             });
-        ZegoUIKitInternal.onRoomStateChanged('ZegoVideoView' + String(userID),
+        ZegoUIKitInternal.onRoomStateChanged(callbackID,
             (reason, errorCode, extendedData) => {
                 if (ZegoUIKitInternal.isRoomConnected()) {
-                    const localUser = ZegoUIKitInternal.getLocalUserInfo();
-                    setIsCameraOn(localUser.isCameraDeviceOn);
+                    const user = ZegoUIKitInternal.getUser(userID);
+                    setIsCameraOn(user.isCameraDeviceOn);
                 }
             });
         return () => {
-            ZegoUIKitInternal.onUserInfoUpdate('ZegoVideoView' + String(userID));
-            ZegoUIKitInternal.onRoomStateChanged('ZegoVideoView' + String(userID));
+            ZegoUIKitInternal.onSDKConnected(callbackID);
+            ZegoUIKitInternal.onUserInfoUpdate(callbackID);
+            ZegoUIKitInternal.onRoomStateChanged(callbackID);
         }
     }, [])
     return (
