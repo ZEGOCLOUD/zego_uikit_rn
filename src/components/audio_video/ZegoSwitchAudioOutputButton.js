@@ -4,7 +4,7 @@ import ZegoUIKitInternal from "../internal/ZegoUIKitInternal";
 
 export default function ZegoSwitchAudioOutputButton(props) {
     // ZegoAudioRouteSpeaker=(0) ZegoAudioRouteHeadphone=(1) ZegoAudioRouteBluetooth=(2) ZegoAudioRouteReceiver=(3) ZegoAudioRouteExternalUSB=(4) ZegoAudioRouteAirPlay=(5)
-    const { iconSpeaker, iconEarpiece, iconBluetooth, useSpeaker = false } = props;
+    const { iconSpeaker, iconEarpiece, iconBluetooth, useSpeaker = false, width = 48, height = 48 } = props;
     const [currentDevice, setCurrentDevice] = useState(0);// Default to speaker
     const [enable, setEnable] = useState(true);
     const getImageSourceByPath = () => {
@@ -46,13 +46,10 @@ export default function ZegoSwitchAudioOutputButton(props) {
         }
     }, []);
 
-    // TODO make style layout
-    return (<View>
-        <TouchableOpacity
-            disabled={!enable} // Only speaker can toggle enable
-            // style={styles.micCon}
-            onPress={onPress}>
-            <Image source={getImageSourceByPath()} />
-        </TouchableOpacity>
-    </View>)
+    return (<TouchableOpacity
+        style={{ width: width, height: height }}
+        disabled={!enable} // Only speaker can toggle enable
+        onPress={onPress}>
+        <Image resizeMode='contain' source={getImageSourceByPath()} style={{ width: "100%", height: "100%" }} />
+    </TouchableOpacity>)
 }

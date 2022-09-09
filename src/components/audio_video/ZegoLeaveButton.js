@@ -3,7 +3,7 @@ import { Image, TouchableOpacity, View } from "react-native";
 import ZegoUIKitInternal from "../internal/ZegoUIKitInternal";
 
 export default function ZegoLeaveButton(props) {
-    const { iconLeave, onLeaveConfirmation, onPressed } = props;
+    const { iconLeave, onLeaveConfirmation, onPressed, width = 48, height = 48 } = props;
     const onPress = () => {
         if (typeof onLeaveConfirmation == 'function') {
             onLeaveConfirmation().then(() => {
@@ -20,10 +20,15 @@ export default function ZegoLeaveButton(props) {
         }
     }
 
-    return (<View>
+    return (
         <TouchableOpacity
-            onPress={onPress}>
-            <Image source={iconLeave ? iconLeave : require("../internal/resources/white_button_hang_up.png")} />
-        </TouchableOpacity>
-    </View>)
+            style={{ width: width, height: height }}
+            onPress={onPress}
+        >
+            <Image
+                resizeMode='contain'
+                source={iconLeave ? iconLeave : require("../internal/resources/white_button_hang_up.png")}
+                style={{ width: "100%", height: "100%" }}
+            />
+        </TouchableOpacity>)
 }

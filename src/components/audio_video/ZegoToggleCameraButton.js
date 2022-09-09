@@ -4,7 +4,7 @@ import ZegoUIKitInternal from "../internal/ZegoUIKitInternal";
 import { zloginfo } from "../../utils/logger";
 
 export default function ZegoToggleCameraButton(props) {
-    const { userID, iconCameraOn, iconCameraOff, isOn, onPress } = props;
+    const { userID, iconCameraOn, iconCameraOff, isOn, onPress, width = 48, height = 48 } = props;
     const [isCurrentOn, setIsCurrentOn] = useState(true);// Default on
     const getImageSourceByPath = () => {
         const pathOn = iconCameraOn ? iconCameraOn : require("../internal/resources/white_button_camera_on.png");
@@ -43,12 +43,9 @@ export default function ZegoToggleCameraButton(props) {
         }
     }, []);
 
-    // TODO make style layout
-    return (<View>
-        <TouchableOpacity
-            // style={styles.cameraCon}
-            onPress={onButtonPress}>
-            <Image source={getImageSourceByPath()} />
-        </TouchableOpacity>
-    </View>)
+    return (<TouchableOpacity
+        style={{ width: width, height: height }}
+        onPress={onButtonPress}>
+        <Image resizeMode='contain' source={getImageSourceByPath()} style={{ width: "100%", height: "100%" }} />
+    </TouchableOpacity>)
 }
