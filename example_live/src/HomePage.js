@@ -5,39 +5,36 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function HomePage(props) {
     const navigation = useNavigation();
-    const onJoinPress = (isVoiceCall) => {
-        navigation.navigate(isVoiceCall ? 'VoiceCallPage' : 'VideoCallPage', {
+    const onJoinPress = (isHost) => {
+        navigation.navigate(isHost ? 'HostPage' : 'AudiencePage', {
             userID: userID,
             userName: userID,
-            callID: callID,
+            liveID: liveID,
         })
     }
     const [userID, setUserID] = useState('');
-    const [callID, setCallID] = useState('');
+    const [liveID, setLiveID] = useState('');
     useEffect(() => {
         setUserID(String(Math.floor(Math.random() * 100000)));
-        setCallID(String(Math.floor(Math.random() * 10000)));
+        setLiveID(String(Math.floor(Math.random() * 10000)));
     }, [])
     const insets = useSafeAreaInsets();
     return (
         <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
             <Text style={styles.userID}>Your User ID: {userID}</Text>
-            <Text style={[styles.simpleCallTitle, styles.leftPadding]}>
-                Start a call without waiting for response:
-            </Text>
-            <Text style={[styles.callID, styles.leftPadding]}>Call ID:</Text>
+            <Text style={[styles.liveID, styles.leftPadding]}>Live ID:</Text>
             <TextInput
-                placeholder="Enter the Call ID. e.g. 6666"
+                placeholder="Enter the Live ID. e.g. 6666"
                 style={[styles.input]}
-                onChangeText={text => setCallID(text.replace(/[^0-9A-Za-z_]/g, ''))}
+                onChangeText={text => setLiveID(text.replace(/[^0-9A-Za-z_]/g, ''))}
                 maxLength={4}
-                value={callID}
+                value={liveID}
             >
             </TextInput>
             <View style={[styles.buttonLine, styles.leftPadding]}>
-                <Button disabled={callID.length == 0} style={styles.button} title="1 on 1 Voice Call" onPress={() => { onJoinPress(true) }} />
+                <Button disabled={liveID.length == 0} style={styles.button} title="Start a live" onPress={() => { onJoinPress(true) }} />
                 <View style={styles.buttonSpacing} />
-                <Button  disabled={callID.length == 0} style={styles.button} title="1 on 1 Video Call" onPress={() => { onJoinPress(false) }} />
+                <Button  disabled={liveID.length == 0} style={styles.button} title="Watch a live" onPress={() => { onJoinPress(false) }} />
             </View>
             {/* <View style={styles.buttonLine}>
                 <Button title="Disconnect SDK" onPress={() => { ZegoUIKit.disconnectSDK() }} />
@@ -82,7 +79,7 @@ const styles = StyleSheet.create({
         paddingTop: 12,
         paddingLeft: 20,
     },
-    callID: {
+    liveID: {
         fontSize: 14,
         color: '#2A2A2A',
         marginBottom: 5,

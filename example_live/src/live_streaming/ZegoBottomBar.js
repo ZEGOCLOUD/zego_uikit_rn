@@ -16,12 +16,13 @@ export default function ZegoBottomBar(props) {
         menuBarButtonsMaxCount = 5,
         menuBarButtons = [],
         menuBarExtendedButtons = [],
-        onHangUp,
+        onLeaveLiveStreaming,
         onHangUpConfirmation,
         turnOnCameraWhenJoining,
         turnOnMicrophoneWhenJoining,
         useSpeakerWhenJoining,
         onMorePress,
+        showInRoomMessageButton
     } = props;
     const [isNormalStyle, setIsNormalStyle] = useState(true);
 
@@ -35,7 +36,7 @@ export default function ZegoBottomBar(props) {
     const getButtonByButtonIndex = (buttonIndex) => {
         switch (buttonIndex) {
             case 0:
-                return <ZegoLeaveButton key={0} onLeaveConfirmation={onHangUpConfirmation} onPressed={onHangUp} />
+                return <ZegoLeaveButton key={0} onLeaveConfirmation={onHangUpConfirmation} onPressed={onLeaveLiveStreaming} />
             case 1:
                 return <ZegoToggleCameraButton key={1} isOn={turnOnCameraWhenJoining} />;
             case 2:
