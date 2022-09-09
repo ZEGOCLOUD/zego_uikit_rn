@@ -9,7 +9,7 @@ import {
 } from '@zegocloud/zego-uikit-rn'
 
 import ZegoMoreButton from './ZegoMoreButton';
-
+import ZegoMessageButton from './ZegoMessageButton';
 
 export default function ZegoBottomBar(props) {
     const {
@@ -17,12 +17,12 @@ export default function ZegoBottomBar(props) {
         menuBarButtons = [],
         menuBarExtendedButtons = [],
         onLeaveLiveStreaming,
-        onHangUpConfirmation,
+        onLeaveLiveStreamingConfirming,
         turnOnCameraWhenJoining,
         turnOnMicrophoneWhenJoining,
         useSpeakerWhenJoining,
         onMorePress,
-        showInRoomMessageButton
+        showInRoomMessageButton = false
     } = props;
     const [isNormalStyle, setIsNormalStyle] = useState(true);
 
@@ -33,18 +33,45 @@ export default function ZegoBottomBar(props) {
     //     swtichCameraFacingButton,
     //     swtichAudioOtputButton
     //     }
-    const getButtonByButtonIndex = (buttonIndex) => {
+    const getButtonByButtonIndex = (buttonIndex, isFirstLevel) => {
+        const buttonSize = isFirstLevel ? 36 : 48;
         switch (buttonIndex) {
             case 0:
-                return <ZegoLeaveButton key={0} onLeaveConfirmation={onHangUpConfirmation} onPressed={onLeaveLiveStreaming} />
+                return <ZegoLeaveButton
+                    key={0}
+                    onLeaveConfirmation={onLeaveLiveStreamingConfirming}
+                    onPressed={onLeaveLiveStreaming}
+                    iconLeave={require("./resources/white_bottom_button_close.png")}
+                    width={buttonSize}
+                    height={buttonSize}
+                />
             case 1:
-                return <ZegoToggleCameraButton key={1} isOn={turnOnCameraWhenJoining} />;
+                return <ZegoToggleCameraButton
+                    key={1}
+                    isOn={turnOnCameraWhenJoining}
+                    width={buttonSize}
+                    height={buttonSize}
+                />;
             case 2:
-                return <ZegoToggleMicrophoneButton key={2} isOn={turnOnMicrophoneWhenJoining} />;
+                return <ZegoToggleMicrophoneButton
+                    key={2}
+                    isOn={turnOnMicrophoneWhenJoining}
+                    width={buttonSize}
+                    height={buttonSize}
+                />;
             case 3:
-                return <ZegoSwitchCameraButton key={3} />
+                return <ZegoSwitchCameraButton
+                    key={3}
+                    width={buttonSize}
+                    height={buttonSize}
+                />
             case 4:
-                return <ZegoSwitchAudioOutputButton key={4} useSpeaker={useSpeakerWhenJoining} />
+                return <ZegoSwitchAudioOutputButton
+                    key={4}
+                    useSpeaker={useSpeakerWhenJoining}
+                    width={buttonSize}
+                    height={buttonSize}
+                />
         }
     }
     const getDisplayButtons = () => {
@@ -56,17 +83,17 @@ export default function ZegoBottomBar(props) {
         menuBarButtons.forEach(buttonIndex => {
             const limitCount = needMoreButton ? maxCount - 1 : maxCount;
             if (firstLevelButtons.length < limitCount) {
-                firstLevelButtons.push(getButtonByButtonIndex(buttonIndex));
+                firstLevelButtons.push(getButtonByButtonIndex(buttonIndex, true));
             } else {
-                secondLevelButtons.push(getButtonByButtonIndex(buttonIndex));
+                secondLevelButtons.push(getButtonByButtonIndex(buttonIndex, false));
             }
         });
         menuBarExtendedButtons.forEach(button => {
             const limitCount = needMoreButton ? maxCount - 1 : maxCount;
             if (firstLevelButtons.length < limitCount) {
-                firstLevelButtons.push(button);
+                firstLevelButtons.push(button, true);
             } else {
-                secondLevelButtons.push(button);
+                secondLevelButtons.push(button, false);
             }
         });
         if (needMoreButton) {
@@ -77,10 +104,6 @@ export default function ZegoBottomBar(props) {
             secondLevelButtons: secondLevelButtons
         }
     }
-    const getButtonStyle = () => {
-        const btnStyles = [styles.ctrlBtn1, styles.ctrlBtn2, styles.ctrlBtn3, styles.ctrlBtn4, styles.ctrlBtn5,]
-        return btnStyles[firstLevelButtons.length - 1]
-    }
 
     var allButtons = getDisplayButtons();
     var firstLevelButtons = allButtons['firstLevelButtons']
@@ -89,11 +112,15 @@ export default function ZegoBottomBar(props) {
     return (
         isNormalStyle ?
             <View style={styles.normalBar}>
-                {firstLevelButtons.map((button, index) => (
-                    <View style={getButtonStyle()}>
-                        {button}
-                    </View>
-                ))}
+                {showInRoomMessageButton ? <ZegoMessageButton onPress={() => { console.log('showMessage') }} /> : null}
+
+                <View style={styles.rightBar}>
+                    {firstLevelButtons.map((button, index) => (
+                        <View style={styles.rightBtn}>
+                            {button}
+                        </View>
+                    ))}
+                </View>
             </View> :
             <View style={[styles.popupContainer, styles.fillParent]}>
                 <View style={[styles.popupMask, styles.fillParent]} >
@@ -111,17 +138,31 @@ export default function ZegoBottomBar(props) {
 }
 
 const styles = StyleSheet.create({
-    normalBar: {
+    messageButton: {
+        position: 'absolute',
+        alignSelf: 'flex-start',
+        width: 16,
+        height: 16
+    },
+    rightBar: {
         flex: 1,
         position: 'absolute',
         flexDirection: 'row',
-        justifyContent: 'center',
+        justifyContent: 'flex-end',
         alignItems: 'flex-end',
-        marginBottom: 50,
-        width: '100%',
-        bottom: 0,
-        height: 50,
+        alignSelf: 'flex-end',
         zIndex: 2,
+    },
+    normalBar: {
+        position: 'absolute',
+        justifyContent: 'flex-end',
+        marginLeft: 16,
+        marginBottom: 16,
+        left: 0,
+        right: 0,
+        height: 50,
+        bottom: 0,
+        zIndex: 2
     },
     popupContainer: {
         flex: 1,
@@ -152,24 +193,7 @@ const styles = StyleSheet.create({
         zIndex: 2,
         backgroundColor: '#262A2D'
     },
-    ctrlBtn1: {
-        marginLeft: 0,
-        marginRight: 0,
-    },
-    ctrlBtn2: {
-        marginLeft: 79 / 2,
-        marginRight: 79 / 2,
-    },
-    ctrlBtn3: {
-        marginLeft: 59.5 / 2,
-        marginRight: 59.5 / 2,
-    },
-    ctrlBtn4: {
-        marginLeft: 37 / 2,
-        marginRight: 37 / 2,
-    },
-    ctrlBtn5: {
-        marginLeft: 23 / 2,
-        marginRight: 23 / 2,
+    rightBtn: {
+        marginRight: 16,
     }
 });

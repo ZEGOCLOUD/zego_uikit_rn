@@ -2,11 +2,11 @@ import React, { useEffect, useState, useRef } from 'react';
 import { PermissionsAndroid, Alert } from 'react-native';
 
 import { StyleSheet, View } from 'react-native';
-import ZegoUIKit, { ZegoAudioVideoContainer, ZegoAudioVideoView } from '@zegocloud/zego-uikit-rn'
+import ZegoUIKit, { ZegoLeaveButton, ZegoAudioVideoView } from '@zegocloud/zego-uikit-rn'
 import AudioVideoForegroundView from './AudioVideoForegroundView';
 import ZegoBottomBar from './ZegoBottomBar';
 
-
+// https://github.com/react-native-community/hooks#usekeyboard
 export default function ZegoUIKitPrebuiltLiveStreaming(props) {
     const {
         appID,
@@ -25,7 +25,7 @@ export default function ZegoUIKitPrebuiltLiveStreaming(props) {
 
         showInRoomMessageButton = true,
 
-        menuBarButtons = [0, 1, 2, 3, 4],
+        menuBarButtons = [0, 1, 2, 3],
         menuBarButtonsMaxCount = 5,
         menuBarExtendedButtons = [],
 
@@ -114,21 +114,31 @@ export default function ZegoUIKitPrebuiltLiveStreaming(props) {
             <View style={styles.fillParent}>
                 <ZegoAudioVideoView
                     userID={userID}
-                    foregroundBuilder={foregroundBuilder}
+                    foregroundBuilder={foregroundBuilder ? foregroundBuilder : ({ userInfo }) => <View />}
                     useVideoViewAspectFill={true}
+                    showSoundWave={showSoundWavesInAudioMode}
                 />
             </View>
             <ZegoBottomBar
                 menuBarButtonsMaxCount={menuBarButtonsMaxCount}
                 menuBarButtons={menuBarButtons}
                 menuBarExtendedButtons={menuBarExtendedButtons}
-                onLeaveLiveStreaming={onLeaveLiveStreaming}
-                onLeaveLiveStreamingConfirming={onLeaveLiveStreamingConfirming}
                 turnOnCameraWhenJoining={turnOnCameraWhenJoining}
                 turnOnMicrophoneWhenJoining={turnOnMicrophoneWhenJoining}
                 useSpeakerWhenJoining={useSpeakerWhenJoining}
                 showInRoomMessageButton={showInRoomMessageButton}
+                onLeaveLiveStreaming={onLeaveLiveStreaming}
+                onLeaveLiveStreamingConfirming={onLeaveLiveStreamingConfirming}
             />
+
+            <View style={styles.leaveButton} >
+                <ZegoLeaveButton
+                    style={styles.fillParent}
+                    onLeaveConfirmation={onLeaveLiveStreamingConfirming}
+                    onPressed={onLeaveLiveStreaming}
+                    iconLeave={require('./resources/white_top_button_close.png')}
+                />
+            </View>
         </View>
     );
 }
@@ -136,6 +146,9 @@ export default function ZegoUIKitPrebuiltLiveStreaming(props) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        position: 'absolute',
+        width: "100%",
+        height: "100%",
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 0,
@@ -145,10 +158,9 @@ const styles = StyleSheet.create({
         height: '100%',
         position: 'absolute',
     },
-    avView: {
-        flex: 1,
-        zIndex: 2,
-        right: 0,
-        top: 0,
-    },
+    leaveButton: {
+        position: 'absolute',
+        top: 32,
+        right: 10
+    }
 });
