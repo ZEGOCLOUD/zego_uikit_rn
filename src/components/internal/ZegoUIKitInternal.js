@@ -17,6 +17,8 @@ var _onSoundLevelUpdateCallbackMap = {};
 var _onSDKConnectedCallbackMap = {};
 var _onAudioOutputDeviceTypeChangeCallbackMap = {};
 var _onOnlySelfInRoomCallbackMap = {};
+var _onAudioVideoAvailableCallbackMap = {};
+var _onAudioVideoUnavailableCallbackMap = {};
 
 var _localCoreUser = _createCoreUser('', '', '', {});
 var _streamCoreUserMap = {}; // <streamID, CoreUser>
@@ -74,8 +76,10 @@ function _onRoomUserUpdate(roomID, updateType, userList) {
     const userInfoList = [];
     if (updateType == 0) {
         userList.forEach(user => {
-            const coreUser = _createCoreUser(user.userID, user.userName);
-            _coreUserMap[user.userID] = coreUser;
+            if (!(user.userID in _coreUserMap)) {
+                const coreUser = _createCoreUser(user.userID, user.userName);
+                _coreUserMap[user.userID] = coreUser;
+            }
             const streamID = _getStreamIDByUserID(user.userID);
             if (streamID in _streamCoreUserMap) {
                 _coreUserMap[user.userID].streamID = streamID;
@@ -134,6 +138,7 @@ function _onRoomUserUpdate(roomID, updateType, userList) {
 }
 function _onRoomStreamUpdate(roomID, updateType, streamList) {
     zloginfo('_onRoomStreamUpdate: ', roomID, updateType, streamList)
+    var users = [];
     if (updateType == 0) { // Add
         streamList.forEach(stream => {
             const userID = stream.user.userID;
@@ -144,9 +149,21 @@ function _onRoomStreamUpdate(roomID, updateType, streamList) {
                 _streamCoreUserMap[streamID] = _coreUserMap[userID];
                 _notifyUserInfoUpdate(_coreUserMap[userID]);
                 _tryStartPlayStream(userID);
+
+                users.push(_coreUserMap[userID]);
             } else {
                 _streamCoreUserMap[streamID] = _createCoreUser(userID, userName, '', {});
                 _streamCoreUserMap[streamID].streamID = streamID;
+
+                _coreUserMap[userID] = _streamCoreUserMap[streamID];
+
+                users.push(_streamCoreUserMap[streamID]);
+            }
+        })
+
+        Object.keys(_onAudioVideoAvailableCallbackMap).forEach(callbackID => {
+            if (_onAudioVideoAvailableCallbackMap[callbackID]) {
+                _onAudioVideoAvailableCallbackMap[callbackID](users);
             }
         })
     } else {
@@ -159,7 +176,16 @@ function _onRoomStreamUpdate(roomID, updateType, streamList) {
                 _coreUserMap[userID].isMicDeviceOn = false;
                 _coreUserMap[userID].streamID = '';
                 _notifyUserInfoUpdate(_coreUserMap[userID]);
+
+                users.push(_coreUserMap[userID]);
+
                 delete _streamCoreUserMap[streamID];
+            }
+        })
+
+        Object.keys(_onAudioVideoUnavailableCallbackMap).forEach(callbackID => {
+            if (_onAudioVideoUnavailableCallbackMap[callbackID]) {
+                _onAudioVideoUnavailableCallbackMap[callbackID](users);
             }
         })
     }
@@ -371,7 +397,17 @@ function _tryStartPublishStream() {
         if (!_localCoreUser.streamID) {
             return;
         }
-        ZegoExpressEngine.instance().startPublishingStream(_localCoreUser.streamID);
+        ZegoExpressEngine.instance().startPublishingStream(_localCoreUser.streamID).then(() => {
+            if ((_localCoreUser.streamID in _streamCoreUserMap)) {
+                _streamCoreUserMap[_localCoreUser.streamID] = _localCoreUser;
+
+                Object.keys(_onAudioVideoAvailableCallbackMap).forEach(callbackID => {
+                    if (_onAudioVideoAvailableCallbackMap[callbackID]) {
+                        _onAudioVideoAvailableCallbackMap[callbackID]([_localCoreUser]);
+                    }
+                })
+            }
+        });
         zloginfo('ZegoExpressEngine startPreview:', _localCoreUser);
         if (_localCoreUser.viewID > 0) {
             ZegoExpressEngine.instance().startPreview({
@@ -386,8 +422,18 @@ function _tryStartPublishStream() {
 }
 function _tryStopPublishStream(force = false) {
     if (!_localCoreUser.isMicDeviceOn && !_localCoreUser.isCameraDeviceOn) {
+        zloginfo('stopPublishStream')
         ZegoExpressEngine.instance().stopPublishingStream();
         ZegoExpressEngine.instance().stopPreview();
+        if ((_localCoreUser.streamID in _streamCoreUserMap)) {
+            delete _streamCoreUserMap[_localCoreUser.streamID];
+
+            Object.keys(_onAudioVideoUnavailableCallbackMap).forEach(callbackID => {
+                if (_onAudioVideoUnavailableCallbackMap[callbackID]) {
+                    _onAudioVideoUnavailableCallbackMap[callbackID]([_localCoreUser]);
+                }
+            })
+        }
     }
 }
 function _tryStartPlayStream(userID) {
@@ -683,6 +729,26 @@ export default {
     },
     setVideoConfig(config) {
         // TODO
+    },
+    onAudioVideoAvailable(callbackID, callback) {
+        if (typeof callback !== 'function') {
+            if (callbackID in _onAudioVideoAvailableCallbackMap) {
+                zloginfo('[onAudioVideoAvailable] Remove callback for: [', callbackID, '] because callback is not a valid function!');
+                delete _onAudioVideoAvailableCallbackMap[callbackID];
+            }
+        } else {
+            _onAudioVideoAvailableCallbackMap[callbackID] = callback;
+        }
+    },
+    onAudioVideoUnavailable(callbackID, callback) {
+        if (typeof callback !== 'function') {
+            if (callbackID in _onAudioVideoUnavailableCallbackMap) {
+                zloginfo('[onAudioVideoUnavailable] Remove callback for: [', callbackID, '] because callback is not a valid function!');
+                delete _onAudioVideoUnavailableCallbackMap[callbackID];
+            }
+        } else {
+            _onAudioVideoUnavailableCallbackMap[callbackID] = callback;
+        }
     },
 
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Room <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<

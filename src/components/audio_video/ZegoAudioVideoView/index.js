@@ -30,21 +30,30 @@ export default function ZegoVideoView(props) {
     } = props;
 
     const [userInfo, setUserInfo] = useState({});
-    const [currentUserID, setCurrentUserID] = useState(userID);
     const [isCameraOn, setIsCameraOn] = useState(true);
 
+
+    useEffect(() => {
+        const user = ZegoUIKitInternal.getUser(userID);
+        if (user) {
+            setUserInfo(user);
+            setIsCameraOn(user.isCameraDeviceOn);
+        }
+    }, [])
 
     useEffect(() => {
         const callbackID = 'ZegoVideoView' + String(userID);
 
         ZegoUIKitInternal.onSDKConnected(callbackID, () => {
             const user = ZegoUIKitInternal.getUser(userID);
-            setUserInfo(user);
-            setIsCameraOn(user.isCameraDeviceOn);
+            if (user) {
+                setUserInfo(user);
+                setIsCameraOn(user.isCameraDeviceOn);
+            }
         });
         ZegoUIKitInternal.onUserInfoUpdate(callbackID,
             (info) => {
-                if (info.userID == currentUserID) {
+                if (info.userID == userID) {
                     setIsCameraOn(info.isCameraDeviceOn);
                     setUserInfo(info);
                 }
@@ -53,7 +62,9 @@ export default function ZegoVideoView(props) {
             (reason, errorCode, extendedData) => {
                 if (ZegoUIKitInternal.isRoomConnected()) {
                     const user = ZegoUIKitInternal.getUser(userID);
-                    setIsCameraOn(user.isCameraDeviceOn);
+                    if (user) {
+                        setIsCameraOn(user.isCameraDeviceOn);
+                    }
                 }
             });
         return () => {
@@ -66,7 +77,7 @@ export default function ZegoVideoView(props) {
         <View style={styles.container}>
             <VideoFrame
                 style={styles.videoContainer}
-                userID={currentUserID}
+                userID={userID}
                 roomID={roomID}
                 fillMode={useVideoViewAspectFill ? 1 : 0} // 1:AspectFill, 0:AspectFit
             >

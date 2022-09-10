@@ -33,6 +33,8 @@ export default {
     getUser: ZegoUIKitInternal.getUser,
     onUserJoin: ZegoUIKitInternal.onUserJoin,
     onUserLeave: ZegoUIKitInternal.onUserLeave,
+    onAudioVideoAvailable: ZegoUIKitInternal.onAudioVideoAvailable,
+    onAudioVideoUnavailable: ZegoUIKitInternal.onAudioVideoUnavailable,
 }
 
 export {
