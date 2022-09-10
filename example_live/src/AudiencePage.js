@@ -14,6 +14,20 @@ export default function AudiencePage(props) {
 
     return (
         <View style={styles.container}>
+            {/* <ZegoUIKitPrebuiltLiveStreaming
+                appID={KeyCenter.appID}
+                appSign={KeyCenter.appSign}
+                userID={userID}
+                userName={userName}
+                liveID={liveID}
+
+                config={{
+                    turnOnCameraWhenJoining: false,
+                    // turnOnMicrophoneWhenJoining: false,
+                    // menuBarButtons: [],
+                    onLeaveLiveStreaming: () => { props.navigation.navigate('HomePage') }
+                }}
+            /> */}
             <ZegoUIKitPrebuiltLiveStreaming
                 appID={KeyCenter.appID}
                 appSign={KeyCenter.appSign}
@@ -22,6 +36,9 @@ export default function AudiencePage(props) {
                 liveID={liveID}
 
                 config={{
+                    turnOnCameraWhenJoining: false,
+                    turnOnMicrophoneWhenJoining: false,
+                    menuBarButtons: [],
                     onLeaveLiveStreaming: () => { props.navigation.navigate('HomePage') }
                 }}
             />

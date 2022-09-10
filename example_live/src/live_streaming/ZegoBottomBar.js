@@ -38,7 +38,7 @@ export default function ZegoBottomBar(props) {
         switch (buttonIndex) {
             case 0:
                 return <ZegoLeaveButton
-                    key={0}
+                    key={buttonIndex}
                     onLeaveConfirmation={onLeaveLiveStreamingConfirming}
                     onPressed={onLeaveLiveStreaming}
                     iconLeave={require("./resources/white_bottom_button_close.png")}
@@ -47,27 +47,27 @@ export default function ZegoBottomBar(props) {
                 />
             case 1:
                 return <ZegoToggleCameraButton
-                    key={1}
+                    key={buttonIndex}
                     isOn={turnOnCameraWhenJoining}
                     width={buttonSize}
                     height={buttonSize}
                 />;
             case 2:
                 return <ZegoToggleMicrophoneButton
-                    key={2}
+                    key={buttonIndex}
                     isOn={turnOnMicrophoneWhenJoining}
                     width={buttonSize}
                     height={buttonSize}
                 />;
             case 3:
                 return <ZegoSwitchCameraButton
-                    key={3}
+                    key={buttonIndex}
                     width={buttonSize}
                     height={buttonSize}
                 />
             case 4:
                 return <ZegoSwitchAudioOutputButton
-                    key={4}
+                    key={buttonIndex}
                     useSpeaker={useSpeakerWhenJoining}
                     width={buttonSize}
                     height={buttonSize}

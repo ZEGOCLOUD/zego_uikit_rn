@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { PermissionsAndroid, Alert } from 'react-native';
+import { PermissionsAndroid, Image } from 'react-native';
 
 import { StyleSheet, View } from 'react-native';
 import ZegoUIKit, { ZegoLeaveButton, ZegoAudioVideoView } from '@zegocloud/zego-uikit-rn'
@@ -34,6 +34,8 @@ export default function ZegoUIKitPrebuiltLiveStreaming(props) {
         onLeaveLiveStreaming,
         onLeaveLiveStreamingConfirming
     } = config;
+
+    const [hostID, setHostID] = useState((turnOnCameraWhenJoining || turnOnMicrophoneWhenJoining) ? userID : "");
 
     const grantPermissions = async (callback) => {
         // Android: Dynamically obtaining device permissions
@@ -79,13 +81,21 @@ export default function ZegoUIKitPrebuiltLiveStreaming(props) {
 
     useEffect(() => {
         const callbackID = 'ZegoUIKitPrebuiltLiveStreaming' + String(Math.floor(Math.random() * 10000));
-        ZegoUIKit.onOnlySelfInRoom(callbackID, () => {
-            if (typeof onOnlySelfInRoom == 'function') {
-                onOnlySelfInRoom();
+        ZegoUIKit.onAudioVideoAvailable(callbackID, (users) => {
+            if (users.length > 0) {
+                setHostID(users[0].userID);
             }
         });
+        ZegoUIKit.onUserLeave(callbackID, (users) => {
+            users.forEach(user => {
+                if (user.userID == hostID) {
+                    setHostID("");
+                }
+            })
+        });
         return () => {
-            ZegoUIKit.onOnlySelfInRoom(callbackID);
+            ZegoUIKit.onAudioVideoAvailable(callbackID);
+            ZegoUIKit.onUserLeave(callbackID);
         }
     }, [])
     useEffect(() => {
@@ -112,12 +122,16 @@ export default function ZegoUIKitPrebuiltLiveStreaming(props) {
     return (
         <View style={styles.container} >
             <View style={styles.fillParent}>
-                <ZegoAudioVideoView
-                    userID={userID}
-                    foregroundBuilder={foregroundBuilder ? foregroundBuilder : ({ userInfo }) => <View />}
-                    useVideoViewAspectFill={true}
-                    showSoundWave={showSoundWavesInAudioMode}
-                />
+                {hostID != "" ?
+                    <ZegoAudioVideoView
+                        userID={hostID}
+                        foregroundBuilder={foregroundBuilder ? foregroundBuilder : ({ userInfo }) => <View />}
+                        useVideoViewAspectFill={true}
+                        showSoundWave={showSoundWavesInAudioMode}
+                    /> :
+                    <View style={styles.fillParent}>
+                        <Image source={require('./resources/background.png')} style={styles.fillParent} />
+                    </View>}
             </View>
             <ZegoBottomBar
                 menuBarButtonsMaxCount={menuBarButtonsMaxCount}
