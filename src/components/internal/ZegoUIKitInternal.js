@@ -48,6 +48,15 @@ function _resetDataForLeavingRoom() {
     _coreUserMap[_localCoreUser.userID] = _localCoreUser;
 }
 
+function _createPublicUser(coreUser) {
+    return {
+        userID: coreUser.userID,
+        userName: coreUser.userName,
+        extendInfo: coreUser.extendInfo,
+        isMicrophoneOn: coreUser.isMicDeviceOn,
+        isCameraOn: coreUser.isCameraDeviceOn
+    }
+}
 function _createCoreUser(userID, userName, profileUrl, extendInfo) {
     return {
         userID: userID,
@@ -61,6 +70,7 @@ function _createCoreUser(userID, userName, profileUrl, extendInfo) {
         isCameraDeviceOn: true,
         publisherQuality: 0,
         soundLevel: 0,
+        joinTime: 0,
     }
 }
 function _isLocalUser(userID) {
@@ -84,15 +94,10 @@ function _onRoomUserUpdate(roomID, updateType, userList) {
             if (streamID in _streamCoreUserMap) {
                 _coreUserMap[user.userID].streamID = streamID;
             }
+            _coreUserMap[user.userID].joinTime = Date.now();
             _notifyUserInfoUpdate(_coreUserMap[user.userID]);
 
-            const userInfo = {
-                userID: user.userID,
-                userName: user.userName,
-                profileUrl: '', // TODO read from zim sdk
-                extendInfo: {} // TODO read from zim sdk
-            }
-            userInfoList.push(userInfo);
+            userInfoList.push(_createPublicUser(_coreUserMap[user.userID]));
 
             // Start after user insert into list
             _tryStartPlayStream(user.userID);
@@ -815,6 +820,15 @@ export default {
     },
     getUser(userID) {
         return _coreUserMap[userID];
+    },
+    getAllUsers() {
+        const users = Object.values(_coreUserMap);
+        users.sort((a, b) => { return a.joinTime > b.joinTime })
+        var publicUsers = [];
+        users.forEach(user => {
+            publicUsers.push(_createPublicUser(user));
+        })
+        return publicUsers;
     },
     onUserJoin(callbackID, callback) {
         if (typeof callback !== 'function') {
