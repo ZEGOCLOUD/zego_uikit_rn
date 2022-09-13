@@ -1,11 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { findNodeHandle, View, StyleSheet } from "react-native";
 import { ZegoTextureView } from 'zego-express-engine-reactnative';
 import ZegoUIKitInternal from "../../internal/ZegoUIKitInternal";
 
 export default function VideoFrame(props) {
     const { userID, roomID, fillMode } = props;
-    const viewRef = React.createRef();
+    const viewRef = useRef(null);
 
     const updateRenderingProperty = () => {
         const viewID = findNodeHandle(viewRef.current);
