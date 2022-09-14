@@ -31,6 +31,14 @@ class ZegoInRoomMessageInput extends React.Component {
             this.props.onContentSizeChange(0, 45);
         }
     }
+    _sumit() {
+        ZegoUIKitInternal.sendInRoomMessage(this.state.currentText);
+        this.clear();
+        this.blur();
+        if (typeof this.props.onSumit == 'function') {
+            this.props.onSumit();
+        }
+    }
 
     render() {
         return (
@@ -50,17 +58,14 @@ class ZegoInRoomMessageInput extends React.Component {
                             }
                         }}
                         onChangeText={(text) => { this.setState({ currentText: text }); }}
+                        onSubmitEditing={() => this._sumit()}
                         placeholder="Say something..."
                     />
                 </View>
                 <TouchableOpacity
                     style={styles.sendButton}
                     onPress={() => {
-                        ZegoUIKitInternal.sendInRoomMessage(this.state.currentText).then(({ errorCode, messageID }) => {
-                            if (errorCode == 0) {
-                                this.clear();
-                            }
-                        })
+                        this._sumit();
                     }}
                 >
                     <Image resizeMode='contain' style={styles.icon} source={(this.state.currentText && this.state.currentText != "") ? this.iconPath.enable : this.iconPath.disable} />
@@ -102,7 +107,7 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 12,
         borderTopRightRadius: 12,
         backgroundColor: 'rgba(0, 0, 0, 0.7500)',
-        width: '100%',
+        width: '100%'
     }
 
 });
