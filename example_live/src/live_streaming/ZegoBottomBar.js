@@ -21,7 +21,8 @@ export default function ZegoBottomBar(props) {
         turnOnCameraWhenJoining,
         turnOnMicrophoneWhenJoining,
         useSpeakerWhenJoining,
-        onMorePress,
+        onMoreButtonPress,
+        onMessageButtonPress,
         showInRoomMessageButton = false
     } = props;
     const [isNormalStyle, setIsNormalStyle] = useState(true);
@@ -97,7 +98,7 @@ export default function ZegoBottomBar(props) {
             }
         });
         if (needMoreButton) {
-            firstLevelButtons.push(<ZegoMoreButton onPress={() => { setIsNormalStyle(false); if (onMorePress) onMorePress() }} />)
+            firstLevelButtons.push(<ZegoMoreButton onPress={() => { setIsNormalStyle(false); if (onMoreButtonPress) onMoreButtonPress() }} />)
         }
         return {
             firstLevelButtons: firstLevelButtons,
@@ -112,7 +113,11 @@ export default function ZegoBottomBar(props) {
     return (
         isNormalStyle ?
             <View style={styles.normalBar}>
-                {showInRoomMessageButton ? <ZegoMessageButton onPress={() => { console.log('showMessage') }} /> : null}
+                {showInRoomMessageButton ? <ZegoMessageButton onPress={() => {
+                    if (typeof onMessageButtonPress == 'function') {
+                        onMessageButtonPress();
+                    }
+                }} /> : null}
 
                 <View style={styles.rightBar}>
                     {firstLevelButtons.map((button, index) => (

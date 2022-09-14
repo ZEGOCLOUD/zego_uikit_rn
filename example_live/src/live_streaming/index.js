@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { PermissionsAndroid, Image, Text } from 'react-native';
 
-import { StyleSheet, View } from 'react-native';
-import ZegoUIKit, { ZegoLeaveButton, ZegoAudioVideoView } from '@zegocloud/zego-uikit-rn'
-import AudioVideoForegroundView from './AudioVideoForegroundView';
+import { StyleSheet, View, Keyboard } from 'react-native';
+import ZegoUIKit, { ZegoLeaveButton, ZegoAudioVideoView, ZegoInRoomMessageInput } from '@zegocloud/zego-uikit-rn'
 import ZegoBottomBar from './ZegoBottomBar';
+import { useKeyboard } from '../utils/keyboard'
 
 // https://github.com/react-native-community/hooks#usekeyboard
 export default function ZegoUIKitPrebuiltLiveStreaming(props) {
@@ -35,7 +35,13 @@ export default function ZegoUIKitPrebuiltLiveStreaming(props) {
         onLeaveLiveStreamingConfirming
     } = config;
 
+    const keyboardHeight = useKeyboard();
+    const [textInputVisable, setTextInputVisable] = useState(false);
+    const [textInput, setTextInput] = useState(null);
+    const [textInputHeight, setTextInputHeight] = useState(45);
+
     const [hostID, setHostID] = useState((turnOnCameraWhenJoining || turnOnMicrophoneWhenJoining) ? userID : "");
+
     const [memberCount, setMemberCount] = useState((turnOnCameraWhenJoining || turnOnMicrophoneWhenJoining) ? 1 : 0);
 
     const grantPermissions = async (callback) => {
@@ -79,6 +85,16 @@ export default function ZegoUIKitPrebuiltLiveStreaming(props) {
             callback();
         }
     }
+    const onFullPageTouch = () => {
+        setTextInputVisable(false);
+    }
+
+    // When the textInput is ready, show keyboard
+    useEffect(() => {
+        if (textInput) {
+            textInput.focus();
+        }
+    }, [textInput])
 
     useEffect(() => {
         const callbackID = 'ZegoUIKitPrebuiltLiveStreaming' + String(Math.floor(Math.random() * 10000));
@@ -149,6 +165,9 @@ export default function ZegoUIKitPrebuiltLiveStreaming(props) {
                 showInRoomMessageButton={showInRoomMessageButton}
                 onLeaveLiveStreaming={onLeaveLiveStreaming}
                 onLeaveLiveStreamingConfirming={onLeaveLiveStreamingConfirming}
+                onMessageButtonPress={() => {
+                    setTextInputVisable(true);
+                }}
             />
 
             <View style={styles.leaveButton} >
@@ -160,14 +179,32 @@ export default function ZegoUIKitPrebuiltLiveStreaming(props) {
                 />
             </View>
             <View style={styles.memberButton}>
-                <Image source={require('./resources/white_top_button_member.png')}/>
+                <Image source={require('./resources/white_top_button_member.png')} />
                 <Text style={styles.memberCountLabel}>{memberCount}</Text>
             </View>
+            <View style={styles.fillParent} pointerEvents='auto' onTouchStart={onFullPageTouch} />
+            {textInputVisable ?
+                <View style={[styles.messageInputPannel, { bottom: keyboardHeight, height: textInputHeight }]}>
+                    <ZegoInRoomMessageInput
+                        ref={input => { setTextInput(input); }}
+                        onContentSizeChange={(width, height) => {
+                            setTextInputHeight(height)
+                        }}
+                        onSumit={() => { setTextInputVisable(false); }}
+                    />
+                </View> : null}
         </View>
     );
 }
 
 const styles = StyleSheet.create({
+    messageInputPannel: {
+        position: 'absolute',
+        borderTopLeftRadius: 12,
+        borderTopRightRadius: 12,
+        backgroundColor: 'rgba(0, 0, 0, 0.7500)',
+        width: '100%',
+    },
     container: {
         flex: 1,
         position: 'absolute',
@@ -205,5 +242,6 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: 'white',
         marginLeft: 3
-    }
+    },
+
 });
