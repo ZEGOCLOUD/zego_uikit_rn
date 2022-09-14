@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { PermissionsAndroid, Image } from 'react-native';
+import { PermissionsAndroid, Image, Text } from 'react-native';
 
 import { StyleSheet, View } from 'react-native';
 import ZegoUIKit, { ZegoLeaveButton, ZegoAudioVideoView } from '@zegocloud/zego-uikit-rn'
@@ -36,6 +36,7 @@ export default function ZegoUIKitPrebuiltLiveStreaming(props) {
     } = config;
 
     const [hostID, setHostID] = useState((turnOnCameraWhenJoining || turnOnMicrophoneWhenJoining) ? userID : "");
+    const [memberCount, setMemberCount] = useState((turnOnCameraWhenJoining || turnOnMicrophoneWhenJoining) ? 1 : 0);
 
     const grantPermissions = async (callback) => {
         // Android: Dynamically obtaining device permissions
@@ -86,15 +87,20 @@ export default function ZegoUIKitPrebuiltLiveStreaming(props) {
                 setHostID(users[0].userID);
             }
         });
+        ZegoUIKit.onUserJoin(callbackID, (users) => {
+            setMemberCount(ZegoUIKit.getAllUsers().length)
+        });
         ZegoUIKit.onUserLeave(callbackID, (users) => {
             users.forEach(user => {
                 if (user.userID == hostID) {
                     setHostID("");
                 }
             })
+            setMemberCount(ZegoUIKit.getAllUsers().length)
         });
         return () => {
             ZegoUIKit.onAudioVideoAvailable(callbackID);
+            ZegoUIKit.onUserJoin(callbackID);
             ZegoUIKit.onUserLeave(callbackID);
         }
     }, [])
@@ -153,6 +159,10 @@ export default function ZegoUIKitPrebuiltLiveStreaming(props) {
                     iconLeave={require('./resources/white_top_button_close.png')}
                 />
             </View>
+            <View style={styles.memberButton}>
+                <Image source={require('./resources/white_top_button_member.png')}/>
+                <Text style={styles.memberCountLabel}>{memberCount}</Text>
+            </View>
         </View>
     );
 }
@@ -175,6 +185,25 @@ const styles = StyleSheet.create({
     leaveButton: {
         position: 'absolute',
         top: 32,
-        right: 10
+        right: 10,
+        zIndex: 10
+    },
+    memberButton: {
+        position: 'absolute',
+        top: 42,
+        right: 52,
+        width: 53,
+        height: 28,
+        backgroundColor: 'rgba(30, 39, 64, 0.4000)',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 17,
+        zIndex: 10
+    },
+    memberCountLabel: {
+        fontSize: 14,
+        color: 'white',
+        marginLeft: 3
     }
 });
