@@ -19,11 +19,14 @@ var _onAudioOutputDeviceTypeChangeCallbackMap = {};
 var _onOnlySelfInRoomCallbackMap = {};
 var _onAudioVideoAvailableCallbackMap = {};
 var _onAudioVideoUnavailableCallbackMap = {};
+var _onInRoomMessageReceivedCallbackMap = {};
 
 var _localCoreUser = _createCoreUser('', '', '', {});
 var _streamCoreUserMap = {}; // <streamID, CoreUser>
 var _coreUserMap = {}; // <userID, CoreUser>
 var _qualityUpdateLogCounter = 0;
+
+var _inRoomMessageList = [];
 
 function _resetData() {
     zloginfo('Reset all data.')
@@ -34,6 +37,7 @@ function _resetData() {
     _currentRoomState = 7;
     _isRoomConnected = false;
     _audioOutputType = 0;
+    _inRoomMessageList = [];
 }
 
 function _resetDataForLeavingRoom() {
@@ -46,6 +50,7 @@ function _resetDataForLeavingRoom() {
     const { userID, userName, profileUrl, extendInfo } = _localCoreUser;
     _localCoreUser = _createCoreUser(userID, userName, profileUrl, extendInfo);
     _coreUserMap[_localCoreUser.userID] = _localCoreUser;
+    _inRoomMessageList = [];
 }
 
 function _createPublicUser(coreUser) {
@@ -263,6 +268,29 @@ function _onRoomStateChanged(roomID, reason, errorCode, extendedData) {
         }
     });
 }
+function _onInRoomMessageReceived(roomID, messageList) {
+    zloginfo('Received in room message: ', roomID, messageList.length);
+    var messages = [];
+    messageList.forEach(msg => {
+        const message = {
+            message: msg.message,
+            messageID: msg.messageID,
+            sendTime: msg.sendTime,
+            sender: _createPublicUser(getUser(msg.fromUser.userID))
+        }
+        messages.push(message);
+        _inRoomMessageList.push(message);
+    })
+
+    Object.keys(_onInRoomMessageReceivedCallbackMap).forEach(callbackID => {
+        // callback may remove from map during room state chaging
+        if (callbackID in _onInRoomMessageReceivedCallbackMap) {
+            if (_onInRoomMessageReceivedCallbackMap[callbackID]) {
+                _onInRoomMessageReceivedCallbackMap[callbackID](messages);
+            }
+        }
+    });
+}
 function _registerEngineCallback() {
     zloginfo('Register callback for ZegoExpressEngine...')
     ZegoExpressEngine.instance().on(
@@ -370,6 +398,12 @@ function _registerEngineCallback() {
             _onAudioRouteChange(audioRoute);
         },
     );
+    ZegoExpressEngine.instance().on(
+        'IMRecvBroadcastMessage',
+        (roomID, messageList) => {
+            _onInRoomMessageReceived(roomID, messageList);
+        },
+    );
 }
 function _unregisterEngineCallback() {
     zloginfo('Unregister callback from ZegoExpressEngine...');
@@ -383,6 +417,7 @@ function _unregisterEngineCallback() {
     ZegoExpressEngine.instance().off('capturedSoundLevelUpdate');
     ZegoExpressEngine.instance().off('roomStateChanged');
     ZegoExpressEngine.instance().off('audioRouteChange');
+    ZegoExpressEngine.instance().off('IMRecvBroadcastMessage');
 }
 
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Stream Handling <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -858,6 +893,39 @@ export default {
             }
         } else {
             _onOnlySelfInRoomCallbackMap[callbackID] = callback;
+        }
+    },
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Message <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    getInRoomMessages() {
+        return _inRoomMessageList;
+    },
+    sendInRoomMessage(message) {
+        return new Promise((resolve, reject) => {
+            ZegoExpressEngine.instance().sendBroadcastMessage(roomID, message).then((errorCode, messageID) => {
+                zloginfo('SendInRoomMessage success.', messageID);
+                const inRoomMessage = {
+                    message: message,
+                    messageID: messageID,
+                    sendTime: Date.now(),
+                    sender: _createPublicUser(_localCoreUser)
+                }
+                _inRoomMessageList.push(inRoomMessage);
+
+                resolve(errorCode, messageID);
+            }).catch((error) => {
+                zlogerror('Join room falied: ', error);
+                reject(error);
+            });
+        });
+    },
+    onInRoomMessageReceived(callbackID, callback) {
+        if (typeof callback !== 'function') {
+            if (callbackID in _onInRoomMessageReceivedCallbackMap) {
+                zloginfo('[onInRoomMessageReceived] Remove callback for: [', callbackID, '] because callback is not a valid function!');
+                delete _onInRoomMessageReceivedCallbackMap[callbackID];
+            }
+        } else {
+            _onInRoomMessageReceivedCallbackMap[callbackID] = callback;
         }
     }
 }

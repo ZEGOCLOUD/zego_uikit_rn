@@ -36,6 +36,9 @@ export default {
     onUserLeave: ZegoUIKitInternal.onUserLeave,
     onAudioVideoAvailable: ZegoUIKitInternal.onAudioVideoAvailable,
     onAudioVideoUnavailable: ZegoUIKitInternal.onAudioVideoUnavailable,
+    getInRoomMessages: ZegoUIKitInternal.getInRoomMessages,
+    sendInRoomMessage: ZegoUIKitInternal.sendInRoomMessage,
+    onInRoomMessageReceived: ZegoUIKitInternal.onInRoomMessageReceived,
 }
 
 export {
