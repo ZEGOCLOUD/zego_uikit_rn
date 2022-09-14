@@ -8,6 +8,7 @@ import ZegoToggleCameraButton from './components/audio_video/ZegoToggleCameraBut
 import ZegoSwitchAudioOutputButton from './components/audio_video/ZegoSwitchAudioOutputButton'
 import ZegoAudioVideoContainer from './components/audio_video_container/ZegoAudioVideoContainer'
 import ZegoLeaveButton from './components/audio_video/ZegoLeaveButton'
+import ZegoInRoomMessageInput from './components/in_room_message/ZegoInRoomMessageInput'
 
 export default {
     init: ZegoUIKitInternal.connectSDK,
@@ -51,6 +52,7 @@ export {
     ZegoSwitchAudioOutputButton,
     ZegoAudioVideoContainer,
     ZegoLeaveButton,
+    ZegoInRoomMessageInput
 }
 
 

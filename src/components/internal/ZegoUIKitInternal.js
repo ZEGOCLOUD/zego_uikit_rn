@@ -901,19 +901,25 @@ export default {
     },
     sendInRoomMessage(message) {
         return new Promise((resolve, reject) => {
-            ZegoExpressEngine.instance().sendBroadcastMessage(roomID, message).then((errorCode, messageID) => {
-                zloginfo('SendInRoomMessage success.', messageID);
-                const inRoomMessage = {
-                    message: message,
-                    messageID: messageID,
-                    sendTime: Date.now(),
-                    sender: _createPublicUser(_localCoreUser)
-                }
-                _inRoomMessageList.push(inRoomMessage);
+            ZegoExpressEngine.instance().sendBroadcastMessage(_currentRoomID, message).then((result) => {
 
-                resolve(errorCode, messageID);
+                zloginfo('SendInRoomMessage finished.', result);
+                const { errorCode, messageID } = result;
+                if (errorCode > 0) {
+                    reject(errorCode)
+                } else {
+                    const inRoomMessage = {
+                        message: message,
+                        messageID: messageID,
+                        sendTime: Date.now(),
+                        sender: _createPublicUser(_localCoreUser)
+                    }
+                    _inRoomMessageList.push(inRoomMessage);
+
+                    resolve(result);
+                }
             }).catch((error) => {
-                zlogerror('Join room falied: ', error);
+                zlogerror('SendInRoomMessage falied: ', error);
                 reject(error);
             });
         });
