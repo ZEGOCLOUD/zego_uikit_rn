@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { PermissionsAndroid, Image, Text } from 'react-native';
 
-import { StyleSheet, View, Keyboard } from 'react-native';
+import { StyleSheet, View, Platform, KeyboardAvoidingView, TouchableOpacity } from 'react-native';
 import ZegoUIKit, { ZegoLeaveButton, ZegoAudioVideoView, ZegoInRoomMessageInput } from '@zegocloud/zego-uikit-rn'
 import ZegoBottomBar from './ZegoBottomBar';
 import { useKeyboard } from '../utils/keyboard'
@@ -89,13 +89,6 @@ export default function ZegoUIKitPrebuiltLiveStreaming(props) {
         setTextInputVisable(false);
     }
 
-    // When the textInput is ready, show keyboard
-    useEffect(() => {
-        if (textInput) {
-            textInput.focus();
-        }
-    }, [textInput])
-
     useEffect(() => {
         const callbackID = 'ZegoUIKitPrebuiltLiveStreaming' + String(Math.floor(Math.random() * 10000));
         ZegoUIKit.onAudioVideoAvailable(callbackID, (users) => {
@@ -142,7 +135,7 @@ export default function ZegoUIKitPrebuiltLiveStreaming(props) {
     }, []);
 
     return (
-        <View style={styles.container} >
+        <View style={styles.container}>
             <View style={styles.fillParent}>
                 {hostID != "" ?
                     <ZegoAudioVideoView
@@ -155,20 +148,6 @@ export default function ZegoUIKitPrebuiltLiveStreaming(props) {
                         <Image source={require('./resources/background.png')} style={styles.fillParent} />
                     </View>}
             </View>
-            <ZegoBottomBar
-                menuBarButtonsMaxCount={menuBarButtonsMaxCount}
-                menuBarButtons={menuBarButtons}
-                menuBarExtendedButtons={menuBarExtendedButtons}
-                turnOnCameraWhenJoining={turnOnCameraWhenJoining}
-                turnOnMicrophoneWhenJoining={turnOnMicrophoneWhenJoining}
-                useSpeakerWhenJoining={useSpeakerWhenJoining}
-                showInRoomMessageButton={showInRoomMessageButton}
-                onLeaveLiveStreaming={onLeaveLiveStreaming}
-                onLeaveLiveStreamingConfirming={onLeaveLiveStreamingConfirming}
-                onMessageButtonPress={() => {
-                    setTextInputVisable(true);
-                }}
-            />
 
             <View style={styles.leaveButton} >
                 <ZegoLeaveButton
@@ -182,17 +161,42 @@ export default function ZegoUIKitPrebuiltLiveStreaming(props) {
                 <Image source={require('./resources/white_top_button_member.png')} />
                 <Text style={styles.memberCountLabel}>{memberCount}</Text>
             </View>
-            <View style={styles.fillParent} pointerEvents='auto' onTouchStart={onFullPageTouch} />
-            {textInputVisable ?
-                <View style={[styles.messageInputPannel, { bottom: keyboardHeight, height: textInputHeight }]}>
-                    <ZegoInRoomMessageInput
-                        ref={input => { setTextInput(input); }}
-                        onContentSizeChange={(width, height) => {
-                            setTextInputHeight(height)
+
+            <View
+                pointerEvents='auto'
+                onTouchStart={onFullPageTouch}
+                style={[styles.dismissArea, { bottom: Platform.OS == 'ios' ? keyboardHeight + textInputHeight : textInputHeight }]}
+            />
+            <KeyboardAvoidingView style={[styles.fillParent, { zIndex: 9 }]} behavior={"padding"}>
+                {Platform.OS != 'ios' && keyboardHeight > 0 ? null :
+                    <ZegoBottomBar
+                        menuBarButtonsMaxCount={menuBarButtonsMaxCount}
+                        menuBarButtons={menuBarButtons}
+                        menuBarExtendedButtons={menuBarExtendedButtons}
+                        turnOnCameraWhenJoining={turnOnCameraWhenJoining}
+                        turnOnMicrophoneWhenJoining={turnOnMicrophoneWhenJoining}
+                        useSpeakerWhenJoining={useSpeakerWhenJoining}
+                        showInRoomMessageButton={showInRoomMessageButton}
+                        onLeaveLiveStreaming={onLeaveLiveStreaming}
+                        onLeaveLiveStreamingConfirming={onLeaveLiveStreamingConfirming}
+                        onMessageButtonPress={() => {
+                            setTextInputVisable(true);
                         }}
-                        onSumit={() => { setTextInputVisable(false); }}
                     />
-                </View> : null}
+                }
+                {textInputVisable ?
+                    <View style={[styles.messageInputPannel, { bottom: Platform.OS == "ios" ? keyboardHeight : 0, height: textInputHeight }]}>
+                        <ZegoInRoomMessageInput
+                            ref={input => { setTextInput(input); }}
+                            onContentSizeChange={(width, height) => {
+                                setTextInputHeight(height)
+                            }}
+                            onSumit={() => { setTextInputVisable(false); }}
+                        />
+                    </View> : null
+                }
+
+            </KeyboardAvoidingView>
         </View>
     );
 }
@@ -204,6 +208,7 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 12,
         backgroundColor: 'rgba(0, 0, 0, 0.7500)',
         width: '100%',
+        zIndex: 11,
     },
     container: {
         flex: 1,
@@ -243,5 +248,11 @@ const styles = StyleSheet.create({
         color: 'white',
         marginLeft: 3
     },
+    dismissArea: {
+        zIndex: 11,
+        width: '100%',
+        top: 80,
+        position: 'absolute'
+    }
 
 });
