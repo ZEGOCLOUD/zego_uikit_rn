@@ -276,7 +276,7 @@ function _onInRoomMessageReceived(roomID, messageList) {
             message: msg.message,
             messageID: msg.messageID,
             sendTime: msg.sendTime,
-            sender: _createPublicUser(getUser(msg.fromUser.userID))
+            sender: _createPublicUser(_coreUserMap[msg.fromUser.userID])
         }
         messages.push(message);
         _inRoomMessageList.push(message);
@@ -902,7 +902,6 @@ export default {
     sendInRoomMessage(message) {
         return new Promise((resolve, reject) => {
             ZegoExpressEngine.instance().sendBroadcastMessage(_currentRoomID, message).then((result) => {
-
                 zloginfo('SendInRoomMessage finished.', result);
                 const { errorCode, messageID } = result;
                 if (errorCode > 0) {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, TextInput, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, TextInput, Image, TouchableOpacity, Platform } from 'react-native';
 import ZegoUIKitInternal from '../internal/ZegoUIKitInternal';
 
 // https://github.com/react-native-community/hooks#usekeyboard
@@ -32,11 +32,13 @@ class ZegoInRoomMessageInput extends React.Component {
         }
     }
     _sumit() {
-        ZegoUIKitInternal.sendInRoomMessage(this.state.currentText);
-        this.clear();
-        this.blur();
-        if (typeof this.props.onSumit == 'function') {
-            this.props.onSumit();
+        if (this.state.currentText != '') {
+            ZegoUIKitInternal.sendInRoomMessage(this.state.currentText);
+            this.clear();
+            this.blur();
+            if (typeof this.props.onSumit == 'function') {
+                this.props.onSumit();
+            }
         }
     }
 
@@ -49,9 +51,16 @@ class ZegoInRoomMessageInput extends React.Component {
                         style={[styles.fillParent, styles.textInput]}
                         blurOnSubmit={true}
                         multiline={true}
+                        autoFocus={true}
                         selectionColor={'#A653FF'}
+                        placeholder="Say something..."
+                        placeholderTextColor={''}
                         onContentSizeChange={({ nativeEvent: { contentSize: { width, height } } }) => {
-                            const h = height + 25;
+                            var h = height;
+                            // https://github.com/facebook/react-native/issues/29702
+                            if (Platform.OS == 'ios') {
+                                h = height + 25;
+                            }
                             this.setState({ textInputHeight: h, contentWidth: width })
                             if (typeof this.props.onContentSizeChange == 'function') {
                                 this.props.onContentSizeChange(width, h);
@@ -59,7 +68,6 @@ class ZegoInRoomMessageInput extends React.Component {
                         }}
                         onChangeText={(text) => { this.setState({ currentText: text }); }}
                         onSubmitEditing={() => this._sumit()}
-                        placeholder="Say something..."
                     />
                 </View>
                 <TouchableOpacity
