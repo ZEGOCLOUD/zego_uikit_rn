@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { PermissionsAndroid, Image, Text } from 'react-native';
 
 import { StyleSheet, View, Platform, KeyboardAvoidingView, TouchableOpacity } from 'react-native';
-import ZegoUIKit, { ZegoLeaveButton, ZegoAudioVideoView, ZegoInRoomMessageInput } from '@zegocloud/zego-uikit-rn'
+import ZegoUIKit, { ZegoLeaveButton, ZegoAudioVideoView, ZegoInRoomMessageInput, ZegoInRoomMessageView } from '@zegocloud/zego-uikit-rn'
 import ZegoBottomBar from './ZegoBottomBar';
 import { useKeyboard } from '../utils/keyboard'
 
@@ -100,9 +100,12 @@ export default function ZegoUIKitPrebuiltLiveStreaming(props) {
             setMemberCount(ZegoUIKit.getAllUsers().length)
         });
         ZegoUIKit.onUserLeave(callbackID, (users) => {
+            // TODO HOST ID is empty?
+            // console.log('@@@@@@@@@@@@@', hostID != "",hostID, users)
             users.forEach(user => {
                 if (user.userID == hostID) {
                     setHostID("");
+
                 }
             })
             setMemberCount(ZegoUIKit.getAllUsers().length)
@@ -149,6 +152,10 @@ export default function ZegoUIKitPrebuiltLiveStreaming(props) {
                     </View>}
             </View>
 
+            <View style={styles.messageListView}>
+                <ZegoInRoomMessageView style={styles.fillParent}/>
+            </View>
+
             <View style={styles.leaveButton} >
                 <ZegoLeaveButton
                     style={styles.fillParent}
@@ -165,7 +172,7 @@ export default function ZegoUIKitPrebuiltLiveStreaming(props) {
             <View
                 pointerEvents='auto'
                 onTouchStart={onFullPageTouch}
-                style={[styles.dismissArea, { bottom: Platform.OS == 'ios' ? keyboardHeight + textInputHeight : textInputHeight }]}
+                style={[styles.dismissArea, { bottom: (Platform.OS == 'ios' ? keyboardHeight + textInputHeight : textInputHeight) + 10 }]}
             />
             <KeyboardAvoidingView style={[styles.fillParent, { zIndex: 9 }]} behavior={"padding"}>
                 {Platform.OS != 'ios' && keyboardHeight > 0 ? null :
@@ -202,6 +209,14 @@ export default function ZegoUIKitPrebuiltLiveStreaming(props) {
 }
 
 const styles = StyleSheet.create({
+    messageListView: {
+        position: 'absolute',
+        left: 16,
+        bottom: 62,
+        width: 270,
+        maxHeight: 200,
+        zIndex: 12,
+    },
     messageInputPannel: {
         position: 'absolute',
         borderTopLeftRadius: 12,

@@ -20,6 +20,7 @@ var _onOnlySelfInRoomCallbackMap = {};
 var _onAudioVideoAvailableCallbackMap = {};
 var _onAudioVideoUnavailableCallbackMap = {};
 var _onInRoomMessageReceivedCallbackMap = {};
+var _onInRoomMessageSentCallbackMap = {};
 
 var _localCoreUser = _createCoreUser('', '', '', {});
 var _streamCoreUserMap = {}; // <streamID, CoreUser>
@@ -413,6 +414,7 @@ function _unregisterEngineCallback() {
     ZegoExpressEngine.instance().off('playerQualityUpdate');
     ZegoExpressEngine.instance().off('remoteCameraStateUpdate');
     ZegoExpressEngine.instance().off('remoteMicStateUpdate');
+    ZegoExpressEngine.instance().off('playerStateUpdate');
     ZegoExpressEngine.instance().off('remoteSoundLevelUpdate');
     ZegoExpressEngine.instance().off('capturedSoundLevelUpdate');
     ZegoExpressEngine.instance().off('roomStateChanged');
@@ -915,6 +917,15 @@ export default {
                     }
                     _inRoomMessageList.push(inRoomMessage);
 
+                    Object.keys(_onInRoomMessageSentCallbackMap).forEach(callbackID => {
+                        // callback may remove from map during room state chaging
+                        if (callbackID in _onInRoomMessageSentCallbackMap) {
+                            if (_onInRoomMessageSentCallbackMap[callbackID]) {
+                                _onInRoomMessageSentCallbackMap[callbackID](errorCode, messageID);
+                            }
+                        }
+                    });
+
                     resolve(result);
                 }
             }).catch((error) => {
@@ -931,6 +942,16 @@ export default {
             }
         } else {
             _onInRoomMessageReceivedCallbackMap[callbackID] = callback;
+        }
+    },
+    onInRoomMessageSent(callbackID, callback) {
+        if (typeof callback !== 'function') {
+            if (callbackID in _onInRoomMessageSentCallbackMap) {
+                zloginfo('[onInRoomMessageSent] Remove callback for: [', callbackID, '] because callback is not a valid function!');
+                delete _onInRoomMessageSentCallbackMap[callbackID];
+            }
+        } else {
+            _onInRoomMessageSentCallbackMap[callbackID] = callback;
         }
     }
 }
