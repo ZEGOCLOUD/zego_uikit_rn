@@ -13,8 +13,8 @@ class ZegoInRoomMessageInput extends React.Component {
             currentText: ""
         };
         this.iconPath = {
-            enable: require('../internal/resources/white_button_send_in_room_message_enable.png'),
-            disable: require('../internal/resources/white_button_send_in_room_message_disable.png')
+            enable: this.props.iconSend ? this.props.iconSend : require('../internal/resources/white_button_send_in_room_message_enable.png'),
+            disable: this.props.iconSendDisable ? this.props.iconSendDisable : (this.props.iconSend ? this.props.iconSend : require('../internal/resources/white_button_send_in_room_message_disable.png'))
         }
     }
 
@@ -44,7 +44,7 @@ class ZegoInRoomMessageInput extends React.Component {
 
     render() {
         return (
-            <View style={[styles.container, { height: this.state.textInputHeight }]} >
+            <View style={[styles.container, { height: this.state.textInputHeight, backgroundColor: this.props.backgroundColor ? this.props.backgroundColor : 'rgba(0, 0, 0, 0.7500)' }]} >
                 <View style={styles.textInputContainer}>
                     <TextInput
                         ref={this.textInput}
@@ -52,9 +52,10 @@ class ZegoInRoomMessageInput extends React.Component {
                         blurOnSubmit={true}
                         multiline={true}
                         autoFocus={true}
+                        editable={this.props.enable ? this.props.enable : true}
                         selectionColor={'#A653FF'}
-                        placeholder="Say something..."
-                        placeholderTextColor={''}
+                        placeholder={this.props.placeholder ? this.props.placeholder : ''}
+                        placeholderTextColor={'rgba(255, 255, 255, 0.2)'}
                         onContentSizeChange={({ nativeEvent: { contentSize: { width, height } } }) => {
                             var h = height;
                             // https://github.com/facebook/react-native/issues/29702
@@ -114,7 +115,6 @@ const styles = StyleSheet.create({
         position: 'absolute',
         borderTopLeftRadius: 12,
         borderTopRightRadius: 12,
-        backgroundColor: 'rgba(0, 0, 0, 0.7500)',
         width: '100%'
     }
 
