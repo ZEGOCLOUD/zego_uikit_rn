@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Alert } from 'react-native';
 
 import { StyleSheet, View, Text, Button } from 'react-native';
-import ZegoUIKitPrebuiltLiveStreaming from './live_streaming'
+import ZegoUIKitPrebuiltLiveStreaming, { AUDIENCE_DEFAULT_CONFIG } from './live_streaming'
 import KeyCenter from './KeyCenter';
 // import ZegoUIKit, {ZegoToggleCameraButton} from @zego-uikit/components-rn
 // import {ZegoUIKitPrebuiltCall} from @zego-uikit/prebuilt-call-rn
@@ -14,20 +14,6 @@ export default function AudiencePage(props) {
 
     return (
         <View style={styles.container}>
-            {/* <ZegoUIKitPrebuiltLiveStreaming
-                appID={KeyCenter.appID}
-                appSign={KeyCenter.appSign}
-                userID={userID}
-                userName={userName}
-                liveID={liveID}
-
-                config={{
-                    turnOnCameraWhenJoining: false,
-                    // turnOnMicrophoneWhenJoining: false,
-                    // menuBarButtons: [],
-                    onLeaveLiveStreaming: () => { props.navigation.navigate('HomePage') }
-                }}
-            /> */}
             <ZegoUIKitPrebuiltLiveStreaming
                 appID={KeyCenter.appID}
                 appSign={KeyCenter.appSign}
@@ -36,9 +22,7 @@ export default function AudiencePage(props) {
                 liveID={liveID}
 
                 config={{
-                    turnOnCameraWhenJoining: false,
-                    turnOnMicrophoneWhenJoining: false,
-                    menuBarButtons: [],
+                    ...AUDIENCE_DEFAULT_CONFIG,
                     onLeaveLiveStreaming: () => { props.navigation.navigate('HomePage') }
                 }}
             />

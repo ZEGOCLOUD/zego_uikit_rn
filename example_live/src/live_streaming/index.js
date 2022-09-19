@@ -6,6 +6,23 @@ import ZegoUIKit, { ZegoLeaveButton, ZegoAudioVideoView, ZegoInRoomMessageInput,
 import ZegoBottomBar from './ZegoBottomBar';
 import { useKeyboard } from '../utils/keyboard'
 
+export const HOST_DEFAULT_CONFIG = {
+    showSoundWavesInAudioMode: true,
+    turnOnCameraWhenJoining: true,
+    turnOnMicrophoneWhenJoining: true,
+    useSpeakerWhenJoining: true,
+    showInRoomMessageButton: true,
+    menuBarButtons: [1, 2, 3]
+}
+export const AUDIENCE_DEFAULT_CONFIG = {
+    showSoundWavesInAudioMode: true,
+    turnOnCameraWhenJoining: false,
+    turnOnMicrophoneWhenJoining: false,
+    useSpeakerWhenJoining: true,
+    showInRoomMessageButton: true,
+    menuBarButtons: []
+}
+
 // https://github.com/react-native-community/hooks#usekeyboard
 export default function ZegoUIKitPrebuiltLiveStreaming(props) {
     const {
@@ -25,7 +42,7 @@ export default function ZegoUIKitPrebuiltLiveStreaming(props) {
 
         showInRoomMessageButton = true,
 
-        menuBarButtons = [0, 1, 2, 3],
+        menuBarButtons = [1, 2, 3],
         menuBarButtonsMaxCount = 5,
         menuBarExtendedButtons = [],
 
@@ -153,7 +170,7 @@ export default function ZegoUIKitPrebuiltLiveStreaming(props) {
             </View>
 
             <View style={styles.messageListView}>
-                <ZegoInRoomMessageView style={styles.fillParent}/>
+                <ZegoInRoomMessageView style={styles.fillParent} />
             </View>
 
             <View style={styles.leaveButton} >
@@ -198,6 +215,7 @@ export default function ZegoUIKitPrebuiltLiveStreaming(props) {
                             onContentSizeChange={(width, height) => {
                                 setTextInputHeight(height)
                             }}
+                            placeholder={'Say something...'}
                             onSumit={() => { setTextInputVisable(false); }}
                         />
                     </View> : null
