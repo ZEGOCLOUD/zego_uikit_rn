@@ -1,0 +1,3 @@
+[submodule "prebuilts/live_streaming"]
+	path = prebuilts/live_streaming
+	url = git@github.com:ZEGOCLOUD/zego_uikit_prebuilt_live_streaming_rn.git
