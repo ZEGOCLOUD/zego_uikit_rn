@@ -201,8 +201,7 @@ function _onRoomStreamUpdate(roomID, updateType, streamList) {
         })
     }
 }
-function _onRemoteCameraStateUpdate(streamID, state) {
-    const userID = _getUserIDByStreamID(streamID);
+function _onRemoteCameraStateUpdate(userID, state) {
     if (userID in _coreUserMap) {
         const isOn = state == 0; // 0 for Open
         _coreUserMap[userID].isCameraDeviceOn = isOn;
@@ -229,8 +228,7 @@ function _onAudioRouteChange(type) {
     });
     _audioOutputType = type;
 }
-function _onRemoteMicStateUpdate(streamID, state) {
-    const userID = _getUserIDByStreamID(streamID);
+function _onRemoteMicStateUpdate(userID, state) {
     if (userID in _coreUserMap) {
         const isOn = state == 0; // 0 for Open
         _coreUserMap[userID].isMicDeviceOn = isOn;
@@ -342,14 +340,14 @@ function _registerEngineCallback() {
         'remoteCameraStateUpdate',
         (streamID, state) => {
             zloginfo('[remoteCameraStateUpdate callback]', streamID, state);
-            _onRemoteCameraStateUpdate(streamID, state);
+            _onRemoteCameraStateUpdate(_getUserIDByStreamID(streamID), state);
         },
     );
     ZegoExpressEngine.instance().on(
         'remoteMicStateUpdate',
         (streamID, state) => {
             zloginfo('[remoteMicStateUpdate callback]', streamID, state);
-            _onRemoteMicStateUpdate(streamID, state);
+            _onRemoteMicStateUpdate(_getUserIDByStreamID(streamID), state);
         },
     );
     ZegoExpressEngine.instance().on(
@@ -425,7 +423,12 @@ function _unregisterEngineCallback() {
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Stream Handling <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 function _getUserIDByStreamID(streamID) {
     // StreamID format: roomid_userid_main
-    return streamID.split('_')[1]
+    for (const userID in _coreUserMap) {
+        if ( _coreUserMap[userID].streamID == streamID) {
+            return userID;
+        }
+    }
+    return ''
 }
 function _getPublishStreamID() {
     return _currentRoomID + '_' + _localCoreUser.userID + '_main';
@@ -682,10 +685,10 @@ export default {
     turnMicDeviceOn(userID, on) {
         return new Promise((resolve, reject) => {
             if (_isLocalUser(userID)) {
-                zloginfo('turnMicDeviceOn: ', userID, on);
+                zloginfo('turnMicDeviceOn: ', _localCoreUser.userID, on);
                 ZegoExpressEngine.instance().muteMicrophone(!on);
 
-                _onRemoteMicStateUpdate(_getPublishStreamID(), on ? 0 : 10); // 0 for open, 10 for mute
+                _onRemoteMicStateUpdate(_localCoreUser.userID, on ? 0 : 10); // 0 for open, 10 for mute
 
                 _localCoreUser.isMicDeviceOn = on;
                 _coreUserMap[_localCoreUser.userID].isMicDeviceOn = on;
@@ -708,10 +711,10 @@ export default {
         return new Promise((resolve, reject) => {
             if (_isLocalUser(userID)) {
                 // Default to Main Channel
-                zloginfo('turnCameraDeviceOn: ', userID, on);
+                zloginfo('turnCameraDeviceOn: ', _localCoreUser.userID, on);
                 ZegoExpressEngine.instance().enableCamera(on, 0);
 
-                _onRemoteCameraStateUpdate(_getPublishStreamID(), on ? 0 : 10); // 0 for open, 10 for mute
+                _onRemoteCameraStateUpdate(_localCoreUser.userID, on ? 0 : 10); // 0 for open, 10 for mute
 
                 _localCoreUser.isCameraDeviceOn = on;
                 // if (!on) {
@@ -798,16 +801,17 @@ export default {
         return new Promise((resolve, reject) => {
             const user = { userID: _localCoreUser.userID, userName: _localCoreUser.userName };
             const config = { isUserStatusNotify: true }
+            _currentRoomID = roomID;
             ZegoExpressEngine.instance().loginRoom(roomID, user, config).then(() => {
                 zloginfo('Join room success.', user)
                 ZegoExpressEngine.instance().startSoundLevelMonitor();
-                _currentRoomID = roomID;
 
                 _localCoreUser.streamID = _getPublishStreamID();
                 _coreUserMap[_localCoreUser.userID] = _localCoreUser;
                 resolve();
             }).catch((error) => {
                 zlogerror('Join room falied: ', error);
+                _currentRoomID = '';
                 reject(error);
             });
         });
