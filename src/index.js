@@ -6,7 +6,7 @@ import ZegoSwitchCameraButton from './components/audio_video/ZegoSwitchCameraBut
 import ZegoToggleMicrophoneButton from './components/audio_video/ZegoToggleMicrophoneButton'
 import ZegoToggleCameraButton from './components/audio_video/ZegoToggleCameraButton'
 import ZegoSwitchAudioOutputButton from './components/audio_video/ZegoSwitchAudioOutputButton'
-import ZegoAudioVideoContainer from './components/audio_video_container/ZegoAudioVideoContainer'
+import ZegoAudioVideoContainer, {ZegoLayoutMode} from './components/audio_video_container/ZegoAudioVideoContainer'
 import ZegoLeaveButton from './components/audio_video/ZegoLeaveButton'
 import ZegoInRoomMessageInput from './components/in_room_message/ZegoInRoomMessageInput'
 import ZegoInRoomMessageView from './components/in_room_message/ZegoInRoomMessageView'
@@ -53,6 +53,7 @@ export {
     ZegoToggleCameraButton,
     ZegoSwitchAudioOutputButton,
     ZegoAudioVideoContainer,
+    ZegoLayoutMode,
     ZegoLeaveButton,
     ZegoInRoomMessageInput,
     ZegoInRoomMessageView

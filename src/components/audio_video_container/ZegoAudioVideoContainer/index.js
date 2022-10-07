@@ -1,16 +1,11 @@
 import React from "react";
 import { Text, View, StyleSheet } from "react-native"
 import PictureInPictureWindow from './PictureInPictureLayout'
+import ZegoLayoutMode from "./ZegoLayotMode";
 
-/*
-LayoutMode {
-    PictureInPicture: 0
-    PicturenOverFlow: 1
-}
-*/
 export default function ZegoAudioVideoContainer(props) {
   const { foregroundBuilder, layout, audioVideoConfig = {} } = props;
-  const { mode = 0, config } = layout;
+  const { mode = ZegoLayoutMode.pictureInPicture, config } = layout;
 
   return (<View style={styles.container}>
     {mode == 0 ?
@@ -23,6 +18,9 @@ export default function ZegoAudioVideoContainer(props) {
   </View>)
 }
 
+export {
+  ZegoLayoutMode
+}
 
 const styles = StyleSheet.create({
   container: {
