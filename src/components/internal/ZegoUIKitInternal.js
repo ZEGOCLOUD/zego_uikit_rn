@@ -17,6 +17,7 @@ var _onSoundLevelUpdateCallbackMap = {};
 var _onSDKConnectedCallbackMap = {};
 var _onAudioOutputDeviceTypeChangeCallbackMap = {};
 var _onOnlySelfInRoomCallbackMap = {};
+var _onUserCountOrPropertyChangedCallbackMap = {};
 var _onAudioVideoAvailableCallbackMap = {};
 var _onAudioVideoUnavailableCallbackMap = {};
 var _onInRoomMessageReceivedCallbackMap = {};
@@ -54,6 +55,15 @@ function _resetDataForLeavingRoom() {
     _inRoomMessageList = [];
 }
 
+function _createMemberUser(coreUser) {
+    return {
+        userID: coreUser.userID,
+        userName: coreUser.userName,
+        isMicrophoneOn: coreUser.isMicDeviceOn,
+        isCameraOn: coreUser.isCameraDeviceOn,
+        soundLevel: coreUser.soundLevel
+    }
+}
 function _createPublicUser(coreUser) {
     return {
         userID: coreUser.userID,
@@ -108,6 +118,7 @@ function _onRoomUserUpdate(roomID, updateType, userList) {
             // Start after user insert into list
             _tryStartPlayStream(user.userID);
         });
+        _notifyUserCountOrPropertyChanged(1);
 
         zloginfo("User Join: ", userInfoList)
         Object.keys(_onUserJoinCallbackMap).forEach(callbackID => {
@@ -132,6 +143,7 @@ function _onRoomUserUpdate(roomID, updateType, userList) {
                 delete _coreUserMap[user.userID];
             }
         });
+        _notifyUserCountOrPropertyChanged(2);
         zloginfo("User Leave: ", userInfoList)
         Object.keys(_onUserLeaveCallbackMap).forEach(callbackID => {
             if (_onUserLeaveCallbackMap[callbackID]) {
@@ -193,6 +205,7 @@ function _onRoomStreamUpdate(roomID, updateType, streamList) {
                 delete _streamCoreUserMap[streamID];
             }
         })
+        _notifyUserCountOrPropertyChanged(5);
 
         Object.keys(_onAudioVideoUnavailableCallbackMap).forEach(callbackID => {
             if (_onAudioVideoUnavailableCallbackMap[callbackID]) {
@@ -206,6 +219,7 @@ function _onRemoteCameraStateUpdate(userID, state) {
         const isOn = state == 0; // 0 for Open
         _coreUserMap[userID].isCameraDeviceOn = isOn;
         _notifyUserInfoUpdate(_coreUserMap[userID]);
+        _notifyUserCountOrPropertyChanged(5);
 
         Object.keys(_onCameraDeviceOnCallbackMap).forEach(callbackID => {
             if (_onCameraDeviceOnCallbackMap[callbackID]) {
@@ -233,6 +247,7 @@ function _onRemoteMicStateUpdate(userID, state) {
         const isOn = state == 0; // 0 for Open
         _coreUserMap[userID].isMicDeviceOn = isOn;
         _notifyUserInfoUpdate(_coreUserMap[userID]);
+        _notifyUserCountOrPropertyChanged(4);
 
         Object.keys(_onMicDeviceOnCallbackMap).forEach(callbackID => {
             if (_onMicDeviceOnCallbackMap[callbackID]) {
@@ -366,6 +381,7 @@ function _registerEngineCallback() {
                 if (userID in _coreUserMap) {
                     _coreUserMap[userID].soundLevel = soundLevels[streamID];
                     _notifySoundLevelUpdate(userID, soundLevels[streamID]);
+                    _notifyUserCountOrPropertyChanged(3);
                 }
             })
         },
@@ -379,6 +395,7 @@ function _registerEngineCallback() {
             _localCoreUser.soundLevel = soundLevel;
             _coreUserMap[_localCoreUser.userID].soundLevel = soundLevel;
             _notifySoundLevelUpdate(_localCoreUser.userID, soundLevel);
+            _notifyUserCountOrPropertyChanged(3);
             // zloginfo('capturedSoundLevelUpdate', soundLevel)
         },
     );
@@ -418,6 +435,19 @@ function _unregisterEngineCallback() {
     ZegoExpressEngine.instance().off('roomStateChanged');
     ZegoExpressEngine.instance().off('audioRouteChange');
     ZegoExpressEngine.instance().off('IMRecvBroadcastMessage');
+}
+function _notifyUserCountOrPropertyChanged(type) {
+    // type 1: user add 2: user delete 3: sound level update 4: mic update 5: camera update
+    const msg = ["", "user add", "user delete", "sound level update", "mic update", "camera update"];
+    const userList = Object.values(_coreUserMap).sort((user1, user2) => {
+        return user1.joinTime - user2.joinTime ;
+    }).map(user => _createMemberUser(user));
+    zloginfo(`_notifyUserCountOrPropertyChanged ${msg[type]}`, userList);
+    Object.keys(_onUserCountOrPropertyChangedCallbackMap).forEach(callbackID => {
+        if (_onUserCountOrPropertyChangedCallbackMap[callbackID]) {
+            _onUserCountOrPropertyChangedCallbackMap[callbackID](userList);
+        }
+    })
 }
 
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Stream Handling <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -693,6 +723,7 @@ export default {
                 _localCoreUser.isMicDeviceOn = on;
                 _coreUserMap[_localCoreUser.userID].isMicDeviceOn = on;
                 _notifyUserInfoUpdate(_localCoreUser);
+                _notifyUserCountOrPropertyChanged(4);
 
                 if (on) {
                     _tryStartPublishStream();
@@ -722,6 +753,7 @@ export default {
                 // }
                 _coreUserMap[_localCoreUser.userID] = _localCoreUser;
                 _notifyUserInfoUpdate(_localCoreUser);
+                _notifyUserCountOrPropertyChanged(5);
 
                 if (on) {
                     _tryStartPublishStream();
@@ -808,6 +840,7 @@ export default {
 
                 _localCoreUser.streamID = _getPublishStreamID();
                 _coreUserMap[_localCoreUser.userID] = _localCoreUser;
+                _notifyUserCountOrPropertyChanged(1);
                 resolve();
             }).catch((error) => {
                 zlogerror('Join room falied: ', error);
@@ -826,6 +859,7 @@ export default {
                 ZegoExpressEngine.instance().logoutRoom(_currentRoomID).then(() => {
                     zloginfo('Leave room succeed.')
                     ZegoExpressEngine.instance().stopSoundLevelMonitor();
+                    _notifyUserCountOrPropertyChanged(2);
                     _resetDataForLeavingRoom();
                     resolve();
                 }).catch((error) => {
@@ -901,6 +935,17 @@ export default {
             _onOnlySelfInRoomCallbackMap[callbackID] = callback;
         }
     },
+    onUserCountOrPropertyChanged(callbackID, callback) {
+        if (typeof callback !== 'function') {
+            if (callbackID in _onUserCountOrPropertyChangedCallbackMap) {
+                zloginfo('[onUserCountOrPropertyChanged] Remove callback for: [', callbackID, '] because callback is not a valid function!');
+                delete _onUserCountOrPropertyChangedCallbackMap[callbackID];
+            }
+        } else {
+            _onUserCountOrPropertyChangedCallbackMap[callbackID] = callback;
+        }
+    },
+
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Message <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     getInRoomMessages() {
         return _inRoomMessageList;
