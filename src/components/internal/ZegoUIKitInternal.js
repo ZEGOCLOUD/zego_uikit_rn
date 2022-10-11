@@ -440,7 +440,7 @@ function _notifyUserCountOrPropertyChanged(type) {
     // type 1: user add 2: user delete 3: sound level update 4: mic update 5: camera update
     const msg = ["", "user add", "user delete", "sound level update", "mic update", "camera update"];
     const userList = Object.values(_coreUserMap).sort((user1, user2) => {
-        return user1.joinTime - user2.joinTime ;
+        return user2.joinTime - user1.joinTime ;
     }).map(user => _createMemberUser(user));
     zloginfo(`_notifyUserCountOrPropertyChanged ${msg[type]}`, userList);
     Object.keys(_onUserCountOrPropertyChangedCallbackMap).forEach(callbackID => {
