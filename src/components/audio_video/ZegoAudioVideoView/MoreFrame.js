@@ -1,12 +1,14 @@
 import { View, StyleSheet, Text, ImageBackground } from "react-native";
 import React from 'react'
+import VideoFrame from './VideoFrame'
 
 export default function MoreFrame(props) {
-    const userList = [{ userName: 'TTT' }, { userName: 'AAA' }];
     const {
-        // userList,
+        roomID,
+        userList,
         audioViewBackgroudColor,
-        audioViewBackgroudImage
+        audioViewBackgroudImage,
+        useVideoViewAspectFill = false,
     } = props;
 
     const getShotName = (name) => {
@@ -41,6 +43,16 @@ export default function MoreFrame(props) {
                 </View>
                 <Text style={styles.totalText}>{`${userList.length} others`}</Text>
             </ImageBackground>
+            {/* Only pull the audio stream */}
+            {
+                userList.map(user => <VideoFrame
+                    style={styles.videoContainer}
+                    userID={user.userID}
+                    roomID={roomID}
+                    fillMode={useVideoViewAspectFill ? 1 : 0} // 1:AspectFill, 0:AspectFit
+                    isPlayingAudioStreamOnly={true}
+                ></VideoFrame>)
+            }
         </View>
     );
 }
@@ -53,6 +65,7 @@ const cstyle = (bgColor) => StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: bgColor,
+        position: 'absolute',
     },
 })
 const styles = StyleSheet.create({
@@ -62,6 +75,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         flexDirection: 'column',
+        zIndex: 2,
     },
     avatarCon: {
         alignItems: 'center',
@@ -95,5 +109,12 @@ const styles = StyleSheet.create({
         marginTop: 16,
         fontSize: 24,
         color: '#FFFFFF',
+    },
+    videoContainer: {
+        flex: 1,
+        width: '100%',
+        height: '100%',
+        position: 'absolute',
+        zIndex: 1,
     }
 });

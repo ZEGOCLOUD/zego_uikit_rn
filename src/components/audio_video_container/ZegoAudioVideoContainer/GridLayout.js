@@ -40,7 +40,7 @@ export default function GridLayout(props) {
             }
         })
         ZegoUIKitInternal.onUserCountOrPropertyChanged(callbackID, (userList) => {
-            console.warn('>>>>>>>>>>> onUserCountOrPropertyChanged', userList)
+            // console.warn('>>>>>>>>>>> onUserCountOrPropertyChanged', userList)
             // Put yourself first
             const index = userList.findIndex((user => user.userID == localUserID));
             index !== -1 && (userList = userList.splice(index).concat(userList));
@@ -83,10 +83,17 @@ export default function GridLayout(props) {
         return avViewSizeStyle;
     }
 
-    return (<View style={[styles.container, addBorderRadiusAndSpacingBetweenView && userList.length > 1 ? styles.avViewPadding : null]}>
+    const isAvViewPadding = addBorderRadiusAndSpacingBetweenView && userList.length > 1 ? styles.avViewPadding : null;
+    const isAvViewBorder = addBorderRadiusAndSpacingBetweenView && userList.length > 1 ? styles.avViewBorder : null;
+
+    return (<View style={[styles.container, isAvViewPadding]}>
         {
-            userList.map((user, index) => <View key={user.userID} style={[styles.avViewCon, getAvViewStyle(), addBorderRadiusAndSpacingBetweenView && userList.length > 1 ? styles.avViewPadding : null]}>
-                <View style={[styles.avViewSubCon, addBorderRadiusAndSpacingBetweenView && userList.length > 1 ? styles.avViewBorder : null ]}>
+            userList.map((user, index) => <View key={user.userID} style={[
+                styles.avViewCon,
+                getAvViewStyle(),
+                isAvViewPadding
+            ]}>
+                <View style={[styles.avViewSubCon, isAvViewBorder]}>
                     <ZegoAudioVideoView
                         userID={user.userID}
                         audioViewBackgroudColor={user.userID == localUserID ? ownViewBackgroundColor : othersViewBackgroundColor}
@@ -99,8 +106,12 @@ export default function GridLayout(props) {
             </View>)
         }
         {
-            moreUserList.length <=1 ? moreUserList.map((user, index) => <View key={user.userID} style={[styles.avViewCon, getAvViewStyle(), addBorderRadiusAndSpacingBetweenView && userList.length > 1 ? styles.avViewPadding : null]}>
-                <View style={[styles.avViewSubCon, addBorderRadiusAndSpacingBetweenView && userList.length > 1 ? styles.avViewBorder : null ]}>
+            moreUserList.length <=1 ? moreUserList.map((user, index) => <View key={user.userID} style={[
+                styles.avViewCon,
+                getAvViewStyle(),
+                isAvViewPadding
+            ]}>
+                <View style={[styles.avViewSubCon, isAvViewBorder]}>
                     <ZegoAudioVideoView
                         userID={user.userID}
                         audioViewBackgroudColor={user.userID == localUserID ? ownViewBackgroundColor : othersViewBackgroundColor}
@@ -110,11 +121,16 @@ export default function GridLayout(props) {
                         foregroundBuilder={foregroundBuilder}
                     />
                 </View>
-            </View>) : <ZegoAudioVideoViewMore 
-                userList={moreUserList}
-                audioViewBackgroudColor={othersViewBackgroundColor}
-                audioViewBackgroudImage={othersViewBackgroundImage}
-            />
+            </View>) : <View style={[styles.avViewCon, getAvViewStyle(), isAvViewPadding]}>
+                <View style={[styles.avViewSubCon, isAvViewBorder]}>
+                    <ZegoAudioVideoViewMore 
+                        userList={moreUserList}
+                        useVideoViewAspectFill={useVideoViewAspectFill}
+                        audioViewBackgroudColor={othersViewBackgroundColor}
+                        audioViewBackgroudImage={othersViewBackgroundImage}
+                    />
+                </View>
+            </View>
         }
     </View>)
 }
@@ -125,6 +141,8 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         backgroundColor: '#171821',
+        flexDirection: 'row',
+        flexWrap: 'wrap'
     },
     avViewCon: {
         zIndex: 1,
