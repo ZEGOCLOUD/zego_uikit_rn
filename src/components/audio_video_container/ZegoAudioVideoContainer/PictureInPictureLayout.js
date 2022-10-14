@@ -23,7 +23,7 @@ export default function PictureInPictureLayout(props) {
     } = config;
     const {
         useVideoViewAspectFill = false,
-        ShowSoundWavesInAudioMode = true,
+        showSoundWavesInAudioMode = true,
     } = audioVideoConfig;
 
     const [localUserID, setLocalUserID] = useState('');
@@ -110,7 +110,7 @@ export default function PictureInPictureLayout(props) {
                         userID={localUserID}
                         audioViewBackgroudColor={smallViewBackgroundColor}
                         audioViewBackgroudImage={smallViewBackgroundImage}
-                        showSoundWave={ShowSoundWavesInAudioMode}
+                        showSoundWave={showSoundWavesInAudioMode}
                         useVideoViewAspectFill={useVideoViewAspectFill}
                         foregroundBuilder={foregroundBuilder}
                     /> :
@@ -121,7 +121,7 @@ export default function PictureInPictureLayout(props) {
                         userID={remoteUserID}
                         audioViewBackgroudColor={smallViewBackgroundColor}
                         audioViewBackgroudImage={smallViewBackgroundImage}
-                        showSoundWave={ShowSoundWavesInAudioMode}
+                        showSoundWave={showSoundWavesInAudioMode}
                         useVideoViewAspectFill={useVideoViewAspectFill}
                         foregroundBuilder={foregroundBuilder}
                     /> :
@@ -136,7 +136,7 @@ export default function PictureInPictureLayout(props) {
                         userID={remoteUserID}
                         audioViewBackgroudColor={largeViewBackgroundColor}
                         audioViewBackgroudImage={largeViewBackgroundImage}
-                        showSoundWave={ShowSoundWavesInAudioMode}
+                        showSoundWave={showSoundWavesInAudioMode}
                         useVideoViewAspectFill={useVideoViewAspectFill}
                         foregroundBuilder={foregroundBuilder}
                     /> :
@@ -147,7 +147,7 @@ export default function PictureInPictureLayout(props) {
                         userID={localUserID}
                         audioViewBackgroudColor={largeViewBackgroundColor}
                         audioViewBackgroudImage={largeViewBackgroundImage}
-                        showSoundWave={ShowSoundWavesInAudioMode}
+                        showSoundWave={showSoundWavesInAudioMode}
                         useVideoViewAspectFill={useVideoViewAspectFill}
                         foregroundBuilder={foregroundBuilder}
                     /> :
