@@ -4,12 +4,12 @@ import { ZegoTextureView } from 'zego-express-engine-reactnative';
 import ZegoUIKitInternal from "../../internal/ZegoUIKitInternal";
 
 export default function VideoFrame(props) {
-    const { userID, roomID, fillMode } = props;
+    const { userID, roomID, fillMode, isPlayingAudioStreamOnly = false } = props;
     const viewRef = useRef(null);
 
     const updateRenderingProperty = () => {
         const viewID = findNodeHandle(viewRef.current);
-        ZegoUIKitInternal.updateRenderingProperty(userID, viewID, fillMode);
+        ZegoUIKitInternal.updateRenderingProperty(userID, viewID, fillMode, isPlayingAudioStreamOnly);
     }
     useEffect(() => {
         updateRenderingProperty();
@@ -27,7 +27,7 @@ export default function VideoFrame(props) {
         return () => {
             ZegoUIKitInternal.onSDKConnected('VideoFrame' + userID);
             ZegoUIKitInternal.onUserJoin('VideoFrame' + userID);
-            ZegoUIKitInternal.updateRenderingProperty(userID, -1, fillMode);
+            ZegoUIKitInternal.updateRenderingProperty(userID, -1, fillMode, isPlayingAudioStreamOnly);
         }
     }, []);
 

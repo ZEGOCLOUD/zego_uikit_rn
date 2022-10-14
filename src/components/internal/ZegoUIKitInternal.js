@@ -87,6 +87,7 @@ function _createCoreUser(userID, userName, profileUrl, extendInfo) {
         publisherQuality: 0,
         soundLevel: 0,
         joinTime: 0,
+        isPlayingAudioStreamOnly: false,
     }
 }
 function _isLocalUser(userID) {
@@ -442,7 +443,9 @@ function _notifyUserCountOrPropertyChanged(type) {
     const userList = Object.values(_coreUserMap).sort((user1, user2) => {
         return user2.joinTime - user1.joinTime ;
     }).map(user => _createMemberUser(user));
-    zloginfo(`_notifyUserCountOrPropertyChanged ${msg[type]}`, userList);
+    if (type !== 3) {
+        zloginfo(`_notifyUserCountOrPropertyChanged ${msg[type]}`, userList);
+    }
     Object.keys(_onUserCountOrPropertyChangedCallbackMap).forEach(callbackID => {
         if (_onUserCountOrPropertyChangedCallbackMap[callbackID]) {
             _onUserCountOrPropertyChangedCallbackMap[callbackID](userList);
@@ -521,6 +524,8 @@ function _tryStartPlayStream(userID) {
                 'viewMode': user.fillMode,
                 'backgroundColor': 0
             });
+            // Determine whether to pull only the audio stream
+            ZegoExpressEngine.instance().mutePlayStreamVideo(user.streamID, user.isPlayingAudioStreamOnly);
         }
     }
 }
@@ -552,8 +557,8 @@ export default {
     isRoomConnected() {
         return _isRoomConnected;
     },
-    updateRenderingProperty(userID, viewID, fillMode) {
-        zloginfo('updateRenderingProperty: ', userID, viewID, fillMode, '<<<<<<<<<<<<<<<<<<<<<<<<<<')
+    updateRenderingProperty(userID, viewID, fillMode, isPlayingAudioStreamOnly) {
+        zloginfo('updateRenderingProperty: ', userID, viewID, fillMode, isPlayingAudioStreamOnly, '<<<<<<<<<<<<<<<<<<<<<<<<<<')
         if (userID === undefined) {
             zlogwarning('updateRenderingProperty: ignore undifine useid. Use empty string for local user.')
             return;
@@ -564,11 +569,13 @@ export default {
         if (userID in _coreUserMap) {
             _coreUserMap[userID].viewID = viewID;
             _coreUserMap[userID].fillMode = fillMode;
+            _coreUserMap[userID].isPlayingAudioStreamOnly = isPlayingAudioStreamOnly;
             _notifyUserInfoUpdate(_coreUserMap[userID]);
 
             if (_localCoreUser.userID == userID) {
                 _localCoreUser.viewID = viewID;
                 _localCoreUser.fillMode = fillMode;
+                _localCoreUser.isPlayingAudioStreamOnly = isPlayingAudioStreamOnly;
                 if (viewID > 0) {
                     _tryStartPublishStream();
                 } else {
