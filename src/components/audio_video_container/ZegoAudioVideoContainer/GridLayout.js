@@ -15,7 +15,7 @@ export default function GridLayout(props) {
     } = config;
     const {
         useVideoViewAspectFill = false,
-        ShowSoundWavesInAudioMode = true,
+        showSoundWavesInAudioMode = true,
     } = audioVideoConfig;
 
     const [localUserID, setLocalUserID] = useState('');
@@ -98,7 +98,7 @@ export default function GridLayout(props) {
                         userID={user.userID}
                         audioViewBackgroudColor={user.userID == localUserID ? ownViewBackgroundColor : othersViewBackgroundColor}
                         audioViewBackgroudImage={user.userID == localUserID ? ownViewBackgroundImage : othersViewBackgroundImage}
-                        showSoundWave={ShowSoundWavesInAudioMode}
+                        showSoundWave={showSoundWavesInAudioMode}
                         useVideoViewAspectFill={useVideoViewAspectFill}
                         foregroundBuilder={foregroundBuilder}
                     />
@@ -116,7 +116,7 @@ export default function GridLayout(props) {
                         userID={user.userID}
                         audioViewBackgroudColor={user.userID == localUserID ? ownViewBackgroundColor : othersViewBackgroundColor}
                         audioViewBackgroudImage={user.userID == localUserID ? ownViewBackgroundImage : othersViewBackgroundImage}
-                        showSoundWave={ShowSoundWavesInAudioMode}
+                        showSoundWave={showSoundWavesInAudioMode}
                         useVideoViewAspectFill={useVideoViewAspectFill}
                         foregroundBuilder={foregroundBuilder}
                     />
