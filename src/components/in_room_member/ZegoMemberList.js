@@ -3,6 +3,7 @@ import { View, ScrollView, FlatList, StyleSheet, Text, TouchableWithoutFeedback 
 import ZegoUIKitInternal from '../internal/ZegoUIKitInternal'
 import ZegoMicrophoneStateIcon from '../audio_video/ZegoMicrophoneStateIcon'
 import ZegoCameraStateIcon from '../audio_video/ZegoCameraStateIcon';
+import Delegate from "react-delegate-component";
 
 export default function ZegoMemberList(props) {
     const {
@@ -64,31 +65,37 @@ export default function ZegoMemberList(props) {
         });
         return shotName;
     }
+
+    const iconMicView = item => !itemBuilder && showMicroPhoneState ? <View style={styles.icon}>
+        <ZegoMicrophoneStateIcon 
+            iconMicrophoneOn={require("../internal/resources/gray_icon_video_mic_on.png")}
+            iconMicrophoneOff={require("../internal/resources/gray_icon_video_mic_off.png")}
+            iconMicrophoneSpeaking={require("../internal/resources/gray_icon_video_mic_speaking.png")} 
+            userID={item.userID}
+        /></View> : <View />;
+    const iconCameraView = item => !itemBuilder && showCameraState ? <View style={styles.icon}>
+        <ZegoCameraStateIcon
+            iconCameraOn={require("../internal/resources/gray_icon_video_camera_on.png")}
+            iconCameraOff={require("../internal/resources/gray_icon_video_camera_off.png")}
+            userID={item.userID}
+        /></View> : <View />;
+    const itemBuilderView = item => itemBuilder ? <Delegate
+        style={styles.icon}
+        to={itemBuilder}
+        props={{ userInfo: item }} /> : <View />
+
     const renderItem = ({ item }) => (
         <View style={styles.item}>
             <View style={styles.itemLeft}>
                 <View style={styles.avatar}>
                     <Text style={styles.nameLabel}>{getShotName(item.userName)}</Text>
                 </View>
-                <Text style={styles.name}>{item.userName + (item.userID == localUserID ? ' (Me)' : '')}</Text>
+                <Text style={styles.name}>{item.userName + (item.userID == localUserID ? ' (You)' : '')}</Text>
             </View>
             <View style={styles.itemRight}>
-                { itemBuilder ? <View style={styles.icon}>{itemBuilder}</View> : <View /> }
-                { showMicroPhoneState ? <View style={styles.icon}>
-                    <ZegoMicrophoneStateIcon 
-                        iconMicrophoneOn={require("../internal/resources/gray_icon_video_mic_on.png")}
-                        iconMicrophoneOff={require("../internal/resources/gray_icon_video_mic_off.png")}
-                        iconMicrophoneSpeaking={require("../internal/resources/gray_icon_video_mic_speaking.png")} 
-                        userID={item.userID}
-                    /></View> : <View />
-                }
-                { showCameraState ? <View style={styles.icon}>
-                    <ZegoCameraStateIcon
-                        iconCameraOn={require("../internal/resources/gray_icon_video_camera_on.png")}
-                        iconCameraOff={require("../internal/resources/gray_icon_video_camera_off.png")}
-                        userID={item.userID}
-                    /></View> : <View />
-                }
+                {itemBuilderView(item)}
+                {iconMicView(item)}
+                {iconCameraView(item)}
             </View>
         </View>
     );
