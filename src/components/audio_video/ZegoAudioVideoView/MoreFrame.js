@@ -50,7 +50,7 @@ export default function MoreFrame(props) {
                     userID={user.userID}
                     roomID={roomID}
                     fillMode={useVideoViewAspectFill ? 1 : 0} // 1:AspectFill, 0:AspectFit
-                    isPlayingAudioStreamOnly={true}
+                    viewID={-1}
                 ></VideoFrame>)
             }
         </View>

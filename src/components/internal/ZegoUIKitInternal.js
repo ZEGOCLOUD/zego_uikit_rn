@@ -87,7 +87,6 @@ function _createCoreUser(userID, userName, profileUrl, extendInfo) {
         publisherQuality: 0,
         soundLevel: 0,
         joinTime: 0,
-        isPlayingAudioStreamOnly: false,
     }
 }
 function _isLocalUser(userID) {
@@ -518,14 +517,16 @@ function _tryStartPlayStream(userID) {
     if (userID in _coreUserMap) {
         const user = _coreUserMap[userID];
         zloginfo('_tryStartPlayStream: ', user)
-        if (user.viewID > 0 && user.streamID !== '') {
-            ZegoExpressEngine.instance().startPlayingStream(user.streamID, {
-                'reactTag': user.viewID,
-                'viewMode': user.fillMode,
-                'backgroundColor': 0
-            });
-            // Determine whether to pull only the audio stream
-            ZegoExpressEngine.instance().mutePlayStreamVideo(user.streamID, user.isPlayingAudioStreamOnly);
+        if (user.streamID !== '') {
+            if (user.viewID > 0) {
+                ZegoExpressEngine.instance().startPlayingStream(user.streamID, {
+                    'reactTag': user.viewID,
+                    'viewMode': user.fillMode,
+                    'backgroundColor': 0
+                });
+            } else {
+                ZegoExpressEngine.instance().startPlayingStream(user.streamID);
+            }
         }
     }
 }
@@ -557,8 +558,8 @@ export default {
     isRoomConnected() {
         return _isRoomConnected;
     },
-    updateRenderingProperty(userID, viewID, fillMode, isPlayingAudioStreamOnly) {
-        zloginfo('updateRenderingProperty: ', userID, viewID, fillMode, isPlayingAudioStreamOnly, '<<<<<<<<<<<<<<<<<<<<<<<<<<')
+    updateRenderingProperty(userID, viewID, fillMode) {
+        zloginfo('updateRenderingProperty: ', userID, viewID, fillMode, '<<<<<<<<<<<<<<<<<<<<<<<<<<')
         if (userID === undefined) {
             zlogwarning('updateRenderingProperty: ignore undifine useid. Use empty string for local user.')
             return;
@@ -569,13 +570,11 @@ export default {
         if (userID in _coreUserMap) {
             _coreUserMap[userID].viewID = viewID;
             _coreUserMap[userID].fillMode = fillMode;
-            _coreUserMap[userID].isPlayingAudioStreamOnly = isPlayingAudioStreamOnly;
             _notifyUserInfoUpdate(_coreUserMap[userID]);
 
             if (_localCoreUser.userID == userID) {
                 _localCoreUser.viewID = viewID;
                 _localCoreUser.fillMode = fillMode;
-                _localCoreUser.isPlayingAudioStreamOnly = isPlayingAudioStreamOnly;
                 if (viewID > 0) {
                     _tryStartPublishStream();
                 } else {
