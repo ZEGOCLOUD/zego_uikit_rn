@@ -11,6 +11,7 @@ var _usingFrontFacingCamera = true;
 var _onMicDeviceOnCallbackMap = {};
 var _onCameraDeviceOnCallbackMap = {};
 var _onRoomStateChangedCallbackMap = {};
+var _onRoomTokenTillExpireCallbackMap = {};
 var _onUserJoinCallbackMap = {};
 var _onUserLeaveCallbackMap = {};
 var _onUserInfoUpdateCallbackMap = {};
@@ -904,7 +905,7 @@ export default {
             _onRoomStateChangedCallbackMap[callbackID] = callback;
         }
     },
-    onRoomTokenTillExpire() {
+    onRoomTokenTillExpire(callbackID, callback) {
         if (typeof callback !== 'function') {
             if (callbackID in _onRoomTokenTillExpireCallbackMap) {
                 zloginfo('[onRoomTokenTillExpire] Remove callback for: [', callbackID, '] because callback is not a valid function!');
