@@ -7,7 +7,7 @@ import Delegate from "react-delegate-component";
 
 export default function ZegoMemberList(props) {
     const {
-        showMicroPhoneState,
+        showMicrophoneState,
         showCameraState,
         itemBuilder,
     } = props;
@@ -66,7 +66,7 @@ export default function ZegoMemberList(props) {
         return shotName;
     }
 
-    const iconMicView = item => !itemBuilder && showMicroPhoneState ? <View style={styles.icon}>
+    const iconMicView = item => !itemBuilder && showMicrophoneState ? <View style={styles.icon}>
         <ZegoMicrophoneStateIcon 
             iconMicrophoneOn={require("../internal/resources/gray_icon_video_mic_on.png")}
             iconMicrophoneOff={require("../internal/resources/gray_icon_video_mic_off.png")}
