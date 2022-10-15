@@ -66,26 +66,25 @@ export default function ZegoMemberList(props) {
         return shotName;
     }
 
-    const iconMicView = item => !itemBuilder && showMicrophoneState ? <View style={styles.icon}>
+    const iconMicView = item => showMicrophoneState ? <View style={styles.icon}>
         <ZegoMicrophoneStateIcon 
             iconMicrophoneOn={require("../internal/resources/gray_icon_video_mic_on.png")}
             iconMicrophoneOff={require("../internal/resources/gray_icon_video_mic_off.png")}
             iconMicrophoneSpeaking={require("../internal/resources/gray_icon_video_mic_speaking.png")} 
             userID={item.userID}
         /></View> : <View />;
-    const iconCameraView = item => !itemBuilder && showCameraState ? <View style={styles.icon}>
+    const iconCameraView = item => showCameraState ? <View style={styles.icon}>
         <ZegoCameraStateIcon
             iconCameraOn={require("../internal/resources/gray_icon_video_camera_on.png")}
             iconCameraOff={require("../internal/resources/gray_icon_video_camera_off.png")}
             userID={item.userID}
         /></View> : <View />;
     const itemBuilderView = item => itemBuilder ? <Delegate
-        style={styles.icon}
         to={itemBuilder}
         props={{ userInfo: item }} /> : <View />
 
     const renderItem = ({ item }) => (
-        <View style={styles.item}>
+        !itemBuilder ? <View style={styles.item}>
             <View style={styles.itemLeft}>
                 <View style={styles.avatar}>
                     <Text style={styles.nameLabel}>{getShotName(item.userName)}</Text>
@@ -93,11 +92,10 @@ export default function ZegoMemberList(props) {
                 <Text style={styles.name}>{item.userName + (item.userID == localUserID ? ' (You)' : '')}</Text>
             </View>
             <View style={styles.itemRight}>
-                {itemBuilderView(item)}
                 {iconMicView(item)}
                 {iconCameraView(item)}
             </View>
-        </View>
+        </View> : itemBuilderView(item)
     );
     const [localUserID, setLocalUserID] = useState('');
 
