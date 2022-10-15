@@ -121,6 +121,11 @@ export default function ZegoMemberList(props) {
         ZegoUIKitInternal.onUserCountOrPropertyChanged(callbackID, (userList) => {
             refreshMemberList();
         });
+        return () => {
+            ZegoUIKitInternal.onSDKConnected(callbackID);
+            ZegoUIKitInternal.onRoomStateChanged(callbackID);
+            ZegoUIKitInternal.onUserCountOrPropertyChanged(callbackID);
+        }
     }, []);
 
     return (<FlatList
