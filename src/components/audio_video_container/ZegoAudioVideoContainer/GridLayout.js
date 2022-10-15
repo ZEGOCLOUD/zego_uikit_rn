@@ -54,46 +54,46 @@ export default function GridLayout(props) {
         }
     }, []);
 
-    const getAvViewStyle = () => {
+    const getAudioVideoViewStyle = () => {
         const len = userList.length;
-        let avViewSizeStyle;
+        let audioVideoViewSizeStyle;
         switch (len) {
             case 1:
-                avViewSizeStyle = styles.avViewSize1;
+                audioVideoViewSizeStyle = styles.audioVideoViewSize1;
                 break;
             case 2:
-                avViewSizeStyle = styles.avViewSize2;
+                audioVideoViewSizeStyle = styles.audioVideoViewSize2;
                 break;
             case 3:
             case 4:
-                avViewSizeStyle = styles.avViewSize4;
+                audioVideoViewSizeStyle = styles.audioVideoViewSize4;
                 break;
             case 5:
             case 6:
-                avViewSizeStyle = styles.avViewSize6;
+                audioVideoViewSizeStyle = styles.audioVideoViewSize6;
                 break;
             case 7:
             case 8:
-                avViewSizeStyle = styles.avViewSize8;
+                audioVideoViewSizeStyle = styles.audioVideoViewSize8;
                 break;
             default:
-                avViewSizeStyle = styles.avViewSizeMore;
+                audioVideoViewSizeStyle = styles.audioVideoViewSizeMore;
                 break;
         }
-        return avViewSizeStyle;
+        return audioVideoViewSizeStyle;
     }
 
-    const isAvViewPadding = addBorderRadiusAndSpacingBetweenView && userList.length > 1 ? styles.avViewPadding : null;
-    const isAvViewBorder = addBorderRadiusAndSpacingBetweenView && userList.length > 1 ? styles.avViewBorder : null;
+    const isAudioVideoViewPadding = addBorderRadiusAndSpacingBetweenView && userList.length > 1 ? styles.audioVideoViewPadding : null;
+    const isAudioVideoViewBorder = addBorderRadiusAndSpacingBetweenView && userList.length > 1 ? styles.audioVideoViewBorder : null;
 
-    return (<View style={[styles.container, isAvViewPadding]}>
+    return (<View style={[styles.container, isAudioVideoViewPadding]}>
         {
             userList.map((user, index) => <View key={user.userID} style={[
-                styles.avViewCon,
-                getAvViewStyle(),
-                isAvViewPadding
+                styles.audioVideoViewContainer,
+                getAudioVideoViewStyle(),
+                isAudioVideoViewPadding
             ]}>
-                <View style={[styles.avViewSubCon, isAvViewBorder]}>
+                <View style={[styles.audioVideoViewSubContainer, isAudioVideoViewBorder]}>
                     <ZegoAudioVideoView
                         userID={user.userID}
                         audioViewBackgroudColor={user.userID == localUserID ? ownViewBackgroundColor : othersViewBackgroundColor}
@@ -107,11 +107,11 @@ export default function GridLayout(props) {
         }
         {
             moreUserList.length <=1 ? moreUserList.map((user, index) => <View key={user.userID} style={[
-                styles.avViewCon,
-                getAvViewStyle(),
-                isAvViewPadding
+                styles.audioVideoViewContainer,
+                getAudioVideoViewStyle(),
+                isAudioVideoViewPadding
             ]}>
-                <View style={[styles.avViewSubCon, isAvViewBorder]}>
+                <View style={[styles.audioVideoViewSubContainer, isAudioVideoViewBorder]}>
                     <ZegoAudioVideoView
                         userID={user.userID}
                         audioViewBackgroudColor={user.userID == localUserID ? ownViewBackgroundColor : othersViewBackgroundColor}
@@ -121,8 +121,8 @@ export default function GridLayout(props) {
                         foregroundBuilder={foregroundBuilder}
                     />
                 </View>
-            </View>) : <View style={[styles.avViewCon, getAvViewStyle(), isAvViewPadding]}>
-                <View style={[styles.avViewSubCon, isAvViewBorder]}>
+            </View>) : <View style={[styles.audioVideoViewContainer, getAudioVideoViewStyle(), isAudioVideoViewPadding]}>
+                <View style={[styles.audioVideoViewSubContainer, isAudioVideoViewBorder]}>
                     <ZegoAudioVideoViewMore 
                         userList={moreUserList}
                         useVideoViewAspectFill={useVideoViewAspectFill}
@@ -144,45 +144,45 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap'
     },
-    avViewCon: {
+    audioVideoViewContainer: {
         zIndex: 1,
     },
-    avViewSubCon: {
+    audioVideoViewSubContainer: {
         width: '100%',
         height: '100%',
         overflow: 'hidden',
         background: '#D8D8D8',
     },
-    avViewBorder: {
+    audioVideoViewBorder: {
         borderRadius: 12,
     },
-    avViewPadding: {
+    audioVideoViewPadding: {
         paddingLeft: 5,
         paddingRight: 5,
         paddingTop: 5,
         paddingBottom: 5,
     },
-    avViewSize1: {
+    audioVideoViewSize1: {
         width: '100%',
         height: '100%',
     },
-    avViewSize2: {
+    audioVideoViewSize2: {
         width: '100%',
         height: '50%',
     },
-    avViewSize4: {
+    audioVideoViewSize4: {
         width: '50%',
         height: '50%',
     },
-    avViewSize6: {
+    audioVideoViewSize6: {
         width: '50%',
         height: '33.33%',
     },
-    avViewSize8: {
+    audioVideoViewSize8: {
         width: '50%',
         height: '25%',
     },
-    avViewSizeMore: {
+    audioVideoViewSizeMore: {
         width: '50%',
         height: '25%',
     },

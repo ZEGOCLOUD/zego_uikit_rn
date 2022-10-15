@@ -33,7 +33,7 @@ export default function MoreFrame(props) {
                     : null} resizeMode="cover"
                 style={styles.imgBackground}
             >
-                <View style={styles.avatarCon}>
+                <View style={styles.avatarContainer}>
                     <View style={[styles.avatar, styles.avatar1]}>
                         <Text style={styles.nameLabel}>{getShotName(userList[0].userName)}</Text>
                     </View>
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         zIndex: 2,
     },
-    avatarCon: {
+    avatarContainer: {
         alignItems: 'center',
         justifyContent: 'center',
         flexDirection: 'row',
