@@ -298,6 +298,15 @@ function _onInRoomMessageReceived(roomID, messageList) {
         }
     });
 }
+function _onRoomTokenTillExpire(roomID, remainTimeInSecond) {
+    Object.keys(_onRoomTokenTillExpireCallbackMap).forEach(callbackID => {
+        if (callbackID in _onRoomTokenTillExpireCallbackMap) {
+            if (_onRoomTokenTillExpireCallbackMap[callbackID]) {
+                _onRoomTokenTillExpireCallbackMap[callbackID](roomID, remainTimeInSecond);
+            }
+        }
+    });
+}
 function _registerEngineCallback() {
     zloginfo('Register callback for ZegoExpressEngine...')
     ZegoExpressEngine.instance().on(
@@ -410,6 +419,12 @@ function _registerEngineCallback() {
         (roomID, messageList) => {
             _onInRoomMessageReceived(roomID, messageList);
         },
+    );
+    ZegoExpressEngine.instance().on(
+        'roomTokenWillExpire',
+        (roomID, remainTimeInSecond) => {
+            _onRoomTokenTillExpire(roomID, remainTimeInSecond);
+        }
     );
 }
 function _unregisterEngineCallback() {
@@ -823,10 +838,11 @@ export default {
     },
 
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Room <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    joinRoom(roomID) {
+    joinRoom(roomID, token) {
         return new Promise((resolve, reject) => {
             const user = { userID: _localCoreUser.userID, userName: _localCoreUser.userName };
             const config = { isUserStatusNotify: true }
+            token && (config.token = token);
             _currentRoomID = roomID;
             ZegoExpressEngine.instance().loginRoom(roomID, user, config).then(() => {
                 zloginfo('Join room success.', user)
@@ -863,6 +879,21 @@ export default {
             }
         });
     },
+    renewToken(token) {
+        return new Promise((resolve, reject) => {
+            if (_currentRoomID == '') {
+                zlogwarning('You are not join in any room, no need to renew token.');
+                resolve();
+            } else {
+                ZegoExpressEngine.instance().renewToken(_currentRoomID, token).then(() => {
+                    resolve();
+                }).catch((error)=>{
+                    zlogerror('Renew token failed: ', error);
+                    reject(error);
+                })
+            }
+        });
+    },
     onRoomStateChanged(callbackID, callback) {
         if (typeof callback !== 'function') {
             if (callbackID in _onRoomStateChangedCallbackMap) {
@@ -871,6 +902,16 @@ export default {
             }
         } else {
             _onRoomStateChangedCallbackMap[callbackID] = callback;
+        }
+    },
+    onRoomTokenTillExpire() {
+        if (typeof callback !== 'function') {
+            if (callbackID in _onRoomTokenTillExpireCallbackMap) {
+                zloginfo('[onRoomTokenTillExpire] Remove callback for: [', callbackID, '] because callback is not a valid function!');
+                delete _onRoomTokenTillExpireCallbackMap[callbackID];
+            }
+        } else {
+            _onRoomTokenTillExpireCallbackMap[callbackID] = callback;
         }
     },
 
