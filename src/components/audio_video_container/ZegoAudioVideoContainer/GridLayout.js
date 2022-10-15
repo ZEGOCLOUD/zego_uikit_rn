@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Text } from 'react-native'
 import ZegoUIKitInternal from "../../internal/ZegoUIKitInternal";
 import ZegoAudioVideoView from "../../audio_video/ZegoAudioVideoView";
-import ZegoAudioVideoViewMore from "../../audio_video/ZegoAudioVideoView/MoreFrame";
+import ZegoAudioVideoViewMore from "./MoreFrame";
 
 export default function GridLayout(props) {
     const { config = {}, foregroundBuilder, audioVideoConfig = {} } = props;

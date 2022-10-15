@@ -1,6 +1,6 @@
 import { View, StyleSheet, Text, ImageBackground } from "react-native";
 import React from 'react'
-import VideoFrame from './VideoFrame'
+import VideoFrame from '../../audio_video/ZegoAudioVideoView/VideoFrame'
 
 export default function MoreFrame(props) {
     const {
