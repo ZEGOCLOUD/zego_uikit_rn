@@ -1,5 +1,6 @@
 import ZegoExpressEngine from 'zego-express-engine-reactnative';
 import { zlogerror, zloginfo, zlogwarning } from '../../utils/logger';
+import ZegoChangedCountOrProperty from './ZegoChangedCountOrProperty'
 
 var _isRoomConnected = false;
 var _currentRoomState = 7; // Logout
@@ -55,22 +56,14 @@ function _resetDataForLeavingRoom() {
     _inRoomMessageList = [];
 }
 
-function _createMemberUser(coreUser) {
-    return {
-        userID: coreUser.userID,
-        userName: coreUser.userName,
-        isMicrophoneOn: coreUser.isMicDeviceOn,
-        isCameraOn: coreUser.isCameraDeviceOn,
-        soundLevel: coreUser.soundLevel
-    }
-}
 function _createPublicUser(coreUser) {
     return {
         userID: coreUser.userID,
         userName: coreUser.userName,
         extendInfo: coreUser.extendInfo,
         isMicrophoneOn: coreUser.isMicDeviceOn,
-        isCameraOn: coreUser.isCameraDeviceOn
+        isCameraOn: coreUser.isCameraDeviceOn,
+        soundLevel: coreUser.soundLevel
     }
 }
 function _createCoreUser(userID, userName, profileUrl, extendInfo) {
@@ -118,7 +111,7 @@ function _onRoomUserUpdate(roomID, updateType, userList) {
             // Start after user insert into list
             _tryStartPlayStream(user.userID);
         });
-        _notifyUserCountOrPropertyChanged(1);
+        _notifyUserCountOrPropertyChanged(ZegoChangedCountOrProperty.userAdd);
 
         zloginfo("User Join: ", userInfoList)
         Object.keys(_onUserJoinCallbackMap).forEach(callbackID => {
@@ -143,7 +136,7 @@ function _onRoomUserUpdate(roomID, updateType, userList) {
                 delete _coreUserMap[user.userID];
             }
         });
-        _notifyUserCountOrPropertyChanged(2);
+        _notifyUserCountOrPropertyChanged(ZegoChangedCountOrProperty.userDelete);
         zloginfo("User Leave: ", userInfoList)
         Object.keys(_onUserLeaveCallbackMap).forEach(callbackID => {
             if (_onUserLeaveCallbackMap[callbackID]) {
@@ -205,7 +198,7 @@ function _onRoomStreamUpdate(roomID, updateType, streamList) {
                 delete _streamCoreUserMap[streamID];
             }
         })
-        _notifyUserCountOrPropertyChanged(5);
+        _notifyUserCountOrPropertyChanged(ZegoChangedCountOrProperty.cameraStateUpdate);
 
         Object.keys(_onAudioVideoUnavailableCallbackMap).forEach(callbackID => {
             if (_onAudioVideoUnavailableCallbackMap[callbackID]) {
@@ -219,7 +212,7 @@ function _onRemoteCameraStateUpdate(userID, state) {
         const isOn = state == 0; // 0 for Open
         _coreUserMap[userID].isCameraDeviceOn = isOn;
         _notifyUserInfoUpdate(_coreUserMap[userID]);
-        _notifyUserCountOrPropertyChanged(5);
+        _notifyUserCountOrPropertyChanged(ZegoChangedCountOrProperty.cameraStateUpdate);
 
         Object.keys(_onCameraDeviceOnCallbackMap).forEach(callbackID => {
             if (_onCameraDeviceOnCallbackMap[callbackID]) {
@@ -247,7 +240,7 @@ function _onRemoteMicStateUpdate(userID, state) {
         const isOn = state == 0; // 0 for Open
         _coreUserMap[userID].isMicDeviceOn = isOn;
         _notifyUserInfoUpdate(_coreUserMap[userID]);
-        _notifyUserCountOrPropertyChanged(4);
+        _notifyUserCountOrPropertyChanged(ZegoChangedCountOrProperty.microphoneStateUpdate);
 
         Object.keys(_onMicDeviceOnCallbackMap).forEach(callbackID => {
             if (_onMicDeviceOnCallbackMap[callbackID]) {
@@ -381,7 +374,6 @@ function _registerEngineCallback() {
                 if (userID in _coreUserMap) {
                     _coreUserMap[userID].soundLevel = soundLevels[streamID];
                     _notifySoundLevelUpdate(userID, soundLevels[streamID]);
-                    _notifyUserCountOrPropertyChanged(3);
                 }
             })
         },
@@ -395,7 +387,6 @@ function _registerEngineCallback() {
             _localCoreUser.soundLevel = soundLevel;
             _coreUserMap[_localCoreUser.userID].soundLevel = soundLevel;
             _notifySoundLevelUpdate(_localCoreUser.userID, soundLevel);
-            _notifyUserCountOrPropertyChanged(3);
             // zloginfo('capturedSoundLevelUpdate', soundLevel)
         },
     );
@@ -437,14 +428,11 @@ function _unregisterEngineCallback() {
     ZegoExpressEngine.instance().off('IMRecvBroadcastMessage');
 }
 function _notifyUserCountOrPropertyChanged(type) {
-    // type 1: user add 2: user delete 3: sound level update 4: mic update 5: camera update
-    const msg = ["", "user add", "user delete", "sound level update", "mic update", "camera update"];
+    const msg = ["", "user add", "user delete", "mic update", "camera update"];
     const userList = Object.values(_coreUserMap).sort((user1, user2) => {
         return user2.joinTime - user1.joinTime ;
-    }).map(user => _createMemberUser(user));
-    if (type !== 3) {
-        zloginfo(`_notifyUserCountOrPropertyChanged ${msg[type]}`, userList);
-    }
+    }).map(user => _createPublicUser(user));
+    zloginfo(`_notifyUserCountOrPropertyChanged ${msg[type]}`, userList);
     Object.keys(_onUserCountOrPropertyChangedCallbackMap).forEach(callbackID => {
         if (_onUserCountOrPropertyChangedCallbackMap[callbackID]) {
             _onUserCountOrPropertyChangedCallbackMap[callbackID](userList);
@@ -729,7 +717,7 @@ export default {
                 _localCoreUser.isMicDeviceOn = on;
                 _coreUserMap[_localCoreUser.userID].isMicDeviceOn = on;
                 _notifyUserInfoUpdate(_localCoreUser);
-                _notifyUserCountOrPropertyChanged(4);
+                _notifyUserCountOrPropertyChanged(ZegoChangedCountOrProperty.microphoneStateUpdate);
 
                 if (on) {
                     _tryStartPublishStream();
@@ -759,7 +747,7 @@ export default {
                 // }
                 _coreUserMap[_localCoreUser.userID] = _localCoreUser;
                 _notifyUserInfoUpdate(_localCoreUser);
-                _notifyUserCountOrPropertyChanged(5);
+                _notifyUserCountOrPropertyChanged(ZegoChangedCountOrProperty.cameraStateUpdate);
 
                 if (on) {
                     _tryStartPublishStream();
@@ -846,7 +834,7 @@ export default {
 
                 _localCoreUser.streamID = _getPublishStreamID();
                 _coreUserMap[_localCoreUser.userID] = _localCoreUser;
-                _notifyUserCountOrPropertyChanged(1);
+                _notifyUserCountOrPropertyChanged(ZegoChangedCountOrProperty.userAdd);
                 resolve();
             }).catch((error) => {
                 zlogerror('Join room falied: ', error);
@@ -865,7 +853,7 @@ export default {
                 ZegoExpressEngine.instance().logoutRoom(_currentRoomID).then(() => {
                     zloginfo('Leave room succeed.')
                     ZegoExpressEngine.instance().stopSoundLevelMonitor();
-                    _notifyUserCountOrPropertyChanged(2);
+                    _notifyUserCountOrPropertyChanged(ZegoChangedCountOrProperty.userDelete);
                     _resetDataForLeavingRoom();
                     resolve();
                 }).catch((error) => {
