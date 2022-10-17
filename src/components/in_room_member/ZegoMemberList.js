@@ -41,15 +41,16 @@ export default function ZegoMemberList(props) {
     //         userName: 'Seven Item',
     //     },
     // ];
+    const [localUserID, setLocalUserID] = useState('');
     const [memberList, setMemberList] = useState([]);
-
+    
     const refreshMemberList = () => {
         // Update list like this will cause rerender
-        const memberList = ZegoUIKitInternal.getAllUsers();
+        let memberList = ZegoUIKitInternal.getAllUsers();
         memberList.reverse();
         // Put yourself first
-        const index = memberList.findIndex((user => user.userID == localUserID));
-        index !== -1 && (memberList = memberList.splice(index, 1).concat(userList));
+        const index = memberList.findIndex((user => user.userID == ZegoUIKitInternal.getLocalUserInfo().userID));
+        index !== -1 && (memberList = memberList.splice(index, 1).concat(memberList));
         setMemberList((arr) => [...memberList]);
     };
 
@@ -94,7 +95,7 @@ export default function ZegoMemberList(props) {
                 <View style={styles.avatar}>
                     <Text style={styles.nameLabel}>{getShotName(item.userName)}</Text>
                 </View>
-                <Text style={styles.name}>{item.userName + (item.userID == localUserID ? ' (You)' : '')}</Text>
+                <Text style={styles.name}>{item.userName + (item.userID == ZegoUIKitInternal.getLocalUserInfo().userID ? ' (You)' : '')}</Text>
             </View>
             <View style={styles.itemRight}>
                 {iconMicView(item)}
@@ -102,7 +103,6 @@ export default function ZegoMemberList(props) {
             </View>
         </View> : itemBuilderView(item)
     );
-    const [localUserID, setLocalUserID] = useState('');
 
     useEffect(() => {
         const callbackID = 'ZegoMemberList' + String(Math.floor(Math.random() * 10000));
@@ -123,7 +123,7 @@ export default function ZegoMemberList(props) {
         })
         ZegoUIKitInternal.onUserCountOrPropertyChanged(callbackID, (userList) => {
             // Put yourself first
-            const index = userList.findIndex((user => user.userID == localUserID));
+            const index = userList.findIndex((user => user.userID == ZegoUIKitInternal.getLocalUserInfo().userID));
             index !== -1 && (userList = userList.splice(index, 1).concat(userList));
             setMemberList((arr) => [...userList]);
         });

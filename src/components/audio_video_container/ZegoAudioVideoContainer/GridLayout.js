@@ -42,7 +42,7 @@ export default function GridLayout(props) {
         ZegoUIKitInternal.onUserCountOrPropertyChanged(callbackID, (userList) => {
             // console.warn('>>>>>>>>>>> onUserCountOrPropertyChanged', userList)
             // Put yourself first
-            const index = userList.findIndex((user => user.userID == localUserID));
+            const index = userList.findIndex((user => user.userID == ZegoUIKitInternal.getLocalUserInfo().userID));
             index !== -1 && (userList = userList.splice(index, 1).concat(userList));
             setUserList(userList.slice(0, 7));
             setMoreUserList(userList.slice(7));
@@ -96,8 +96,8 @@ export default function GridLayout(props) {
                 <View style={[styles.audioVideoViewSubContainer, isAudioVideoViewBorder]}>
                     <ZegoAudioVideoView
                         userID={user.userID}
-                        audioViewBackgroudColor={user.userID == localUserID ? ownViewBackgroundColor : othersViewBackgroundColor}
-                        audioViewBackgroudImage={user.userID == localUserID ? ownViewBackgroundImage : othersViewBackgroundImage}
+                        audioViewBackgroudColor={user.userID == ZegoUIKitInternal.getLocalUserInfo().userID ? ownViewBackgroundColor : othersViewBackgroundColor}
+                        audioViewBackgroudImage={user.userID == ZegoUIKitInternal.getLocalUserInfo().userID ? ownViewBackgroundImage : othersViewBackgroundImage}
                         showSoundWave={showSoundWavesInAudioMode}
                         useVideoViewAspectFill={useVideoViewAspectFill}
                         foregroundBuilder={foregroundBuilder}
@@ -114,8 +114,8 @@ export default function GridLayout(props) {
                 <View style={[styles.audioVideoViewSubContainer, isAudioVideoViewBorder]}>
                     <ZegoAudioVideoView
                         userID={user.userID}
-                        audioViewBackgroudColor={user.userID == localUserID ? ownViewBackgroundColor : othersViewBackgroundColor}
-                        audioViewBackgroudImage={user.userID == localUserID ? ownViewBackgroundImage : othersViewBackgroundImage}
+                        audioViewBackgroudColor={user.userID == ZegoUIKitInternal.getLocalUserInfo().userID ? ownViewBackgroundColor : othersViewBackgroundColor}
+                        audioViewBackgroudImage={user.userID == ZegoUIKitInternal.getLocalUserInfo().userID ? ownViewBackgroundImage : othersViewBackgroundImage}
                         showSoundWave={showSoundWavesInAudioMode}
                         useVideoViewAspectFill={useVideoViewAspectFill}
                         foregroundBuilder={foregroundBuilder}
