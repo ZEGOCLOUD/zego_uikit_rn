@@ -301,11 +301,21 @@ function _onInRoomMessageReceived(roomID, messageList) {
         }
     });
 }
-function _onRequireNewToken(roomID, remainTimeInSecond) {
+function _onRequireNewToken() {
     Object.keys(_onRequireNewTokenCallbackMap).forEach(callbackID => {
         if (callbackID in _onRequireNewTokenCallbackMap) {
             if (_onRequireNewTokenCallbackMap[callbackID]) {
-                _onRequireNewTokenCallbackMap[callbackID](roomID, remainTimeInSecond);
+                const token = _onRequireNewTokenCallbackMap[callbackID]();
+                if (token) {
+                    ZegoExpressEngine.instance().renewToken(_currentRoomID, token).then(() => {
+                        resolve();
+                    }).catch((error)=>{
+                        zlogerror('Renew token failed: ', error);
+                        reject(error);
+                    })
+                } else {
+                    zlogerror('Renew token failed: the returned token is abnormal');
+                }
             }
         }
     });
@@ -426,7 +436,7 @@ function _registerEngineCallback() {
     ZegoExpressEngine.instance().on(
         'roomTokenWillExpire',
         (roomID, remainTimeInSecond) => {
-            _onRequireNewToken(roomID, remainTimeInSecond);
+            _onRequireNewToken();
         }
     );
 }
@@ -879,21 +889,6 @@ export default {
                     zlogerror('Leave room failed: ', error);
                     reject(error);
                 });
-            }
-        });
-    },
-    setNewToken(token) {
-        return new Promise((resolve, reject) => {
-            if (_currentRoomID == '') {
-                zlogwarning('You are not join in any room, no need to renew token.');
-                resolve();
-            } else {
-                ZegoExpressEngine.instance().renewToken(_currentRoomID, token).then(() => {
-                    resolve();
-                }).catch((error)=>{
-                    zlogerror('Renew token failed: ', error);
-                    reject(error);
-                })
             }
         });
     },
