@@ -93,21 +93,21 @@ const styles = StyleSheet.create({
         position: 'relative',
     },
     avatar1: {
-        left: (20 / 120 * 100).toString() + '%',
+        left: (10 / 60 * 100).toString() + '%',
     },
     avatar2: {
         borderWidth: 1,
         borderStyle: 'solid',
         borderColor: '#4A4B4D',
-        right: (20 / 120 * 100).toString() + '%',
+        right: (10 / 60 * 100).toString() + '%',
     },
     nameLabel: {
         color: '#222222',
-        fontSize: 22,
+        fontSize: 23,
     },
     totalText: {
-        marginTop: 16,
-        fontSize: 24,
+        marginTop: 29.5,
+        fontSize: 12,
         color: '#FFFFFF',
     },
     videoContainer: {

@@ -66,19 +66,19 @@ export default function ZegoMemberList(props) {
         return shotName;
     }
 
-    const iconMicView = item => showMicrophoneState ? <View style={styles.icon}>
+    const iconMicView = item => showMicrophoneState ?
         <ZegoMicrophoneStateIcon 
             iconMicrophoneOn={require("../internal/resources/gray_icon_video_mic_on.png")}
             iconMicrophoneOff={require("../internal/resources/gray_icon_video_mic_off.png")}
             iconMicrophoneSpeaking={require("../internal/resources/gray_icon_video_mic_speaking.png")} 
             userID={item.userID}
-        /></View> : <View />;
-    const iconCameraView = item => showCameraState ? <View style={styles.icon}>
+        /> : <View />;
+    const iconCameraView = item => showCameraState ?
         <ZegoCameraStateIcon
             iconCameraOn={require("../internal/resources/gray_icon_video_camera_on.png")}
             iconCameraOff={require("../internal/resources/gray_icon_video_camera_off.png")}
             userID={item.userID}
-        /></View> : <View />;
+        /> : <View />;
     const itemBuilderView = item => itemBuilder ? <Delegate
         to={itemBuilder}
         props={{ userInfo: item }} /> : <View />
@@ -139,18 +139,17 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingTop: 15,
-        paddingBottom: 15,
-        paddingLeft: 20,
-        paddingRight: 20,
+        paddingLeft: 18,
+        paddingRight: 17,
+        height: 62,
     },
     itemLeft: {
         flexDirection: 'row',
         alignItems: 'center',
     },
     avatar: {
-        width: 50,
-        height: 50,
+        width: 36,
+        height: 36,
         backgroundColor: '#DBDDE3',
         borderRadius: 1000,
         marginRight: 20,
@@ -162,10 +161,10 @@ const styles = StyleSheet.create({
         flex: 1,
         textAlign: 'center',
         color: '#222222',
-        fontSize: 20,
+        fontSize: 16,
     },
     name: {
-        fontSize: 20,
+        fontSize: 16,
         color: '#FFFFFF',
     },
     itemRight: {
@@ -177,6 +176,6 @@ const styles = StyleSheet.create({
         height: 35,
         alignItems: 'center',
         justifyContent: 'center',
-        marginLeft: 10
+        marginLeft: 12
     },
 });

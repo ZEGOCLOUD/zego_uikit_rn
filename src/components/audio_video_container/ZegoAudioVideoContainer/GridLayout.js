@@ -154,14 +154,15 @@ const styles = StyleSheet.create({
         background: '#D8D8D8',
     },
     audioVideoViewBorder: {
-        borderRadius: 12,
+        borderRadius: 10,
     },
     audioVideoViewPadding: {
-        paddingLeft: 5,
-        paddingRight: 5,
-        paddingTop: 5,
-        paddingBottom: 5,
+        paddingLeft: 2.5,
+        paddingRight: 2.5,
+        paddingTop: 2.5,
+        paddingBottom: 2.5,
     },
+
     audioVideoViewSize1: {
         width: '100%',
         height: '100%',
