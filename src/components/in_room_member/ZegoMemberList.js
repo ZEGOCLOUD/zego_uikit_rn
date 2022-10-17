@@ -45,7 +45,12 @@ export default function ZegoMemberList(props) {
 
     const refreshMemberList = () => {
         // Update list like this will cause rerender
-        setMemberList((arr) => [...ZegoUIKitInternal.getAllUsers()]);
+        const memberList = ZegoUIKitInternal.getAllUsers();
+        memberList.reverse();
+        // Put yourself first
+        const index = memberList.findIndex((user => user.userID == localUserID));
+        index !== -1 && (memberList = memberList.splice(index, 1).concat(userList));
+        setMemberList((arr) => [...memberList]);
     };
 
     useEffect(() => {
@@ -117,7 +122,10 @@ export default function ZegoMemberList(props) {
             }
         })
         ZegoUIKitInternal.onUserCountOrPropertyChanged(callbackID, (userList) => {
-            refreshMemberList();
+            // Put yourself first
+            const index = userList.findIndex((user => user.userID == localUserID));
+            index !== -1 && (userList = userList.splice(index, 1).concat(userList));
+            setMemberList((arr) => [...userList]);
         });
         return () => {
             ZegoUIKitInternal.onSDKConnected(callbackID);

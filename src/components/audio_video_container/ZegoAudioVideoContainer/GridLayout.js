@@ -43,7 +43,7 @@ export default function GridLayout(props) {
             // console.warn('>>>>>>>>>>> onUserCountOrPropertyChanged', userList)
             // Put yourself first
             const index = userList.findIndex((user => user.userID == localUserID));
-            index !== -1 && (userList = userList.splice(index).concat(userList));
+            index !== -1 && (userList = userList.splice(index, 1).concat(userList));
             setUserList(userList.slice(0, 7));
             setMoreUserList(userList.slice(7));
         });
