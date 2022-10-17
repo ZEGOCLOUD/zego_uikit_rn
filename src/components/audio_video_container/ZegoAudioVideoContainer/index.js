@@ -6,17 +6,17 @@ import ZegoLayoutMode from "./ZegoLayotMode";
 
 export default function ZegoAudioVideoContainer(props) {
   const { foregroundBuilder, layout, audioVideoConfig = {} } = props;
-  const { mode = ZegoLayoutMode.pictureInPicture, config } = layout;
+  const { mode = ZegoLayoutMode.pictureInPicture } = layout;
 
   return (<View style={styles.container}>
     {mode == 0 ?
       <PictureInPictureWindow
         audioVideoConfig={audioVideoConfig}
-        config={config}
+        config={layout}
         foregroundBuilder={foregroundBuilder} /> :
       <GridLayout 
         audioVideoConfig={audioVideoConfig}
-        config={config}
+        config={layout}
         foregroundBuilder={foregroundBuilder} />
     }
   </View>)
