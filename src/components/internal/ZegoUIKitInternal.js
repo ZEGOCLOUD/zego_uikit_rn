@@ -76,8 +76,8 @@ function _createCoreUser(userID, userName, profileUrl, extendInfo) {
         viewID: -1,
         viewFillMode: 1,
         streamID: '',
-        isMicDeviceOn: true,
-        isCameraDeviceOn: true,
+        isMicDeviceOn: false,
+        isCameraDeviceOn: false,
         publisherQuality: 0,
         soundLevel: 0,
         joinTime: 0,
@@ -209,6 +209,7 @@ function _onRoomStreamUpdate(roomID, updateType, streamList) {
     }
 }
 function _onRemoteCameraStateUpdate(userID, state) {
+    console.warn('>>>>>>>>>>>>> _onRemoteCameraStateUpdate', userID, state);
     if (userID in _coreUserMap) {
         const isOn = state == 0; // 0 for Open
         _coreUserMap[userID].isCameraDeviceOn = isOn;
@@ -237,6 +238,7 @@ function _onAudioRouteChange(type) {
     _audioOutputType = type;
 }
 function _onRemoteMicStateUpdate(userID, state) {
+    console.warn('>>>>>>>>>>>>> _onRemoteMicStateUpdate', userID, state);
     if (userID in _coreUserMap) {
         const isOn = state == 0; // 0 for Open
         _coreUserMap[userID].isMicDeviceOn = isOn;
