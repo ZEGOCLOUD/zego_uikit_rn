@@ -11,7 +11,7 @@ var _usingFrontFacingCamera = true;
 var _onMicDeviceOnCallbackMap = {};
 var _onCameraDeviceOnCallbackMap = {};
 var _onRoomStateChangedCallbackMap = {};
-var _onRoomTokenTillExpireCallbackMap = {};
+var _onRequireNewTokenCallbackMap = {};
 var _onUserJoinCallbackMap = {};
 var _onUserLeaveCallbackMap = {};
 var _onUserInfoUpdateCallbackMap = {};
@@ -299,11 +299,11 @@ function _onInRoomMessageReceived(roomID, messageList) {
         }
     });
 }
-function _onRoomTokenTillExpire(roomID, remainTimeInSecond) {
-    Object.keys(_onRoomTokenTillExpireCallbackMap).forEach(callbackID => {
-        if (callbackID in _onRoomTokenTillExpireCallbackMap) {
-            if (_onRoomTokenTillExpireCallbackMap[callbackID]) {
-                _onRoomTokenTillExpireCallbackMap[callbackID](roomID, remainTimeInSecond);
+function _onRequireNewToken(roomID, remainTimeInSecond) {
+    Object.keys(_onRequireNewTokenCallbackMap).forEach(callbackID => {
+        if (callbackID in _onRequireNewTokenCallbackMap) {
+            if (_onRequireNewTokenCallbackMap[callbackID]) {
+                _onRequireNewTokenCallbackMap[callbackID](roomID, remainTimeInSecond);
             }
         }
     });
@@ -424,7 +424,7 @@ function _registerEngineCallback() {
     ZegoExpressEngine.instance().on(
         'roomTokenWillExpire',
         (roomID, remainTimeInSecond) => {
-            _onRoomTokenTillExpire(roomID, remainTimeInSecond);
+            _onRequireNewToken(roomID, remainTimeInSecond);
         }
     );
 }
@@ -880,7 +880,7 @@ export default {
             }
         });
     },
-    renewToken(token) {
+    setNewToken(token) {
         return new Promise((resolve, reject) => {
             if (_currentRoomID == '') {
                 zlogwarning('You are not join in any room, no need to renew token.');
@@ -905,14 +905,14 @@ export default {
             _onRoomStateChangedCallbackMap[callbackID] = callback;
         }
     },
-    onRoomTokenTillExpire(callbackID, callback) {
+    onRequireNewToken(callbackID, callback) {
         if (typeof callback !== 'function') {
-            if (callbackID in _onRoomTokenTillExpireCallbackMap) {
-                zloginfo('[onRoomTokenTillExpire] Remove callback for: [', callbackID, '] because callback is not a valid function!');
-                delete _onRoomTokenTillExpireCallbackMap[callbackID];
+            if (callbackID in _onRequireNewTokenCallbackMap) {
+                zloginfo('[onRequireNewToken] Remove callback for: [', callbackID, '] because callback is not a valid function!');
+                delete _onRequireNewTokenCallbackMap[callbackID];
             }
         } else {
-            _onRoomTokenTillExpireCallbackMap[callbackID] = callback;
+            _onRequireNewTokenCallbackMap[callbackID] = callback;
         }
     },
 
