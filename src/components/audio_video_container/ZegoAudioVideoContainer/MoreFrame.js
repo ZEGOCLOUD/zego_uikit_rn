@@ -1,6 +1,5 @@
 import { View, StyleSheet, Text, ImageBackground } from "react-native";
 import React from 'react'
-import VideoFrame from '../../audio_video/ZegoAudioVideoView/VideoFrame'
 
 export default function MoreFrame(props) {
     const {
@@ -44,15 +43,6 @@ export default function MoreFrame(props) {
                 <Text style={styles.totalText}>{`${userList.length} others`}</Text>
             </ImageBackground>
             {/* Only pull the audio stream */}
-            {
-                userList.map(user => <VideoFrame
-                    style={styles.videoContainer}
-                    userID={user.userID}
-                    roomID={roomID}
-                    fillMode={useVideoViewAspectFill ? 1 : 0} // 1:AspectFill, 0:AspectFit
-                    viewID={-1}
-                ></VideoFrame>)
-            }
         </View>
     );
 }
