@@ -71,7 +71,7 @@
     "react": "*",
     "react-native": "*",
     "react-delegate-component": "*",
-    "zego-express-engine-reactnative": "^0.20.1"
+    "zego-express-engine-reactnative": ">=0.22.1"
   },
   "jest": {
     "preset": "react-native",
