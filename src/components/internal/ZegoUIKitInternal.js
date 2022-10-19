@@ -463,7 +463,7 @@ function _notifyUserCountOrPropertyChanged(type) {
     zloginfo(`_notifyUserCountOrPropertyChanged ${msg[type]}`, userList);
     Object.keys(_onUserCountOrPropertyChangedCallbackMap).forEach(callbackID => {
         if (_onUserCountOrPropertyChangedCallbackMap[callbackID]) {
-            _onUserCountOrPropertyChangedCallbackMap[callbackID](userList);
+            _onUserCountOrPropertyChangedCallbackMap[callbackID](JSON.parse(JSON.stringify(userList)));
         }
     })
 }
