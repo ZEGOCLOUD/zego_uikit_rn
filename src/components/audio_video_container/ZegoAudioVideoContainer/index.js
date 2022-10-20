@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, View, StyleSheet } from "react-native"
 import PictureInPictureWindow from './PictureInPictureLayout'
-import GridLayout from './GridLayout'
+import GalleryLayout from './GalleryLayout'
 import ZegoLayoutMode from "./ZegoLayotMode";
 
 export default function ZegoAudioVideoContainer(props) {
@@ -14,7 +14,7 @@ export default function ZegoAudioVideoContainer(props) {
         audioVideoConfig={audioVideoConfig}
         config={layout}
         foregroundBuilder={foregroundBuilder} /> :
-      <GridLayout 
+      <GalleryLayout 
         audioVideoConfig={audioVideoConfig}
         config={layout}
         foregroundBuilder={foregroundBuilder} />
