@@ -4,7 +4,7 @@ import ZegoUIKitInternal from "../../internal/ZegoUIKitInternal";
 import ZegoAudioVideoView from "../../audio_video/ZegoAudioVideoView";
 import ZegoAudioVideoViewMore from "./MoreFrame";
 
-export default function GridLayout(props) {
+export default function GalleryLayout(props) {
     const { config = {}, foregroundBuilder, audioVideoConfig = {} } = props;
     const {
         addBorderRadiusAndSpacingBetweenView = true, // Whether to display rounded corners and spacing between Views
@@ -23,7 +23,7 @@ export default function GridLayout(props) {
     const [moreUserList, setMoreUserList] = useState([]);
 
     useEffect(() => {
-        const callbackID = 'GridLayout' + String(Math.floor(Math.random() * 10000));
+        const callbackID = 'GalleryLayout' + String(Math.floor(Math.random() * 10000));
         ZegoUIKitInternal.onSDKConnected(callbackID, () => {
             setLocalUserID(ZegoUIKitInternal.getLocalUserInfo().userID);
         });
