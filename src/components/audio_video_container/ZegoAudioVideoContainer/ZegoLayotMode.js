@@ -1,6 +1,6 @@
 const ZegoLayoutMode = {
     pictureInPicture: 0,
-    grid: 1
+    gallery: 1
 }
 
 export default ZegoLayoutMode;
