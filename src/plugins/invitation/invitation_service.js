@@ -48,42 +48,42 @@ const ZegoUIKitInvitationService = {
   },
   onInvitationReceived: (callbackID, callback) => {
     ZegoUIKitSignalingPlugin.getInstance().registerPluginEventHandler(
-      'callInvitationReceived',
+      'invitationReceived',
       callbackID,
       callback
     );
   },
   onInvitationTimeout: (callbackID, callback) => {
     ZegoUIKitSignalingPlugin.getInstance().registerPluginEventHandler(
-      'callInvitationTimeout',
+      'invitationTimeout',
       callbackID,
       callback
     );
   },
   onInvitationResponseTimeout: (callbackID, callback) => {
     ZegoUIKitSignalingPlugin.getInstance().registerPluginEventHandler(
-      'callInviteesAnsweredTimeout',
+      'invitationResponseTimeout',
       callbackID,
       callback
     );
   },
   onInvitationAccepted: (callbackID, callback) => {
     ZegoUIKitSignalingPlugin.getInstance().registerPluginEventHandler(
-      'callInvitationAccepted',
+      'invitationAccepted',
       callbackID,
       callback
     );
   },
   onInvitationRefused: (callbackID, callback) => {
     ZegoUIKitSignalingPlugin.getInstance().registerPluginEventHandler(
-      'callInvitationRejected',
+      'invitationRefused',
       callbackID,
       callback
     );
   },
   onInvitationCanceled: (callbackID, callback) => {
     ZegoUIKitSignalingPlugin.getInstance().registerPluginEventHandler(
-      'callInvitationCancelled',
+      'invitationCanceled',
       callbackID,
       callback
     );
