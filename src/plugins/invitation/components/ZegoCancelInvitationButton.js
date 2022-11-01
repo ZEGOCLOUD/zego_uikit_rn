@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Image, TouchableOpacity, StyleSheet } from 'react-native';
-import ZegoUIKitInvitationService from '../invitation_service';
+import ZegoUIKitInvitationService from '../services/ZegoUIKitInvitationService';
 import { zloginfo, zlogerror } from '../../../utils/logger';
 
 export default function ZegoCancelInvitationButton(props) {

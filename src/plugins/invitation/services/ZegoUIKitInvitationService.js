@@ -1,5 +1,5 @@
-import ZegoUIKitCorePlugin from '../../components/internal/ZegoUIKitCorePlugin';
-import ZegoUIKitPluginType from '../../components/internal/ZegoUIKitPluginType';
+import ZegoUIKitCorePlugin from '../../../components/internal/ZegoUIKitCorePlugin';
+import ZegoUIKitPluginType from '../../../components/internal/ZegoUIKitPluginType';
 
 const ZegoUIKitSignalingPlugin = ZegoUIKitCorePlugin.getPlugin(
   ZegoUIKitPluginType.signaling
