@@ -1,4 +1,4 @@
-import ZegoUIKitInvitationService from './services/ZegoUIKitInvitationService';
+import ZegoUIKitInvitationService from './services';
 import ZegoStartInvitationButton from './components/ZegoStartInvitationButton';
 import ZegoCancelInvitationButton from './components/ZegoCancelInvitationButton';
 import ZegoAcceptInvitationButton from './components/ZegoAcceptInvitationButton';
