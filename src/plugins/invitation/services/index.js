@@ -5,6 +5,9 @@ const ZegoUIKitSignalingPlugin = ZegoUIKitCorePlugin.getPlugin(
   ZegoUIKitPluginType.signaling
 );
 const ZegoUIKitInvitationService = {
+  getVersion: () => {
+    ZegoUIKitSignalingPlugin.getInstance().getVersion();
+  },
   init: (appID, appSign) => {
     ZegoUIKitSignalingPlugin.getInstance().invoke('init', { appID, appSign });
   },
