@@ -1,4 +1,4 @@
-export default class ZegoInvitationServiceResult {
+export class ZegoInvitationServiceResult {
   code = '';
   message = '';
   result = '';
