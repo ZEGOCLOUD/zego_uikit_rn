@@ -1,5 +1,7 @@
 import ZegoUIKitInternal from './components/internal/ZegoUIKitInternal';
-import ZegoUIKitCorePlugin from './components/internal/ZegoUIKitCorePlugin';
+import ZegoUIKitCorePlugin, {
+  ZegoUIKitPluginType,
+} from './components/internal/ZegoUIKitCorePlugin';
 import ZegoAudioVideoView from './components/audio_video/ZegoAudioVideoView';
 import ZegoCameraStateIcon from './components/audio_video/ZegoCameraStateIcon';
 import ZegoMicrophoneStateIcon from './components/audio_video/ZegoMicrophoneStateIcon';
@@ -75,4 +77,5 @@ export {
   ZegoCancelInvitationButton,
   ZegoAcceptInvitationButton,
   ZegoRefuseInvitationButton,
+  ZegoUIKitPluginType,
 };
