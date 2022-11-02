@@ -10,7 +10,7 @@ const ZegoUIKitCorePlugin = {
     }
     plugins.forEach((plugin) => {
       const type = plugin.getPluginType ? plugin.getPluginType() : null;
-      if (type) {
+      if (Object.values(ZegoUIKitPluginType).find(type)) {
         if (_plugins.get(type)) {
           zlogwarning(
             '[installPlugins]Plugin already exists, will update plugin instance'
