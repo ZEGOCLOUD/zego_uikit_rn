@@ -18,7 +18,7 @@ export default function ZegoStartInvitationButton(props) {
     if (type === ZegoInvitationType.videoCall) {
       return require('../resources/blue_button_video_call.png');
     } else {
-      return require('../resources/blue_button_audio_call.png.png');
+      return require('../resources/blue_button_audio_call.png');
     }
   };
   const getRenderView = () => {
