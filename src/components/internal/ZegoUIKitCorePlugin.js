@@ -9,15 +9,22 @@ const ZegoUIKitCorePlugin = {
       return;
     }
     plugins.forEach((plugin) => {
-      const type = plugin.getPluginType ? plugin.getPluginType() : null;
-      if (Object.values(ZegoUIKitPluginType).find(type)) {
-        if (_plugins.get(type)) {
-          zlogwarning(
-            '[installPlugins]Plugin already exists, will update plugin instance'
-          );
-        } else {
-          _plugins.set(type, plugin);
-          zloginfo('[installPlugins]Plugin install success');
+      if (plugin.getInstance) {
+        const type = plugin.getInstance().getPluginType
+          ? plugin.getInstance().getPluginType()
+          : null;
+        if (Object.values(ZegoUIKitPluginType).includes(type)) {
+          if (_plugins.get(type)) {
+            zlogwarning(
+              '[installPlugins]Plugin already exists, will update plugin instance'
+            );
+          } else {
+            _plugins.set(type, plugin);
+            zloginfo(
+              '[installPlugins]Plugin install success, plugins: ',
+              _plugins
+            );
+          }
         }
       }
     });

@@ -2,18 +2,19 @@ import ZegoUIKitCorePlugin from '../../../components/internal/ZegoUIKitCorePlugi
 import ZegoUIKitPluginType from '../../../components/internal/ZegoUIKitPluginType';
 import { zlogerror } from '../../../utils/logger';
 
-const ZegoUIKitSignalingPlugin = ZegoUIKitCorePlugin.getPlugin(
-  ZegoUIKitPluginType.signaling
-);
+var ZegoUIKitSignalingPlugin;
 const ZegoUIKitInvitationService = {
   getVersion: () => {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return;
     }
-    ZegoUIKitSignalingPlugin.getInstance().getVersion();
+    ZegoUIKitSignalingPlugin.getVersion();
   },
   init: (appID, appSign) => {
+    ZegoUIKitSignalingPlugin = ZegoUIKitCorePlugin.getPlugin(
+      ZegoUIKitPluginType.signaling
+    );
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return;
