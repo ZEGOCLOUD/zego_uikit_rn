@@ -40,7 +40,7 @@ export default function ZegoStartInvitationButton(props) {
     ZegoUIKitInvitationService.sendInvitation(invitees, timeout, type, data)
       .then(({ code, message, errorInvitees }) => {
         zloginfo(
-          `[Components]Send invitation success, errorInvitees: ${errorInvitees}`
+          `[Components]Send invitation success, code: ${code}, message: ${message}, errorInvitees: ${errorInvitees}`
         );
         if (typeof onPressed === 'function') {
           onPressed();

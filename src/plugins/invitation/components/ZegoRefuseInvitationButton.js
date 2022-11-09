@@ -45,11 +45,11 @@ export default function ZegoRefuseInvitationButton(props) {
 }
 const styles = StyleSheet.create({
   container: {
-    width: 37,
-    height: 37,
     backgroundColor: '#FF4A50',
     alignItems: 'center',
     justifyContent: 'center',
+    borderRadius: 1000,
+    padding: 7.5,
   },
   text: {
     fontSize: 16,
