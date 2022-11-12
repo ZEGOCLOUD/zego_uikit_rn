@@ -38,12 +38,24 @@ export default function ZegoStartInvitationButton(props) {
   };
   const onButtonPress = () => {
     ZegoUIKitInvitationService.sendInvitation(invitees, timeout, type, data)
-      .then(({ code, message, errorInvitees }) => {
+      .then(({ code, message, callID, errorInvitees }) => {
         zloginfo(
           `[Components]Send invitation success, code: ${code}, message: ${message}, errorInvitees: ${errorInvitees}`
         );
-        if (typeof onPressed === 'function') {
-          onPressed();
+        if (invitees.length > errorInvitees.length) {
+          if (typeof onPressed === 'function') {
+            const inviteesBackup = JSON.parse(JSON.stringify(invitees));
+            errorInvitees.forEach((errorInviteeID) => {
+              const index = inviteesBackup.findIndex(
+                (inviteeID) => errorInviteeID === inviteeID
+              );
+              index !== -1 && inviteesBackup.splice(index, 1);
+            });
+            onPressed({
+              callID,
+              invitees: inviteesBackup,
+            });
+          }
         }
       })
       .catch(({ code, message }) => {
