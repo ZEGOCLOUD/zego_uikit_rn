@@ -3,6 +3,7 @@ import ZegoUIKitPluginType from '../../../components/internal/ZegoUIKitPluginTyp
 import { zlogerror } from '../../../utils/logger';
 
 var ZegoUIKitSignalingPlugin;
+const _localUser = {};
 const ZegoUIKitInvitationService = {
   getVersion: () => {
     if (!ZegoUIKitSignalingPlugin) {
@@ -33,6 +34,8 @@ const ZegoUIKitInvitationService = {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return Promise.reject();
     }
+    _localUser.userID = userID;
+    _localUser.userName = userName;
     return ZegoUIKitSignalingPlugin.getInstance().invoke('login', {
       userID,
       userName,
@@ -51,6 +54,7 @@ const ZegoUIKitInvitationService = {
       return Promise.reject();
     }
     return ZegoUIKitSignalingPlugin.getInstance().invoke('sendInvitation', {
+      inviterName: _localUser.userName,
       invitees,
       timeout,
       type,
