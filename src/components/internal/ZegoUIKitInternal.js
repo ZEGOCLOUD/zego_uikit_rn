@@ -2,6 +2,10 @@ import ZegoExpressEngine from 'zego-express-engine-reactnative';
 import { zlogerror, zloginfo, zlogwarning } from '../../utils/logger';
 import ZegoChangedCountOrProperty from './ZegoChangedCountOrProperty';
 
+var _appInfo = {
+  appID: 0,
+  appSign: '',
+};
 var _isRoomConnected = false;
 var _currentRoomState = 7; // Logout
 var _currentRoomID = '';
@@ -34,6 +38,7 @@ var _inRoomMessageList = [];
 
 function _resetData() {
   zloginfo('Reset all data.');
+  _appInfo = { appID: 0, appSign: '' };
   _localCoreUser = _createCoreUser('', '', '', {});
   _streamCoreUserMap = {};
   _coreUserMap = {};
@@ -580,7 +585,11 @@ function _tryStopPublishStream(force = false) {
 function _tryStartPlayStream(userID) {
   if (userID in _coreUserMap) {
     const user = _coreUserMap[userID];
-    zloginfo('_tryStartPlayStream: ', user);
+    zloginfo(
+      '########_tryStartPlayStream##############: ',
+      user,
+      user.fillMode
+    );
     if (user.streamID !== '') {
       if (user.viewID > 0) {
         ZegoExpressEngine.instance().startPlayingStream(user.streamID, {
@@ -704,6 +713,11 @@ export default {
   },
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SDK <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
   connectSDK(appID, appSign, userInfo) {
+    // Solve the problem of repeated initialization
+    if (appID === _appInfo.appID && userInfo.userID === _localCoreUser.userID) {
+      zloginfo('Create ZegoExpressEngine succeed already!');
+      return Promise.resolve();
+    }
     return new Promise((resolve, reject) => {
       // set advancedConfig to monitor remote user's device changed
       ZegoExpressEngine.setEngineConfig({
@@ -720,7 +734,8 @@ export default {
       ZegoExpressEngine.createEngineWithProfile(engineProfile)
         .then((engine) => {
           zloginfo('Create ZegoExpressEngine succeed!');
-
+          _appInfo.appID = appID;
+          _appInfo.appSign = appSign;
           _unregisterEngineCallback();
           _registerEngineCallback();
 
@@ -955,6 +970,11 @@ export default {
 
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Room <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
   joinRoom(roomID, token) {
+    // Solve the problem of repeated join
+    if (_isRoomConnected && _currentRoomID === roomID) {
+      zloginfo('Join room success already');
+      return Promise.resolve();
+    }
     return new Promise((resolve, reject) => {
       const user = {
         userID: _localCoreUser.userID,
