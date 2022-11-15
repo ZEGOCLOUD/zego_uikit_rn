@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Image, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import ZegoUIKitInvitationService from '../services';
 import ZegoInvitationType from './ZegoInvitationType';
 import { zloginfo, zlogerror } from '../../../utils/logger';
@@ -42,9 +42,6 @@ export default function ZegoStartInvitationButton(props) {
         zloginfo(
           `[Components]Send invitation success, code: ${code}, message: ${message}, errorInvitees: ${errorInvitees}`
         );
-        if (errorInvitees.length === invitees.length) {
-          Alert.alert(`offline: ${errorInvitees}`);
-        }
         if (invitees.length > errorInvitees.length) {
           if (typeof onPressed === 'function') {
             const inviteesBackup = JSON.parse(JSON.stringify(invitees));
