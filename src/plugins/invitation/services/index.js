@@ -91,6 +91,17 @@ const ZegoUIKitInvitationService = {
       data,
     });
   },
+  onConnectionStateChanged: (callbackID, callback) => {
+    if (!ZegoUIKitSignalingPlugin) {
+      zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
+      return;
+    }
+    ZegoUIKitSignalingPlugin.getInstance().registerPluginEventHandler(
+      'connectionStateChanged',
+      callbackID,
+      callback
+    );
+  },
   onInvitationReceived: (callbackID, callback) => {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
