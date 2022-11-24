@@ -4,7 +4,7 @@ import { zlogerror } from '../../../utils/logger';
 
 var ZegoUIKitSignalingPlugin;
 const _localUser = {};
-const ZegoUIKitInvitationService = {
+const ZegoUIKitSignalingPluginImpl = {
   getVersion: () => {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
@@ -170,4 +170,4 @@ const ZegoUIKitInvitationService = {
   },
 };
 
-export default ZegoUIKitInvitationService;
+export default ZegoUIKitSignalingPluginImpl;
