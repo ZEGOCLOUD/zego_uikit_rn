@@ -70,6 +70,7 @@ function _createPublicUser(coreUser) {
     isMicrophoneOn: coreUser.isMicDeviceOn,
     isCameraOn: coreUser.isCameraDeviceOn,
     soundLevel: coreUser.soundLevel,
+    inRoomAttributes: coreUser.inRoomAttributes,
   };
 }
 function _createCoreUser(userID, userName, profileUrl, extendInfo) {
@@ -86,6 +87,7 @@ function _createCoreUser(userID, userName, profileUrl, extendInfo) {
     publisherQuality: 0,
     soundLevel: 0,
     joinTime: 0,
+    inRoomAttributes: {},
   };
 }
 function _isLocalUser(userID) {
@@ -492,7 +494,14 @@ function _unregisterEngineCallback() {
   ZegoExpressEngine.instance().off('IMRecvBroadcastMessage');
 }
 function _notifyUserCountOrPropertyChanged(type) {
-  const msg = ['', 'user add', 'user delete', 'mic update', 'camera update'];
+  const msg = [
+    '',
+    'user add',
+    'user delete',
+    'mic update',
+    'camera update',
+    'attributes update',
+  ];
   const userList = Object.values(_coreUserMap)
     .sort((user1, user2) => {
       return user2.joinTime - user1.joinTime;
@@ -1211,5 +1220,9 @@ export default {
     } else {
       _onInRoomMessageSentCallbackMap[callbackID] = callback;
     }
+  },
+  // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Live audio room <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+  notifyUserCountOrPropertyChanged(type) {
+    _notifyUserCountOrPropertyChanged(type);
   },
 };
