@@ -1,11 +1,9 @@
-export class ZegoInvitationServiceResult {
+export class ZegoInvitationImplResult {
   code = '';
   message = '';
-  result = '';
-  constructor(code = '', message = '', result = '') {
+  constructor(code = '', message = '') {
     this.code = code;
     this.message = message;
-    this.result = result;
   }
 }
 
