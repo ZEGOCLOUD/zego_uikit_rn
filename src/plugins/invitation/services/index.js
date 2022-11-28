@@ -244,36 +244,43 @@ const ZegoUIKitSignalingPluginImpl = {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return;
     }
-    return ZegoUIKitSignalingPlugin.getInstance()
-      .invoke('joinRoom', {
-        roomID,
-      })
-      .then(async () => {
-        try {
-          zloginfo('[Plugins][invitation]Join room successfully.', roomID);
-          // query the attributes of the users in room
-          const fullAttributes = await _queryUsersInRoomAttributesFully();
-          _usersInRoomAttributes.clear();
-          fullAttributes.forEach((element) => {
-            _usersInRoomAttributes.set(element.userID, element.attributes);
-          });
-          zloginfo(
-            `[Plugins][invitation]Auto query the attributes of the users in room successfully.`,
-            _usersInRoomAttributes
-          );
-          // query the room attributes
-          await this.queryRoomProperties();
-          zloginfo(
-            `[Plugins][invitation]Auto query the room attributes successfully.`,
-            _roomAttributes
-          );
-        } catch (error) {
-          zlogerror(
-            `[Plugins][invitation]Failed to auto query the attributes of the users in room of room attributes.`,
-            error
-          );
-        }
-      });
+    return new Promise((resolve, reject) => {
+      ZegoUIKitSignalingPlugin.getInstance()
+        .invoke('joinRoom', {
+          roomID,
+        })
+        .then(async () => {
+          try {
+            zloginfo('[Plugins][invitation]Join room successfully.', roomID);
+            // query the attributes of the users in room
+            const fullAttributes = await _queryUsersInRoomAttributesFully();
+            _usersInRoomAttributes.clear();
+            fullAttributes.forEach((element) => {
+              _usersInRoomAttributes.set(element.userID, element.attributes);
+            });
+            zloginfo(
+              `[Plugins][invitation]Auto query the attributes of the users in room successfully.`,
+              _usersInRoomAttributes
+            );
+            // query the room attributes
+            await this.queryRoomProperties();
+            zloginfo(
+              `[Plugins][invitation]Auto query the room attributes successfully.`,
+              _roomAttributes
+            );
+            resolve(new ZegoInvitationImplResult('', ''));
+          } catch (error) {
+            zlogerror(
+              `[Plugins][invitation]Failed to auto query the attributes of the users in room of room attributes.`,
+              error
+            );
+          }
+        })
+        .catch((error) => {
+          zloginfo('[Plugins][invitation]Failed to join room.', roomID);
+          reject(error);
+        });
+    });
   },
   getUsersInRoomAttributes: () => {
     if (!ZegoUIKitSignalingPlugin) {
