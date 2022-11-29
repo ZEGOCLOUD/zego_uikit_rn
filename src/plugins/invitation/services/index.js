@@ -538,7 +538,7 @@ const ZegoUIKitSignalingPluginImpl = {
               `[Plugins][invitation]Auto query the room attributes successfully.`,
               _roomAttributes
             );
-            resolve();
+            resolve(new ZegoInvitationImplResult('', ''));
           } catch (error) {
             zlogerror(
               `[Plugins][invitation]Failed to auto query room attributes.`,
