@@ -37,7 +37,6 @@ export default function AudioFrame(props) {
         }
       }
     );
-    console.log('===audio frame', showSoundWave, hasSound);
     return () => {
       ZegoUIKitInternal.onSoundLevelUpdate('AudioFrame' + userInfo.userID);
     };
