@@ -588,7 +588,7 @@ const ZegoUIKitSignalingPluginImpl = {
     ZegoUIKitSignalingPlugin.getInstance().registerPluginEventHandler(
       'roomPropertiesUpdated',
       callbackID,
-      ({ info }) => {
+      (info) => {
         const oldRoomAttributes = JSON.parse(JSON.stringify(_roomAttributes));
         const { action, roomAttributes } = info;
         const updateKeys = Object.keys(roomAttributes);
