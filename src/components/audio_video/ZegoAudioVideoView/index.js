@@ -38,7 +38,6 @@ export default function ZegoVideoView(props) {
       setUserInfo(user);
       setIsCameraOn(user.isCameraDeviceOn);
     }
-    console.log('===audio video view ', user, userInfo);
   }, []);
 
   useEffect(() => {
