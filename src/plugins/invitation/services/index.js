@@ -497,27 +497,17 @@ const ZegoUIKitSignalingPluginImpl = {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return;
     }
-    return new Promise((resolve, reject) => {
-      ZegoUIKitSignalingPlugin.getInstance()
-        .invoke('beginRoomPropertiesBatchOperation', {
-          isDeleteAfterOwnerLeft,
-          isForce,
-          isUpdateOwner,
-        })
-        .then(() => {
-          zloginfo(
-            '[Plugins][invitation]Begin room properties batch operation successfully.'
-          );
-          resolve(new ZegoInvitationImplResult('', ''));
-        })
-        .catch((error) => {
-          zlogerror(
-            '[Plugins][invitation]Failed to begin room attributes batch operation.',
-            error
-          );
-          reject(error);
-        });
-    });
+    ZegoUIKitSignalingPlugin.getInstance().invoke(
+      'beginRoomPropertiesBatchOperation',
+      {
+        isDeleteAfterOwnerLeft,
+        isForce,
+        isUpdateOwner,
+      }
+    );
+    zloginfo(
+      '[Plugins][invitation]Begin room properties batch operation successfully.'
+    );
   },
   endRoomPropertiesBatchOperation() {
     if (!ZegoUIKitSignalingPlugin) {
