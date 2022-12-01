@@ -723,10 +723,10 @@ export default {
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SDK <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
   connectSDK(appID, appSign, userInfo) {
     // Solve the problem of repeated initialization
-    // if (appID === _appInfo.appID && userInfo.userID === _localCoreUser.userID) {
-    //   zloginfo('Create ZegoExpressEngine succeed already!');
-    //   return Promise.resolve();
-    // }
+    if (appID === _appInfo.appID && userInfo.userID === _localCoreUser.userID) {
+      zloginfo('Create ZegoExpressEngine succeed already!');
+      return Promise.resolve();
+    }
     return new Promise((resolve, reject) => {
       // set advancedConfig to monitor remote user's device changed
       ZegoExpressEngine.setEngineConfig({
@@ -980,10 +980,10 @@ export default {
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Room <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
   joinRoom(roomID, token) {
     // Solve the problem of repeated join
-    // if (_isRoomConnected && _currentRoomID === roomID) {
-    //   zloginfo('Join room success already');
-    //   return Promise.resolve();
-    // }
+    if (_isRoomConnected && _currentRoomID === roomID) {
+      zloginfo('Join room success already');
+      return Promise.resolve();
+    }
     return new Promise((resolve, reject) => {
       const user = {
         userID: _localCoreUser.userID,
