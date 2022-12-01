@@ -31,7 +31,6 @@ export default function AudioFrame(props) {
     ZegoUIKitInternal.onSoundLevelUpdate(
       'AudioFrame' + userInfo.userID,
       (userID, soundLevel) => {
-        console.log();
         if (userInfo.userID == userID) {
           setHasSound(soundLevel > 5);
         }
