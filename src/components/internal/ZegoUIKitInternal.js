@@ -230,10 +230,9 @@ function _onRoomStreamUpdate(roomID, updateType, streamList) {
     });
   }
 }
-function _onRemoteCameraStateUpdate(userID, state) {
-  console.warn('>>>>>>>>>>>>> _onRemoteCameraStateUpdate', userID, state);
+function _onRemoteCameraStateUpdate(userID, isOn) {
+  console.warn('>>>>>>>>>>>>> _onRemoteCameraStateUpdate', userID, isOn);
   if (userID in _coreUserMap) {
-    const isOn = state == 0; // 0 for Open
     _coreUserMap[userID].isCameraDeviceOn = isOn;
     _notifyUserInfoUpdate(_coreUserMap[userID]);
     _notifyUserCountOrPropertyChanged(
@@ -263,10 +262,9 @@ function _onAudioRouteChange(type) {
   );
   _audioOutputType = type;
 }
-function _onRemoteMicStateUpdate(userID, state) {
-  console.warn('>>>>>>>>>>>>> _onRemoteMicStateUpdate', userID, state);
+function _onRemoteMicStateUpdate(userID, isOn) {
+  console.warn('>>>>>>>>>>>>> _onRemoteMicStateUpdate', userID, isOn);
   if (userID in _coreUserMap) {
-    const isOn = state == 0; // 0 for Open
     _coreUserMap[userID].isMicDeviceOn = isOn;
     _notifyUserInfoUpdate(_coreUserMap[userID]);
     _notifyUserCountOrPropertyChanged(
@@ -396,7 +394,7 @@ function _registerEngineCallback() {
     'playerQualityUpdate',
     (streamID, quality) => {
       if (_qualityUpdateLogCounter % 10 == 0) {
-        zloginfo('[playerQualityUpdate callback]', streamID, quality);
+        // zloginfo('[playerQualityUpdate callback]', streamID, quality);
       }
       // TODO
     }
@@ -405,12 +403,14 @@ function _registerEngineCallback() {
     'remoteCameraStateUpdate',
     (streamID, state) => {
       zloginfo('[remoteCameraStateUpdate callback]', streamID, state);
-      _onRemoteCameraStateUpdate(_getUserIDByStreamID(streamID), state);
+      // 0 for device is on
+      _onRemoteCameraStateUpdate(_getUserIDByStreamID(streamID), state == 0);
     }
   );
   ZegoExpressEngine.instance().on('remoteMicStateUpdate', (streamID, state) => {
     zloginfo('[remoteMicStateUpdate callback]', streamID, state);
-    _onRemoteMicStateUpdate(_getUserIDByStreamID(streamID), state);
+    // 0 for device is on
+    _onRemoteMicStateUpdate(_getUserIDByStreamID(streamID), state == 0);
   });
   ZegoExpressEngine.instance().on(
     'playerStateUpdate',
@@ -477,6 +477,22 @@ function _registerEngineCallback() {
       _onRequireNewToken();
     }
   );
+  ZegoExpressEngine.instance().on('roomStreamExtraInfoUpdate', (roomID, streamList) => {
+    zloginfo('roomStreamExtraInfoUpdate', streamList)
+    streamList.forEach((stream) => {
+        try {
+            var extraInfo = JSON.parse(stream.extraInfo)
+            if ('isCameraOn' in extraInfo) {
+                _onRemoteCameraStateUpdate(stream.user.userID, extraInfo.isCameraOn)
+            }
+            if ('isMicrophoneOn' in extraInfo) {
+                _onRemoteMicStateUpdate(stream.user.userID, extraInfo.isMicrophoneOn)
+            }
+        } catch (error) {
+            zlogerror('roomStreamExtraInfoUpdate ERROR: ', error)
+        }
+    })
+  })
 }
 function _unregisterEngineCallback() {
   zloginfo('Unregister callback from ZegoExpressEngine...');
@@ -492,6 +508,7 @@ function _unregisterEngineCallback() {
   ZegoExpressEngine.instance().off('roomStateChanged');
   ZegoExpressEngine.instance().off('audioRouteChange');
   ZegoExpressEngine.instance().off('IMRecvBroadcastMessage');
+  ZegoExpressEngine.instance().off('roomStreamExtraInfoUpdate');
 }
 function _notifyUserCountOrPropertyChanged(type) {
   const msg = [
@@ -850,7 +867,7 @@ export default {
         zloginfo('turnMicDeviceOn: ', _localCoreUser.userID, on);
         ZegoExpressEngine.instance().muteMicrophone(!on);
 
-        _onRemoteMicStateUpdate(_localCoreUser.userID, on ? 0 : 10); // 0 for open, 10 for mute
+        _onRemoteMicStateUpdate(_localCoreUser.userID, on);
 
         _localCoreUser.isMicDeviceOn = on;
         _coreUserMap[_localCoreUser.userID].isMicDeviceOn = on;
@@ -879,7 +896,7 @@ export default {
         zloginfo('turnCameraDeviceOn: ', _localCoreUser.userID, on);
         ZegoExpressEngine.instance().enableCamera(on, 0);
 
-        _onRemoteCameraStateUpdate(_localCoreUser.userID, on ? 0 : 10); // 0 for open, 10 for mute
+        _onRemoteCameraStateUpdate(_localCoreUser.userID, on);
 
         _localCoreUser.isCameraDeviceOn = on;
         // if (!on) {
