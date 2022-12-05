@@ -263,11 +263,11 @@ const ZegoUIKitSignalingPluginImpl = {
               _usersInRoomAttributes
             );
             // query the room attributes
-            await this.queryRoomProperties();
-            zloginfo(
-              `[Plugins][invitation]Auto query the room attributes successfully.`,
-              _roomAttributes
-            );
+            // await this.queryRoomProperties();
+            // zloginfo(
+            //   `[Plugins][invitation]Auto query the room attributes successfully.`,
+            //   _roomAttributes
+            // );
             resolve(new ZegoInvitationImplResult('', ''));
           } catch (error) {
             zlogerror(
@@ -282,13 +282,13 @@ const ZegoUIKitSignalingPluginImpl = {
         });
     });
   },
-  getUsersInRoomAttributes: () => {
-    if (!ZegoUIKitSignalingPlugin) {
-      zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
-      return;
-    }
-    return _usersInRoomAttributes;
-  },
+  // getUsersInRoomAttributes: () => {
+  //   if (!ZegoUIKitSignalingPlugin) {
+  //     zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
+  //     return;
+  //   }
+  //   return _usersInRoomAttributes;
+  // },
   setUsersInRoomAttributes: (key, value, userIDs) => {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
