@@ -49,6 +49,7 @@ export default {
   disconnectUser: ZegoUIKitInternal.disconnectUser,
   getUser: ZegoUIKitInternal.getUser,
   getAllUsers: ZegoUIKitInternal.getAllUsers,
+  getLocalUserInfo: ZegoUIKitInternal.getLocalUserInfo,
   onUserJoin: ZegoUIKitInternal.onUserJoin,
   onUserLeave: ZegoUIKitInternal.onUserLeave,
   onAudioVideoAvailable: ZegoUIKitInternal.onAudioVideoAvailable,
