@@ -51,7 +51,7 @@ export default function ZegoMemberList(props) {
 
   const refreshMemberList = () => {
     let memberList = ZegoUIKitInternal.getAllUsers();
-
+    console.warn('===============refreshMemberList==============', memberList);
     if (typeof sortUserList === 'function') {
       const temp = sortUserList(memberList) || memberList;
       setMemberList((arr) => [...temp]);
@@ -115,6 +115,7 @@ export default function ZegoMemberList(props) {
     );
 
   const roleDescription = (item) => {
+    console.warn('===============roleDescription==============', item);
     const localUserID = ZegoUIKitInternal.getLocalUserInfo().userID;
     const showMe = item.userID == localUserID ? 'You' : '';
     let roleName = '';
@@ -122,9 +123,9 @@ export default function ZegoMemberList(props) {
       const roleValue = item.inRoomAttributes.role;
       if (roleValue) {
         roleName =
-          roleValue === ZegoLiveAudioRoomRole.host
+          roleValue === ZegoLiveAudioRoomRole.host.toString()
             ? 'Host'
-            : roleValue === ZegoLiveAudioRoomRole.speaker
+            : roleValue === ZegoLiveAudioRoomRole.speaker.toString()
             ? 'speaker'
             : '';
       }
@@ -178,6 +179,10 @@ export default function ZegoMemberList(props) {
       }
     );
     ZegoUIKitInternal.onUserCountOrPropertyChanged(callbackID, (userList) => {
+      console.warn(
+        '===============onUserCountOrPropertyChanged==============',
+        userList
+      );
       if (typeof sortUserList === 'function') {
         const temp = sortUserList(userList) || userList;
         setMemberList((arr) => [...temp]);
