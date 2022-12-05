@@ -876,6 +876,13 @@ export default {
           ZegoChangedCountOrProperty.microphoneStateUpdate
         );
 
+        // sync device status via stream extra info
+        var extraInfo = {
+            isCameraOn : _localCoreUser.isCameraDeviceOn,
+            isMicrophoneOn : on
+        }
+        ZegoExpressEngine.instance().setStreamExtraInfo(JSON.stringify(extraInfo))
+
         if (on) {
           _tryStartPublishStream();
         } else {
@@ -907,6 +914,13 @@ export default {
         _notifyUserCountOrPropertyChanged(
           ZegoChangedCountOrProperty.cameraStateUpdate
         );
+
+        // sync device status via stream extra info
+        var extraInfo = {
+            isCameraOn : on,
+            isMicrophoneOn : _localCoreUser.isMicDeviceOn
+        }
+        ZegoExpressEngine.instance().setStreamExtraInfo(JSON.stringify(extraInfo))
 
         if (on) {
           _tryStartPublishStream();
