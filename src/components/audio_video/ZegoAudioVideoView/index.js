@@ -27,6 +27,7 @@ export default function ZegoVideoView(props) {
     useVideoViewAspectFill = false,
     foregroundBuilder,
     avatarSize,
+    soundWaveColor,
   } = props;
 
   const [userInfo, setUserInfo] = useState({});
@@ -88,6 +89,7 @@ export default function ZegoVideoView(props) {
             audioViewBackgroudColor={audioViewBackgroudColor}
             audioViewBackgroudImage={audioViewBackgroudImage}
             avatarSize={avatarSize}
+            soundWaveColor={soundWaveColor}
           />
         ) : null}
       </VideoFrame>

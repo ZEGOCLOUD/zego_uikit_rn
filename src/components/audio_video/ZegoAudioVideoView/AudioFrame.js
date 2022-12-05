@@ -9,6 +9,7 @@ export default function AudioFrame(props) {
     audioViewBackgroudColor,
     audioViewBackgroudImage,
     avatarSize,
+    soundWaveColor = '#3655ff',
   } = props;
 
   const [hasSound, setHasSound] = useState(false);
@@ -56,12 +57,21 @@ export default function AudioFrame(props) {
         style={styles.imgBackground}
       >
         {showSoundWave && hasSound ? (
-          <View style={waveStyle(avatarSize.width + 8, '#c7d6f7').circleWave}>
+          <View
+            style={
+              waveStyle(avatarSize.width + 8, soundWaveColor, 0.7).circleWave
+            }
+          >
             <View
-              style={waveStyle(avatarSize.width + 6, '#6093fb').subCircleWave}
+              style={
+                waveStyle(avatarSize.width + 6, soundWaveColor, 0.8)
+                  .subCircleWave
+              }
             />
             <View
-              style={waveStyle(avatarSize.width + 4, '#3655ff').subCircleWave}
+              style={
+                waveStyle(avatarSize.width + 4, soundWaveColor, 1).subCircleWave
+              }
             />
           </View>
         ) : (
@@ -98,7 +108,7 @@ const cstyle = (bgColor) =>
       backgroundColor: bgColor,
     },
   });
-const waveStyle = (w, color) =>
+const waveStyle = (w, color, opacity) =>
   StyleSheet.create({
     circleWave: {
       flex: 1,
@@ -108,6 +118,7 @@ const waveStyle = (w, color) =>
       aspectRatio: 1,
       borderRadius: 1000,
       backgroundColor: color,
+      opacity: opacity,
       zIndex: 0,
       justifyContent: 'center',
       alignContent: 'center',
@@ -120,6 +131,7 @@ const waveStyle = (w, color) =>
       aspectRatio: 1,
       borderRadius: 1000,
       backgroundColor: color,
+      opacity: opacity,
       zIndex: 0,
     },
   });
