@@ -11,6 +11,7 @@ import ZegoUIKitInternal from '../internal/ZegoUIKitInternal';
 import ZegoMicrophoneStateIcon from '../audio_video/ZegoMicrophoneStateIcon';
 import ZegoCameraStateIcon from '../audio_video/ZegoCameraStateIcon';
 import Delegate from 'react-delegate-component';
+import { ZegoLiveAudioRoomRole } from '../../plugins/invitation/services/defines';
 
 export default function ZegoMemberList(props) {
   const { showMicrophoneState, showCameraState, itemBuilder, sortUserList } =
@@ -49,16 +50,22 @@ export default function ZegoMemberList(props) {
   const [memberList, setMemberList] = useState([]);
 
   const refreshMemberList = () => {
-    // Update list like this will cause rerender
     let memberList = ZegoUIKitInternal.getAllUsers();
-    memberList.reverse();
-    // Put yourself first
-    const index = memberList.findIndex(
-      (user) => user.userID == ZegoUIKitInternal.getLocalUserInfo().userID
-    );
-    index !== -1 &&
-      (memberList = memberList.splice(index, 1).concat(memberList));
-    setMemberList((arr) => [...memberList]);
+
+    if (typeof sortUserList === 'function') {
+      const temp = sortUserList(memberList) || memberList;
+      setMemberList((arr) => [...temp]);
+    } else {
+      // Update list like this will cause rerender
+      memberList.reverse();
+      // Put yourself first
+      const index = memberList.findIndex(
+        (user) => user.userID == ZegoUIKitInternal.getLocalUserInfo().userID
+      );
+      index !== -1 &&
+        (memberList = memberList.splice(index, 1).concat(memberList));
+      setMemberList((arr) => [...memberList]);
+    }
   };
 
   useEffect(() => {
@@ -107,6 +114,28 @@ export default function ZegoMemberList(props) {
       <View />
     );
 
+  const roleDescription = (item) => {
+    const localUserID = ZegoUIKitInternal.getLocalUserInfo().userID;
+    const showMe = item.userID == localUserID ? 'You' : '';
+    let roleName = '';
+    if (item.inRoomAttributes) {
+      const roleValue = item.inRoomAttributes.get('role');
+      if (roleValue) {
+        roleName =
+          roleValue === ZegoLiveAudioRoomRole.host
+            ? 'Host'
+            : roleValue === ZegoLiveAudioRoomRole.speaker
+            ? 'speaker'
+            : '';
+      }
+    }
+    if (!showMe && !roleName) {
+      return '';
+    } else {
+      return `(${showMe + (showMe && roleName ? ',' : '') + roleName})`;
+    }
+  };
+
   const renderItem = ({ item }) =>
     !itemBuilder ? (
       <View style={styles.item}>
@@ -115,10 +144,7 @@ export default function ZegoMemberList(props) {
             <Text style={styles.nameLabel}>{getShotName(item.userName)}</Text>
           </View>
           <Text style={styles.name}>
-            {item.userName +
-              (item.userID == ZegoUIKitInternal.getLocalUserInfo().userID
-                ? ' (You)'
-                : '')}
+            {item.userName + roleDescription(item)}
           </Text>
         </View>
         <View style={styles.itemRight}>
