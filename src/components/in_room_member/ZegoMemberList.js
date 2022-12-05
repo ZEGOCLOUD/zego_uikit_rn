@@ -119,7 +119,7 @@ export default function ZegoMemberList(props) {
     const showMe = item.userID == localUserID ? 'You' : '';
     let roleName = '';
     if (item.inRoomAttributes) {
-      const roleValue = item.inRoomAttributes.get('role');
+      const roleValue = item.inRoomAttributes.role;
       if (roleValue) {
         roleName =
           roleValue === ZegoLiveAudioRoomRole.host
