@@ -9,7 +9,7 @@ export default function AudioFrame(props) {
     audioViewBackgroudColor,
     audioViewBackgroudImage,
     avatarSize,
-    soundWaveColor = '#3655ff',
+    soundWaveColor = '#6B6A71',
   } = props;
 
   const [hasSound, setHasSound] = useState(false);
