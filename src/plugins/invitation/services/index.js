@@ -253,15 +253,15 @@ const ZegoUIKitSignalingPluginImpl = {
           try {
             zloginfo('[Plugins][invitation]Join room successfully.', roomID);
             // query the attributes of the users in room
-            const fullAttributes = await _queryUsersInRoomAttributesFully();
-            _usersInRoomAttributes.clear();
-            fullAttributes.forEach((element) => {
-              _usersInRoomAttributes.set(element.userID, element.attributes);
-            });
-            zloginfo(
-              `[Plugins][invitation]Auto query the attributes of the users in room successfully.`,
-              _usersInRoomAttributes
-            );
+            // const fullAttributes = await _queryUsersInRoomAttributesFully();
+            // _usersInRoomAttributes.clear();
+            // fullAttributes.forEach((element) => {
+            //   _usersInRoomAttributes.set(element.userID, element.attributes);
+            // });
+            // zloginfo(
+            //   `[Plugins][invitation]Auto query the attributes of the users in room successfully.`,
+            //   _usersInRoomAttributes
+            // );
             // query the room attributes
             // await this.queryRoomProperties();
             // zloginfo(
@@ -410,13 +410,13 @@ const ZegoUIKitSignalingPluginImpl = {
     );
   },
   // ------- live audio room - room------
-  getRoomProperties() {
-    if (!ZegoUIKitSignalingPlugin) {
-      zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
-      return;
-    }
-    return _roomAttributes;
-  },
+  // getRoomProperties() {
+  //   if (!ZegoUIKitSignalingPlugin) {
+  //     zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
+  //     return;
+  //   }
+  //   return _roomAttributes;
+  // },
   updateRoomProperty(
     key,
     value,
