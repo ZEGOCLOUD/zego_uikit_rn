@@ -118,22 +118,10 @@ export default function ZegoMemberList(props) {
     console.warn('===============roleDescription==============', item);
     const localUserID = ZegoUIKitInternal.getLocalUserInfo().userID;
     const showMe = item.userID == localUserID ? 'You' : '';
-    let roleName = '';
-    if (item.inRoomAttributes) {
-      const roleValue = item.inRoomAttributes.role;
-      if (roleValue) {
-        roleName =
-          roleValue === ZegoLiveAudioRoomRole.host.toString()
-            ? 'Host'
-            : roleValue === ZegoLiveAudioRoomRole.speaker.toString()
-            ? 'Speaker'
-            : '';
-      }
-    }
-    if (!showMe && !roleName) {
+    if (!showMe) {
       return '';
     } else {
-      return `(${showMe + (showMe && roleName ? ',' : '') + roleName})`;
+      return `(${showMe})`;
     }
   };
 
