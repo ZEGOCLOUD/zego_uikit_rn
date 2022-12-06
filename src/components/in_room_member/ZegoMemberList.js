@@ -126,7 +126,7 @@ export default function ZegoMemberList(props) {
           roleValue === ZegoLiveAudioRoomRole.host.toString()
             ? 'Host'
             : roleValue === ZegoLiveAudioRoomRole.speaker.toString()
-            ? 'speaker'
+            ? 'Speaker'
             : '';
       }
     }
