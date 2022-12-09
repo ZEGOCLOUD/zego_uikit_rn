@@ -2,6 +2,7 @@ import { View, StyleSheet, Text, ImageBackground } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import ZegoUIKitInternal from '../../internal/ZegoUIKitInternal';
 
+const defaultAvatarSizeRatio = 129 / 375;
 export default function AudioFrame(props) {
   const {
     userInfo,
@@ -13,6 +14,7 @@ export default function AudioFrame(props) {
   } = props;
 
   const [hasSound, setHasSound] = useState(false);
+  const [dimensions, setDimensions] = useState({width: 0, height: 0})
 
   const getShotName = (name) => {
     if (!name) {
@@ -37,6 +39,7 @@ export default function AudioFrame(props) {
         }
       }
     );
+
     return () => {
       ZegoUIKitInternal.onSoundLevelUpdate('AudioFrame' + userInfo.userID);
     };
@@ -48,6 +51,12 @@ export default function AudioFrame(props) {
         cstyle(audioViewBackgroudColor ? audioViewBackgroudColor : '#4A4B4D')
           .container
       }
+      onLayout={event => {
+        setDimensions({
+          width: event.nativeEvent.layout.width,
+          height: event.nativeEvent.layout.height,
+        })
+      }}
     >
       <ImageBackground
         source={
@@ -59,18 +68,18 @@ export default function AudioFrame(props) {
         {showSoundWave && hasSound ? (
           <View
             style={
-              waveStyle(avatarSize.width + 8, soundWaveColor, 0.7).circleWave
+              waveStyle((avatarSize ? avatarSize : defaultAvatarSizeRatio * dimensions.width) + 0.08 * dimensions.width, soundWaveColor, 0.7).circleWave
             }
           >
             <View
               style={
-                waveStyle(avatarSize.width + 6, soundWaveColor, 0.8)
+                waveStyle((avatarSize ? avatarSize : defaultAvatarSizeRatio * dimensions.width) + 0.06 * dimensions.width, soundWaveColor, 0.8)
                   .subCircleWave
               }
             />
             <View
               style={
-                waveStyle(avatarSize.width + 4, soundWaveColor, 1).subCircleWave
+                waveStyle((avatarSize ? avatarSize : defaultAvatarSizeRatio * dimensions.width) + + 0.04 * dimensions.width, soundWaveColor, 1).subCircleWave
               }
             />
           </View>
@@ -81,12 +90,9 @@ export default function AudioFrame(props) {
           style={[
             styles.avatar,
             {
-              width: avatarSize.width
-                ? avatarSize.width
-                : ((129 / 375) * 100).toString() + '%',
-              height: avatarSize.height
-                ? avatarSize.height
-                : ((129 / 375) * 100).toString() + '%',
+              width: avatarSize
+                ? avatarSize
+                : defaultAvatarSizeRatio * dimensions.width,
             },
           ]}
         >
