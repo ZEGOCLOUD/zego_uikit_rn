@@ -523,11 +523,11 @@ const ZegoUIKitSignalingPluginImpl = {
               '[Plugins][invitation]End room properties batch operation successfully.'
             );
             // query the room attributes
-            await this.queryRoomProperties();
-            zloginfo(
-              `[Plugins][invitation]Auto query the room attributes successfully.`,
-              _roomAttributes
-            );
+            // await this.queryRoomProperties();
+            // zloginfo(
+            //   `[Plugins][invitation]Auto query the room attributes successfully.`,
+            //   _roomAttributes
+            // );
             resolve(new ZegoInvitationImplResult('', ''));
           } catch (error) {
             zlogerror(
