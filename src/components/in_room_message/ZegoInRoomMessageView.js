@@ -31,6 +31,7 @@ export default function ZegoInRoomMessageView(props) {
   }, []);
   return (
     <FlatList
+      showsVerticalScrollIndicator={false}
       ref={listRef}
       data={messageList}
       // https://stackoverflow.com/questions/46304677/scrolltoend-after-update-data-for-flatlist
