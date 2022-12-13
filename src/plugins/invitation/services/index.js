@@ -370,44 +370,52 @@ const ZegoUIKitSignalingPluginImpl = {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return;
     }
-    ZegoUIKitSignalingPlugin.getInstance().registerPluginEventHandler(
-      'usersInRoomAttributesUpdated',
-      callbackID,
-      ({ infos, editor }) => {
-        // incremental information
-        const oldAttributes = new Map();
-        Array.from(_usersInRoomAttributes.keys()).forEach((key) => {
-          oldAttributes.set(
-            key,
-            JSON.parse(JSON.stringify(_usersInRoomAttributes.get(key)))
-          );
-        });
-        const updateKeys = [];
-        infos.forEach((info) => {
-          Object.keys(info.attributes).forEach((key) => {
-            if (!updateKeys.includes(key)) {
-              updateKeys.push(key);
-            }
+    if (typeof callback !== 'function') {
+      ZegoUIKitSignalingPlugin.getInstance().registerPluginEventHandler(
+        'usersInRoomAttributesUpdated',
+        callbackID,
+        callback
+      );
+    } else {
+      ZegoUIKitSignalingPlugin.getInstance().registerPluginEventHandler(
+        'usersInRoomAttributesUpdated',
+        callbackID,
+        ({ infos, editor }) => {
+          // incremental information
+          const oldAttributes = new Map();
+          Array.from(_usersInRoomAttributes.keys()).forEach((key) => {
+            oldAttributes.set(
+              key,
+              JSON.parse(JSON.stringify(_usersInRoomAttributes.get(key)))
+            );
           });
-          // merge
-          let temp = _usersInRoomAttributes.get(info.userID);
-          !temp && (temp = {});
-          _usersInRoomAttributes.set(info.userID, temp);
-          Object.assign(temp, info.attributes);
-        });
-        zloginfo(
-          '[Plugins][invitation]Notify updated attributes of users in room successfully.',
-          updateKeys,
-          oldAttributes,
-          _usersInRoomAttributes,
-          editor
-        );
-        callback(updateKeys, oldAttributes, _usersInRoomAttributes, editor);
+          const updateKeys = [];
+          infos.forEach((info) => {
+            Object.keys(info.attributes).forEach((key) => {
+              if (!updateKeys.includes(key)) {
+                updateKeys.push(key);
+              }
+            });
+            // merge
+            let temp = _usersInRoomAttributes.get(info.userID);
+            !temp && (temp = {});
+            _usersInRoomAttributes.set(info.userID, temp);
+            Object.assign(temp, info.attributes);
+          });
+          zloginfo(
+            '[Plugins][invitation]Notify updated attributes of users in room successfully.',
+            updateKeys,
+            oldAttributes,
+            _usersInRoomAttributes,
+            editor
+          );
+          callback(updateKeys, oldAttributes, _usersInRoomAttributes, editor);
 
-        // update the user information of the core layer
-        _updateCoreUserAndNofityChanges(infos, editor);
-      }
-    );
+          // update the user information of the core layer
+          _updateCoreUserAndNofityChanges(infos, editor);
+        }
+      );
+    }
   },
   // ------- live audio room - room------
   // getRoomProperties() {
@@ -575,32 +583,40 @@ const ZegoUIKitSignalingPluginImpl = {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return;
     }
-    ZegoUIKitSignalingPlugin.getInstance().registerPluginEventHandler(
-      'roomPropertiesUpdated',
-      callbackID,
-      (info) => {
-        const oldRoomAttributes = JSON.parse(JSON.stringify(_roomAttributes));
-        const { action, roomAttributes } = info;
-        const updateKeys = Object.keys(roomAttributes);
-        Object.keys(roomAttributes).forEach((key) => {
-          const oldValue = _roomAttributes[key];
-          // action: Set = 0, Delete = 1
-          if (action === 0) {
-            const value = roomAttributes[key];
-            _roomAttributes[key] = value;
-            callback(key, oldValue, value);
-          } else {
-            delete _roomAttributes[key];
-            callback(key, oldValue, '');
-          }
-        });
-        _notifyRoomPropertiesFullUpdated([
-          updateKeys,
-          oldRoomAttributes,
-          _roomAttributes,
-        ]);
-      }
-    );
+    if (typeof callback !== 'function') {
+      ZegoUIKitSignalingPlugin.getInstance().registerPluginEventHandler(
+        'roomPropertiesUpdated',
+        callbackID,
+        callback
+      );
+    } else {
+      ZegoUIKitSignalingPlugin.getInstance().registerPluginEventHandler(
+        'roomPropertiesUpdated',
+        callbackID,
+        (info) => {
+          const oldRoomAttributes = JSON.parse(JSON.stringify(_roomAttributes));
+          const { action, roomAttributes } = info;
+          const updateKeys = Object.keys(roomAttributes);
+          Object.keys(roomAttributes).forEach((key) => {
+            const oldValue = _roomAttributes[key];
+            // action: Set = 0, Delete = 1
+            if (action === 0) {
+              const value = roomAttributes[key];
+              _roomAttributes[key] = value;
+              callback(key, oldValue, value);
+            } else {
+              delete _roomAttributes[key];
+              callback(key, oldValue, '');
+            }
+          });
+          _notifyRoomPropertiesFullUpdated([
+            updateKeys,
+            oldRoomAttributes,
+            _roomAttributes,
+          ]);
+        }
+      );
+    }
   },
   onRoomPropertiesFullUpdated(callbackID, callback) {
     if (typeof callback !== 'function') {
