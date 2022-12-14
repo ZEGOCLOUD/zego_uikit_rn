@@ -54,6 +54,7 @@ const _updateCoreUserAndNofityChanges = (infos, editor) => {
         shouldNotifyChange = true;
         // merge
         Object.assign(coreUser.inRoomAttributes, info.attributes);
+        ZegoUIKitInternal.notifyUserInfoUpdate(info.userID);
       }
     }
   });

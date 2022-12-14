@@ -1225,4 +1225,7 @@ export default {
   notifyUserCountOrPropertyChanged(type) {
     _notifyUserCountOrPropertyChanged(type);
   },
+  notifyUserInfoUpdate(userID) {
+    _notifyUserInfoUpdate(_coreUserMap[userID]);
+  },
 };
