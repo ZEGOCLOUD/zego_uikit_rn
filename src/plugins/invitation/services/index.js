@@ -355,6 +355,8 @@ const ZegoUIKitSignalingPluginImpl = {
             ...new ZegoInvitationImplResult('', ''),
             usersInRoomAttributes: _usersInRoomAttributes,
           });
+          // update the user information of the core layer
+          _updateCoreUserAndNofityChanges(fullAttributes);
         })
         .catch((error) => {
           zlogerror(
