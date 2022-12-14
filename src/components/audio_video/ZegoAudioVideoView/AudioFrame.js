@@ -14,7 +14,7 @@ export default function AudioFrame(props) {
   } = props;
 
   const [hasSound, setHasSound] = useState(false);
-  const [dimensions, setDimensions] = useState({width: 0, height: 0})
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
   const getShotName = (name) => {
     if (!name) {
@@ -51,11 +51,11 @@ export default function AudioFrame(props) {
         cstyle(audioViewBackgroudColor ? audioViewBackgroudColor : '#4A4B4D')
           .container
       }
-      onLayout={event => {
+      onLayout={(event) => {
         setDimensions({
           width: event.nativeEvent.layout.width,
           height: event.nativeEvent.layout.height,
-        })
+        });
       }}
     >
       <ImageBackground
@@ -68,18 +68,38 @@ export default function AudioFrame(props) {
         {showSoundWave && hasSound ? (
           <View
             style={
-              waveStyle((avatarSize ? avatarSize : defaultAvatarSizeRatio * dimensions.width) + 0.08 * dimensions.width, soundWaveColor, 0.7).circleWave
+              waveStyle(
+                (avatarSize
+                  ? avatarSize.width
+                  : defaultAvatarSizeRatio * dimensions.width) +
+                  0.08 * dimensions.width,
+                soundWaveColor,
+                0.7
+              ).circleWave
             }
           >
             <View
               style={
-                waveStyle((avatarSize ? avatarSize : defaultAvatarSizeRatio * dimensions.width) + 0.06 * dimensions.width, soundWaveColor, 0.8)
-                  .subCircleWave
+                waveStyle(
+                  (avatarSize
+                    ? avatarSize.width
+                    : defaultAvatarSizeRatio * dimensions.width) +
+                    0.06 * dimensions.width,
+                  soundWaveColor,
+                  0.8
+                ).subCircleWave
               }
             />
             <View
               style={
-                waveStyle((avatarSize ? avatarSize : defaultAvatarSizeRatio * dimensions.width) + + 0.04 * dimensions.width, soundWaveColor, 1).subCircleWave
+                waveStyle(
+                  (avatarSize
+                    ? avatarSize.width
+                    : defaultAvatarSizeRatio * dimensions.width) +
+                    +0.04 * dimensions.width,
+                  soundWaveColor,
+                  1
+                ).subCircleWave
               }
             />
           </View>
@@ -91,7 +111,7 @@ export default function AudioFrame(props) {
             styles.avatar,
             {
               width: avatarSize
-                ? avatarSize
+                ? avatarSize.width
                 : defaultAvatarSizeRatio * dimensions.width,
             },
           ]}
