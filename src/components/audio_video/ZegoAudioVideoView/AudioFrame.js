@@ -13,7 +13,7 @@ export default function AudioFrame(props) {
     soundWaveColor = '#6B6A71',
   } = props;
 
-  const [hasSound, setHasSound] = useState(0);
+  const [soundLevel, setSoundLevel] = useState(0);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
   const getShotName = (name) => {
@@ -35,7 +35,7 @@ export default function AudioFrame(props) {
       'AudioFrame' + userInfo.userID,
       (userID, soundLevel) => {
         if (userInfo.userID == userID) {
-          setHasSound(soundLevel);
+          setSoundLevel(soundLevel);
         }
       }
     );
@@ -65,7 +65,7 @@ export default function AudioFrame(props) {
         resizeMode="cover"
         style={styles.imgBackground}
       >
-        {showSoundWave && hasSound > 0 ? (
+        {showSoundWave && soundLevel > 0 ? (
           <View
             style={
               waveStyle(
@@ -78,7 +78,7 @@ export default function AudioFrame(props) {
               ).circleWave
             }
           >
-            {hasSound > 10 ? (
+            {soundLevel > 10 ? (
               <View
                 style={
                   waveStyle(
@@ -92,7 +92,7 @@ export default function AudioFrame(props) {
                 }
               />
             ) : null}
-            {hasSound > 15 ? (
+            {soundLevel > 15 ? (
               <View
                 style={
                   waveStyle(
