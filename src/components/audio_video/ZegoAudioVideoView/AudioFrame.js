@@ -35,7 +35,6 @@ export default function AudioFrame(props) {
       'AudioFrame' + userInfo.userID,
       (userID, soundLevel) => {
         if (userInfo.userID == userID) {
-          // console.log('===sound level', soundLevel);
           setHasSound(soundLevel);
         }
       }
