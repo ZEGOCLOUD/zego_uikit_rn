@@ -13,7 +13,7 @@ export default function AudioFrame(props) {
     soundWaveColor = '#6B6A71',
   } = props;
 
-  const [hasSound, setHasSound] = useState(false);
+  const [hasSound, setHasSound] = useState(0);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
   const getShotName = (name) => {
@@ -35,7 +35,8 @@ export default function AudioFrame(props) {
       'AudioFrame' + userInfo.userID,
       (userID, soundLevel) => {
         if (userInfo.userID == userID) {
-          setHasSound(soundLevel > 5);
+          // console.log('===sound level', soundLevel);
+          setHasSound(soundLevel);
         }
       }
     );
@@ -65,43 +66,47 @@ export default function AudioFrame(props) {
         resizeMode="cover"
         style={styles.imgBackground}
       >
-        {showSoundWave && hasSound ? (
+        {showSoundWave && hasSound > 0 ? (
           <View
             style={
               waveStyle(
                 (avatarSize
                   ? avatarSize.width
                   : defaultAvatarSizeRatio * dimensions.width) +
-                  0.08 * dimensions.width,
+                  0.04 * dimensions.width,
                 soundWaveColor,
-                0.7
+                1
               ).circleWave
             }
           >
-            <View
-              style={
-                waveStyle(
-                  (avatarSize
-                    ? avatarSize.width
-                    : defaultAvatarSizeRatio * dimensions.width) +
-                    0.06 * dimensions.width,
-                  soundWaveColor,
-                  0.8
-                ).subCircleWave
-              }
-            />
-            <View
-              style={
-                waveStyle(
-                  (avatarSize
-                    ? avatarSize.width
-                    : defaultAvatarSizeRatio * dimensions.width) +
-                    +0.04 * dimensions.width,
-                  soundWaveColor,
-                  1
-                ).subCircleWave
-              }
-            />
+            {hasSound > 10 ? (
+              <View
+                style={
+                  waveStyle(
+                    (avatarSize
+                      ? avatarSize.width
+                      : defaultAvatarSizeRatio * dimensions.width) +
+                      0.06 * dimensions.width,
+                    soundWaveColor,
+                    0.6
+                  ).subCircleWave
+                }
+              />
+            ) : null}
+            {hasSound > 15 ? (
+              <View
+                style={
+                  waveStyle(
+                    (avatarSize
+                      ? avatarSize.width
+                      : defaultAvatarSizeRatio * dimensions.width) +
+                      +0.08 * dimensions.width,
+                    soundWaveColor,
+                    0.3
+                  ).subCircleWave
+                }
+              />
+            ) : null}
           </View>
         ) : (
           <View />
