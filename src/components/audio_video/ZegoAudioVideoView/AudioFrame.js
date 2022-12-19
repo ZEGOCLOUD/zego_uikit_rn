@@ -65,7 +65,7 @@ export default function AudioFrame(props) {
         resizeMode="cover"
         style={styles.imgBackground}
       >
-        {showSoundWave && soundLevel > 0 ? (
+        {showSoundWave && soundLevel > 5 ? (
           <View
             style={
               waveStyle(
