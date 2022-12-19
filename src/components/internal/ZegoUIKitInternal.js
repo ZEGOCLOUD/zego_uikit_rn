@@ -634,6 +634,13 @@ function _notifySoundLevelUpdate(userID, soundLevel) {
     }
   });
 }
+const _isEngineCreated = () => {
+  try {
+    return ZegoExpressEngine.instance() != undefined;
+  } catch (error) {
+    return false;
+  }
+}
 
 export default {
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Internal <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -723,7 +730,7 @@ export default {
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SDK <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
   connectSDK(appID, appSign, userInfo) {
     // Solve the problem of repeated initialization
-    if (appID === _appInfo.appID && userInfo.userID === _localCoreUser.userID) {
+    if (_isEngineCreated()) {
       zloginfo('Create ZegoExpressEngine succeed already!');
       return Promise.resolve();
     }
