@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import ZegoUIKitInternal from '../../internal/ZegoUIKitInternal';
 
 const defaultAvatarSizeRatio = 129 / 375;
+const flexStyle = ['center', 'flex-start', 'flex-end'];
+
 export default function AudioFrame(props) {
   const {
     userInfo,
@@ -10,6 +12,7 @@ export default function AudioFrame(props) {
     audioViewBackgroudColor,
     audioViewBackgroudImage,
     avatarSize,
+    avatarAlignment = 0,
     soundWaveColor = '#6B6A71',
   } = props;
 
@@ -63,7 +66,10 @@ export default function AudioFrame(props) {
           audioViewBackgroudImage ? { uri: audioViewBackgroudImage } : null
         }
         resizeMode="cover"
-        style={styles.imgBackground}
+        style={[
+          styles.imgBackground,
+          { justifyContent: flexStyle[avatarAlignment] },
+        ]}
       >
         {showSoundWave && soundLevel > 5 ? (
           <View
@@ -171,10 +177,11 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     position: 'absolute',
-    justifyContent: 'center',
   },
   avatar: {
     flex: 1,
+    marginTop: 1.5,
+    marginBottom: 1.5,
     width: ((129 / 375) * 100).toString() + '%',
     aspectRatio: 1,
     borderRadius: 1000,

@@ -17,6 +17,12 @@ function MaskViewDefault(props) {
   );
 }
 
+const ZegoLiveAudioRoomLayoutAlignment = {
+  center: 0,
+  start: 1,
+  end: 2,
+};
+
 export default function ZegoVideoView(props) {
   const {
     userID,
@@ -27,6 +33,7 @@ export default function ZegoVideoView(props) {
     useVideoViewAspectFill = false,
     foregroundBuilder,
     avatarSize,
+    avatarAlignment = ZegoLiveAudioRoomLayoutAlignment.center,
     soundWaveColor,
   } = props;
 
@@ -81,6 +88,7 @@ export default function ZegoVideoView(props) {
       ZegoUIKitInternal.onRoomStateChanged(callbackID);
     };
   }, []);
+
   return (
     <View style={styles.container}>
       <VideoFrame
@@ -96,6 +104,7 @@ export default function ZegoVideoView(props) {
             audioViewBackgroudColor={audioViewBackgroudColor}
             audioViewBackgroudImage={audioViewBackgroudImage}
             avatarSize={avatarSize}
+            avatarAlignment={avatarAlignment}
             soundWaveColor={soundWaveColor}
           />
         ) : null}
