@@ -12,7 +12,7 @@ export default function AudioFrame(props) {
     audioViewBackgroudColor,
     audioViewBackgroudImage,
     avatarSize,
-    avatarAlignment = 0,
+    avatarAlignment,
     soundWaveColor = '#6B6A71',
   } = props;
 
