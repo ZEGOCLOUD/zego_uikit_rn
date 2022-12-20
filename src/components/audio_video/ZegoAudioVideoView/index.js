@@ -17,12 +17,6 @@ function MaskViewDefault(props) {
   );
 }
 
-const ZegoLiveAudioRoomLayoutAlignment = {
-  center: 0,
-  start: 1,
-  end: 2,
-};
-
 export default function ZegoVideoView(props) {
   const {
     userID,
@@ -33,7 +27,7 @@ export default function ZegoVideoView(props) {
     useVideoViewAspectFill = false,
     foregroundBuilder,
     avatarSize,
-    avatarAlignment = ZegoLiveAudioRoomLayoutAlignment.center,
+    avatarAlignment = 0,
     soundWaveColor,
   } = props;
 
