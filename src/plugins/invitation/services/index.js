@@ -581,20 +581,20 @@ const ZegoUIKitSignalingPluginImpl = {
         });
     });
   },
-  onRoomPropertiesUpdated(callbackID, callback) {
+  onRoomPropertyUpdated(callbackID, callback) {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return;
     }
     if (typeof callback !== 'function') {
       ZegoUIKitSignalingPlugin.getInstance().registerPluginEventHandler(
-        'roomPropertiesUpdated',
+        'roomPropertyUpdated',
         callbackID,
         callback
       );
     } else {
       ZegoUIKitSignalingPlugin.getInstance().registerPluginEventHandler(
-        'roomPropertiesUpdated',
+        'roomPropertyUpdated',
         callbackID,
         (info) => {
           const oldRoomAttributes = JSON.parse(JSON.stringify(_roomAttributes));
