@@ -16,7 +16,7 @@ import ZegoLeaveButton from './components/audio_video/ZegoLeaveButton';
 import ZegoInRoomMessageInput from './components/in_room_message/ZegoInRoomMessageInput';
 import ZegoInRoomMessageView from './components/in_room_message/ZegoInRoomMessageView';
 import ZegoMemberList from './components/in_room_member/ZegoMemberList';
-import ZegoUIKitInvitationService, {
+import ZegoUIKitSignalingPluginImpl, {
   ZegoInvitationConnectionState,
   ZegoStartInvitationButton,
   ZegoCancelInvitationButton,
@@ -49,6 +49,7 @@ export default {
   disconnectUser: ZegoUIKitInternal.disconnectUser,
   getUser: ZegoUIKitInternal.getUser,
   getAllUsers: ZegoUIKitInternal.getAllUsers,
+  getLocalUserInfo: ZegoUIKitInternal.getLocalUserInfo,
   onUserJoin: ZegoUIKitInternal.onUserJoin,
   onUserLeave: ZegoUIKitInternal.onUserLeave,
   onAudioVideoAvailable: ZegoUIKitInternal.onAudioVideoAvailable,
@@ -59,6 +60,7 @@ export default {
   onInRoomMessageSent: ZegoUIKitInternal.onInRoomMessageSent,
   installPlugins: ZegoUIKitCorePlugin.installPlugins,
   getPlugin: ZegoUIKitCorePlugin.getPlugin,
+  getSignalingPlugin: () => ZegoUIKitSignalingPluginImpl,
 };
 
 export {
@@ -80,6 +82,5 @@ export {
   ZegoAcceptInvitationButton,
   ZegoRefuseInvitationButton,
   ZegoUIKitPluginType,
-  ZegoUIKitInvitationService,
   ZegoInvitationConnectionState,
 };

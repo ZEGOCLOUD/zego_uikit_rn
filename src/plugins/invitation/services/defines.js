@@ -1,11 +1,9 @@
-export class ZegoInvitationServiceResult {
+export class ZegoInvitationImplResult {
   code = '';
   message = '';
-  result = '';
-  constructor(code = '', message = '', result = '') {
+  constructor(code = '', message = '') {
     this.code = code;
     this.message = message;
-    this.result = result;
   }
 }
 
@@ -14,4 +12,10 @@ export const ZegoInvitationConnectionState = {
   connecting: 1,
   connected: 2,
   reconnecting: 3,
+};
+
+export const ZegoLiveAudioRoomRole = {
+  host: 0,
+  speaker: 1,
+  audience: 2,
 };
