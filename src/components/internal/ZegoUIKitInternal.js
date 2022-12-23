@@ -28,6 +28,9 @@ var _onAudioVideoAvailableCallbackMap = {};
 var _onAudioVideoUnavailableCallbackMap = {};
 var _onInRoomMessageReceivedCallbackMap = {};
 var _onInRoomMessageSentCallbackMap = {};
+var _onRoomPropertyUpdatedCallbackMap = {};
+var _onRoomPropertiesFullUpdatedCallbackMap = {};
+
 
 var _localCoreUser = _createCoreUser('', '', '', {});
 var _streamCoreUserMap = {}; // <streamID, CoreUser>
@@ -35,6 +38,7 @@ var _coreUserMap = {}; // <userID, CoreUser>
 var _qualityUpdateLogCounter = 0;
 
 var _inRoomMessageList = [];
+var _roomProperties = {};
 
 function _resetData() {
   zloginfo('Reset all data.');
@@ -355,6 +359,25 @@ function _onRequireNewToken() {
     }
   });
 }
+function _onRoomExtraInfoUpdate(roomID, roomExtraInfoList) {
+  const updateKeys = [];
+  const oldRoomProperties = JSON.parse(JSON.stringify(_roomProperties));
+  roomExtraInfoList.forEach(({ key, updateTime, updateUser, value }) => {
+    if (key === 'extra_info') {
+      const roomProperties = JSON.parse(value);
+      Object.keys(roomProperties).forEach((propertyKey) => {
+        if (oldRoomProperties[propertyKey] !== roomProperties[propertyKey]) {
+          updateKeys.push(propertyKey);
+          _roomProperties[propertyKey] = roomProperties[propertyKey];
+          _notifyRoomPropertyUpdate(propertyKey, oldRoomProperties[propertyKey], roomProperties[propertyKey]);
+        }
+      })
+    }
+  });
+  if (updateKeys.length > 0) {
+    _notifyRoomPropertiesFullUpdate(updateKeys, oldRoomProperties, JSON.parse(JSON.stringify(_roomProperties)));
+  }
+}
 function _registerEngineCallback() {
   zloginfo('Register callback for ZegoExpressEngine...');
   ZegoExpressEngine.instance().on(
@@ -477,6 +500,9 @@ function _registerEngineCallback() {
       _onRequireNewToken();
     }
   );
+  ZegoExpressEngine.instance().on('roomExtraInfoUpdate', (roomID, roomExtraInfoList) => {
+    _onRoomExtraInfoUpdate(roomID, roomExtraInfoList);
+  });
 }
 function _unregisterEngineCallback() {
   zloginfo('Unregister callback from ZegoExpressEngine...');
@@ -492,6 +518,7 @@ function _unregisterEngineCallback() {
   ZegoExpressEngine.instance().off('roomStateChanged');
   ZegoExpressEngine.instance().off('audioRouteChange');
   ZegoExpressEngine.instance().off('IMRecvBroadcastMessage');
+  ZegoExpressEngine.instance().off('roomExtraInfoUpdate');
 }
 function _notifyUserCountOrPropertyChanged(type) {
   const msg = [
@@ -631,6 +658,20 @@ function _notifySoundLevelUpdate(userID, soundLevel) {
   Object.keys(_onSoundLevelUpdateCallbackMap).forEach((callbackID) => {
     if (_onSoundLevelUpdateCallbackMap[callbackID]) {
       _onSoundLevelUpdateCallbackMap[callbackID](userID, soundLevel);
+    }
+  });
+}
+function _notifyRoomPropertyUpdate(key, oldValue, value) {
+  Object.keys(_onRoomPropertyUpdatedCallbackMap).forEach((callbackID) => {
+    if (_onRoomPropertyUpdatedCallbackMap[callbackID]) {
+      _onRoomPropertyUpdatedCallbackMap[callbackID](key, oldValue, value);
+    }
+  });
+}
+function _notifyRoomPropertiesFullUpdate(keys, oldRoomProperties, roomProperties) {
+  Object.keys(_onRoomPropertiesFullUpdatedCallbackMap).forEach((callbackID) => {
+    if (_onRoomPropertiesFullUpdatedCallbackMap[callbackID]) {
+      _onRoomPropertiesFullUpdatedCallbackMap[callbackID](keys, oldRoomProperties, roomProperties);
     }
   });
 }
@@ -983,6 +1024,14 @@ export default {
       _onAudioVideoUnavailableCallbackMap[callbackID] = callback;
     }
   },
+  startPlayingAllAudioVideo() {
+    ZegoExpressEngine.instance().muteAllPlayStreamAudio(false);
+    ZegoExpressEngine.instance().muteAllPlayStreamVideo(false);
+  },
+  stopPlayingAllAudioVideo() {
+    ZegoExpressEngine.instance().muteAllPlayStreamAudio(true);
+    ZegoExpressEngine.instance().muteAllPlayStreamVideo(true);
+  },
 
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Room <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
   joinRoom(roomID, token) {
@@ -1070,6 +1119,99 @@ export default {
       _onRequireNewTokenCallbackMap[callbackID] = callback;
     }
   },
+  setRoomProperty(key, value) {
+    if (!_isRoomConnected) {
+      zlogerror('You need to join the room before using this interface!');
+      return;
+    }
+    if (_roomProperties[key] === value) {
+      return;
+    }
+    const oldValue = _roomProperties[key];
+    const oldRoomProperties = JSON.parse(JSON.stringify(_roomProperties));
+    _roomProperties[key] = value;
+    const extraInfo = JSON.stringify(_roomProperties);
+    ZegoExpressEngine.instance().setRoomExtraInfo(_currentRoomID, 'extra_info', extraInfo).then(({ errorCode }) => {
+      if (errorCode === 0) {
+        // Notify
+        _notifyRoomPropertyUpdate(key, oldValue, value);
+        _notifyRoomPropertiesFullUpdate([key], oldRoomProperties, JSON.parse(extraInfo));
+      } else {
+        // Restore
+        _roomProperties = JSON.parse(JSON.stringify(oldRoomProperties));
+        zlogwarning('[setRoomProperty]Set failed, errorCode: ', errorCode);
+      }
+    }).catch((error) => {
+      // Restore
+      _roomProperties = JSON.parse(JSON.stringify(oldRoomProperties));
+      zlogerror('[setRoomProperty]Set error', error);
+    });
+  },
+  updateRoomProperties(newRoomProperties) {
+    if (!_isRoomConnected) {
+      zlogerror('You need to join the room before using this interface!');
+      return;
+    }
+    const updateKeys = [];
+    const oldRoomProperties = JSON.parse(JSON.stringify(_roomProperties));
+    Object.keys(newRoomProperties).forEach((key) => {
+      if (oldRoomProperties[key] !== newRoomProperties[key]) {
+        updateKeys.push(key);
+        _roomProperties[key] = newRoomProperties[key];
+      }
+    })
+    const extraInfo = JSON.stringify(_roomProperties);
+    ZegoExpressEngine.instance().setRoomExtraInfo(_currentRoomID, 'extra_info', extraInfo).then(({ errorCode }) => {
+      if (errorCode === 0) {
+        // Notify
+        updateKeys.forEach((updateKey) => {
+          const oldValue = oldRoomProperties[updateKey];
+          const value = newRoomProperties[updateKey];
+          _notifyRoomPropertyUpdate(updateKey, oldValue, value);
+        })
+        _notifyRoomPropertiesFullUpdate(updateKeys, oldRoomProperties, JSON.parse(extraInfo));
+      } else {
+        // Restore
+        _roomProperties = JSON.parse(JSON.stringify(oldRoomProperties));
+        zlogwarning('[updateRoomProperties]Update failed, errorCode: ', errorCode);
+      }
+    }).catch((error) => {
+      // Restore
+      _roomProperties = JSON.parse(JSON.stringify(oldRoomProperties));
+      zlogerror('[updateRoomProperties]Update error', error);
+    });
+  },
+  getRoomProperties() {
+    return _roomProperties;
+  },
+  onRoomPropertyUpdated() {
+    if (typeof callback !== 'function') {
+      if (callbackID in _onRoomPropertyUpdatedCallbackMap) {
+        zloginfo(
+          '[onRoomPropertyUpdated] Remove callback for: [',
+          callbackID,
+          '] because callback is not a valid function!'
+        );
+        delete _onRoomPropertyUpdatedCallbackMap[callbackID];
+      }
+    } else {
+      _onRoomPropertyUpdatedCallbackMap[callbackID] = callback;
+    }
+  },
+  onRoomPropertiesFullUpdated() {
+    if (typeof callback !== 'function') {
+      if (callbackID in _onRoomPropertiesFullUpdatedCallbackMap) {
+        zloginfo(
+          '[onRoomPropertiesFullUpdated] Remove callback for: [',
+          callbackID,
+          '] because callback is not a valid function!'
+        );
+        delete _onRoomPropertiesFullUpdatedCallbackMap[callbackID];
+      }
+    } else {
+      _onRoomPropertiesFullUpdatedCallbackMap[callbackID] = callback;
+    }
+  },   
 
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> User <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
   connectUser(userID, userName) {
