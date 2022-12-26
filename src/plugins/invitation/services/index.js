@@ -12,6 +12,7 @@ const _onRoomPropertiesFullUpdatedCallbackMap = {};
 const _usersInRoomAttributes = new Map(); // <userID, attributes> attributes={ string, string }
 let _roomAttributes = {};
 
+
 // ------- live audio room ------
 const _queryUsersInRoomAttributesIteration = (
   nextFlag = '',
@@ -119,7 +120,16 @@ const ZegoUIKitSignalingPluginImpl = {
     }
     return ZegoUIKitSignalingPlugin.getInstance().invoke('logout');
   },
-  sendInvitation: (invitees, timeout, type, data) => {
+  enableNotifyWhenAppRunningInBackgroundOrQuit: (enable) => {
+    if (!ZegoUIKitSignalingPlugin) {
+      zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
+      return Promise.reject();
+    }
+    return ZegoUIKitSignalingPlugin.getInstance().invoke('enableNotifyWhenAppRunningInBackgroundOrQuit', {
+      enable,
+    });
+  },
+  sendInvitation: (invitees, timeout, type, data, notificationConfig) => {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return Promise.reject();
@@ -130,6 +140,7 @@ const ZegoUIKitSignalingPluginImpl = {
       timeout,
       type,
       data,
+      notificationConfig
     });
   },
   cancelInvitation: (invitees, data) => {
