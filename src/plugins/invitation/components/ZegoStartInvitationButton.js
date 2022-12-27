@@ -40,7 +40,7 @@ export default function ZegoStartInvitationButton(props) {
     return renderView;
   };
   const onButtonPress = () => {
-    ZegoUIKitInvitationService.sendInvitation(invitees, timeout, type, data, {resourcesID, title: notificationTitle, message: notificationMessage})
+    ZegoUIKitInvitationService.sendInvitation(invitees, timeout, type, data, { resourcesID, title: notificationTitle, message: notificationMessage })
       .then(({ code, message, callID, errorInvitees }) => {
         zloginfo(
           `[Components]Send invitation success, code: ${code}, message: ${message}, errorInvitees: ${errorInvitees}`
@@ -55,7 +55,10 @@ export default function ZegoStartInvitationButton(props) {
               index !== -1 && inviteesBackup.splice(index, 1);
             });
             onPressed({
-              callID,
+              invitationID: callID,
+              errorCode: code,
+              errorMessage: message,
+              errorInvitees,
               invitees: inviteesBackup,
             });
           }

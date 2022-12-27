@@ -749,6 +749,18 @@ export default {
     // Solve the problem of repeated initialization
     if (_isEngineCreated()) {
       zloginfo('Create ZegoExpressEngine succeed already!');
+
+      
+      _unregisterEngineCallback();
+      _registerEngineCallback();
+
+      Object.keys(_onSDKConnectedCallbackMap).forEach((callbackID) => {
+        // TODO cause  WARN  Possible Unhandled Promise Rejection (id: 56)
+        if (_onSDKConnectedCallbackMap[callbackID]) {
+          _onSDKConnectedCallbackMap[callbackID]();
+        }
+      });
+
       return Promise.resolve();
     }
     return new Promise((resolve, reject) => {
@@ -1039,6 +1051,9 @@ export default {
           _localCoreUser.streamID = _getPublishStreamID();
           _coreUserMap[_localCoreUser.userID] = _localCoreUser;
           _notifyUserCountOrPropertyChanged(ZegoChangedCountOrProperty.userAdd);
+
+          _tryStartPublishStream()
+
           resolve();
         })
         .catch((error) => {

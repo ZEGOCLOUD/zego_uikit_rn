@@ -1,5 +1,5 @@
 const ZegoInvitationType = {
-  videoCall: 0,
-  voiceCall: 1,
+  voiceCall: 0,
+  videoCall: 1,
 };
 export default ZegoInvitationType;
