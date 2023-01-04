@@ -1,13 +1,13 @@
 import { ZegoInvitationConnectionState } from './services/defines';
 import ZegoUIKitSignalingPluginImpl from './services';
-import ZegoStartInvitationButton from './components/ZegoStartInvitationButton';
+import ZegoSendInvitationButton from './components/ZegoSendInvitationButton';
 import ZegoCancelInvitationButton from './components/ZegoCancelInvitationButton';
 import ZegoAcceptInvitationButton from './components/ZegoAcceptInvitationButton';
 import ZegoRefuseInvitationButton from './components/ZegoRefuseInvitationButton';
 
 export {
   ZegoInvitationConnectionState,
-  ZegoStartInvitationButton,
+  ZegoSendInvitationButton,
   ZegoCancelInvitationButton,
   ZegoAcceptInvitationButton,
   ZegoRefuseInvitationButton,

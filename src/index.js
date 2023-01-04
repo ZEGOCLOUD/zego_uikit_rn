@@ -19,7 +19,7 @@ import ZegoMemberList from './components/in_room_member/ZegoMemberList';
 import { ZegoAudioVideoResourceMode } from './components/internal/defines';
 import ZegoUIKitSignalingPluginImpl, {
   ZegoInvitationConnectionState,
-  ZegoStartInvitationButton,
+  ZegoSendInvitationButton,
   ZegoCancelInvitationButton,
   ZegoAcceptInvitationButton,
   ZegoRefuseInvitationButton,
@@ -80,7 +80,7 @@ export {
   ZegoInRoomMessageInput,
   ZegoInRoomMessageView,
   ZegoMemberList,
-  ZegoStartInvitationButton,
+  ZegoSendInvitationButton,
   ZegoCancelInvitationButton,
   ZegoAcceptInvitationButton,
   ZegoRefuseInvitationButton,
