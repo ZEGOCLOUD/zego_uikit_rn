@@ -18,7 +18,7 @@ import ZegoInRoomMessageView from './components/in_room_message/ZegoInRoomMessag
 import ZegoMemberList from './components/in_room_member/ZegoMemberList';
 import ZegoUIKitSignalingPluginImpl, {
   ZegoInvitationConnectionState,
-  ZegoStartInvitationButton,
+  ZegoSendInvitationButton,
   ZegoCancelInvitationButton,
   ZegoAcceptInvitationButton,
   ZegoRefuseInvitationButton,
@@ -77,7 +77,7 @@ export {
   ZegoInRoomMessageInput,
   ZegoInRoomMessageView,
   ZegoMemberList,
-  ZegoStartInvitationButton,
+  ZegoSendInvitationButton,
   ZegoCancelInvitationButton,
   ZegoAcceptInvitationButton,
   ZegoRefuseInvitationButton,
