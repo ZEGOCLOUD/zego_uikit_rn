@@ -11,7 +11,6 @@ import ZegoUIKitInternal from '../internal/ZegoUIKitInternal';
 import ZegoMicrophoneStateIcon from '../audio_video/ZegoMicrophoneStateIcon';
 import ZegoCameraStateIcon from '../audio_video/ZegoCameraStateIcon';
 import Delegate from 'react-delegate-component';
-import { ZegoLiveAudioRoomRole } from '../../plugins/invitation/services/defines';
 
 export default function ZegoMemberList(props) {
   const { showMicrophoneState, showCameraState, itemBuilder, sortUserList } =
@@ -51,7 +50,6 @@ export default function ZegoMemberList(props) {
 
   const refreshMemberList = () => {
     let memberList = ZegoUIKitInternal.getAllUsers();
-    console.warn('===============refreshMemberList==============', memberList);
     if (typeof sortUserList === 'function') {
       const temp = sortUserList(memberList) || memberList;
       setMemberList((arr) => [...temp]);
@@ -107,12 +105,6 @@ export default function ZegoMemberList(props) {
     ) : (
       <View />
     );
-  const itemBuilderView = (item) =>
-    itemBuilder ? (
-      <Delegate to={itemBuilder} props={{ userInfo: item }} />
-    ) : (
-      <View />
-    );
 
   const roleDescription = (item) => {
     console.warn('===============roleDescription==============', item);
@@ -142,7 +134,7 @@ export default function ZegoMemberList(props) {
         </View>
       </View>
     ) : (
-      itemBuilderView(item)
+      <Delegate to={itemBuilder} props={{ userInfo: item }} />
     );
 
   useEffect(() => {

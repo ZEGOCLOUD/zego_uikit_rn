@@ -38,7 +38,6 @@ export default function ZegoVideoView(props) {
   useEffect(() => {
     const user = ZegoUIKitInternal.getUser(userID);
     if (user) {
-      console.log('=========ZegoVideoView=========', user);
       setUserInfo(user);
       setPropsData({ userInfo: user });
       setIsCameraOn(user.isCameraDeviceOn);
@@ -51,7 +50,6 @@ export default function ZegoVideoView(props) {
     ZegoUIKitInternal.onSDKConnected(callbackID, () => {
       const user = ZegoUIKitInternal.getUser(userID);
       if (user) {
-        console.log('=========ZegoVideoView=========', user);
         setUserInfo(user);
         setPropsData({ userInfo: user });
         setIsCameraOn(user.isCameraDeviceOn);
@@ -60,7 +58,6 @@ export default function ZegoVideoView(props) {
     ZegoUIKitInternal.onUserInfoUpdate(callbackID, (info) => {
       if (info.userID == userID) {
         setIsCameraOn(info.isCameraDeviceOn);
-        console.log('=========ZegoVideoView=========', info);
         setUserInfo(info);
         setPropsData({ userInfo: info });
       }

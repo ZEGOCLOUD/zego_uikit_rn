@@ -13,9 +13,3 @@ export const ZegoInvitationConnectionState = {
   connected: 2,
   reconnecting: 3,
 };
-
-export const ZegoLiveAudioRoomRole = {
-  host: 0,
-  speaker: 1,
-  audience: 2,
-};

@@ -1,170 +1,137 @@
 import React, { useEffect, useState } from "react";
 import ZegoUIKitInternal from "../../internal/ZegoUIKitInternal";
 import ZegoAudioVideoView from "../../audio_video/ZegoAudioVideoView";
-import { StyleSheet, View, TouchableOpacity, Text } from 'react-native'
+import { StyleSheet, View } from 'react-native'
+import { ZegoViewPostion } from './defines'
 
-// enum ZegoViewPostion {
-//     topLeft = 0,
-//     topRight = 1,
-//     bottomLeft = 2,
-//     bottomRight = 3
-//     }
 export default function PictureInPictureLayout(props) {
-    const { config = {}, foregroundBuilder, audioVideoConfig = {} } = props;
+    const { config = {}, foregroundBuilder, audioVideoConfig = {}, sortAudioVideo } = props;
     const {
         isSmallViewDraggable = false, // TODO
-        showMyViewWithVideoOnly = false,
         smallViewBackgroundColor = '',
         largeViewBackgroundColor = '',
         smallViewBackgroundImage = '',
         largeViewBackgroundImage = '',
-        smallViewPostion = 1,
+        smallViewPostion = ZegoViewPostion.topRight,
         switchLargeOrSmallViewByClick = true,
+        smallViewSize = { width: 105, height: 169 },
+        spacingBetweenSmallViews = 8,
     } = config;
     const {
         useVideoViewAspectFill = false,
         showSoundWavesInAudioMode = true,
     } = audioVideoConfig;
 
-    const [localUserID, setLocalUserID] = useState('');
-    const [remoteUserID, setRemoteUserID] = useState('');
-    const [showMeOnSmallView, setShowMeOnSmallView] = useState(true);
+    const [globalAudioVideoUserList, setGlobalAudioVideoUserList] = useState([]);
 
     useEffect(() => {
         const callbackID = 'PictureInPictureLayout' + String(Math.floor(Math.random() * 10000));
-        ZegoUIKitInternal.onSDKConnected(callbackID, () => {
-            setLocalUserID(ZegoUIKitInternal.getLocalUserInfo().userID);
+        ZegoUIKitInternal.onAudioVideoAvailable(callbackID, (userList) => {
+            console.log('<<<<<<<<<<<<<< onAudioVideoAvailable', userList)
+            userList.forEach((user) => {
+                const result = globalAudioVideoUserList.find((item) => user.userID === item.userID);
+                if (!result) {
+                    globalAudioVideoUserList.push(user);
+                    setGlobalAudioVideoUserList((arr) => [...(sortAudioVideo ? sortAudioVideo(globalAudioVideoUserList) : globalAudioVideoUserList)]);
+                }
+            });
+            console.log('<<<<<<<<<<<<<< globalAudioVideoUserList', globalAudioVideoUserList);
         });
-        ZegoUIKitInternal.onRoomStateChanged(callbackID, (reason, errorCode, extendedData) => {
-            if (reason == 1 || reason == 4) {
-                setLocalUserID(ZegoUIKitInternal.getLocalUserInfo().userID);
-            } else if (reason == 2 || reason == 5 || reason == 6 || reason == 7) {
-                // ZegoRoomStateChangedReasonLoginFailed
-                // ZegoRoomStateChangedReasonReconnectFailed
-                // ZegoRoomStateChangedReasonKickOut
-                // ZegoRoomStateChangedReasonLogout
-                // ZegoRoomStateChangedReasonLogoutFailed
-                setLocalUserID('');
-                setRemoteUserID('');
-            }
-        })
-        ZegoUIKitInternal.onUserJoin(callbackID, (userList) => {
-            console.log('>>>>>>>>>>> join', userList)
-            if (userList.length == 1) {
-                setRemoteUserID(userList[0].userID);
-            } else {
-                //TODO
-            }
-        });
-        ZegoUIKitInternal.onUserLeave(callbackID, (userList) => {
-            console.log('<<<<<<<<<<<<<< leave', userList)
-            if (userList.length == 1) {
-                setRemoteUserID('');
-            } else {
-                //TODO
-            }
+        ZegoUIKitInternal.onAudioVideoUnavailable(callbackID, (userList) => {
+            console.log('<<<<<<<<<<<<<< onAudioVideoUnavailable', userList)
+            userList.forEach((user) => {
+                const result = globalAudioVideoUserList.findIndex((item) => user.userID === item.userID);
+                if (result !== -1) {
+                    globalAudioVideoUserList.splice(result, 1);
+                    setGlobalAudioVideoUserList((arr) => [...(sortAudioVideo ? sortAudioVideo(globalAudioVideoUserList) : globalAudioVideoUserList)]);
+                }
+            });
+            console.log('<<<<<<<<<<<<<< globalAudioVideoUserList', globalAudioVideoUserList);
         });
         return () => {
             ZegoUIKitInternal.onSDKConnected(callbackID);
             ZegoUIKitInternal.onRoomStateChanged(callbackID);
             ZegoUIKitInternal.onUserJoin(callbackID);
             ZegoUIKitInternal.onUserLeave(callbackID);
+            ZegoUIKitInternal.onAudioVideoAvailable(callbackID);
+            ZegoUIKitInternal.onAudioVideoUnavailable(callbackID);
         }
     }, [])
-    /*
-    enum {
-        topLeft = 0,
-        topRight = 1,
-        bottomLeft = 2,
-        bottomRight = 3
-    }
-    */
     const getSmallViewPostStyle = () => {
-        const styleList = [styles.smallViewPostTopLeft, styles.smallViewPostTopRight, styles.smallViewPostBottomLeft, styles.smallViewPostBottomRgith];
-        if (smallViewPostion >= 0 && smallViewPostion <= 3) {
+        const styleList = [styles.smallViewPostTopLeft, styles.smallViewPostTopRight, styles.smallViewPostBottomLeft, styles.smallViewPostBottomRight];
+        if (smallViewPostion >= ZegoViewPostion.topLeft && smallViewPostion <= ZegoViewPostion.bottomRight) {
             return styleList[smallViewPostion];
         } else {
             return styles.smallViewPostTopLeft;
         }
     }
-    const getSmallViewBorderStyle = () => {
-        if (showMeOnSmallView) {
-            return localUserID ? styles.smallViewBorder : ''
-        } else {
-            return remoteUserID ? styles.smallViewBorder : ''
-        }
-    }
-    const switchLargeOrSmallView = () => {
+    const switchLargeOrSmallView = (index, user) => {
+        console.log('###########switchLargeOrSmallView', index, user, globalAudioVideoUserList, switchLargeOrSmallViewByClick);
         if (switchLargeOrSmallViewByClick) {
-            setShowMeOnSmallView(!showMeOnSmallView);
+            globalAudioVideoUserList.splice(index + 1, 1);
+            globalAudioVideoUserList.unshift(user);
+            setGlobalAudioVideoUserList((arr) => [...globalAudioVideoUserList]);
         }
     }
 
     return (<View style={styles.container}>
-
-        <View  pointerEvents='auto' onTouchStart={switchLargeOrSmallView} style={[styles.smallView, getSmallViewPostStyle(), getSmallViewBorderStyle()]}>
-            {showMeOnSmallView ?
-                (localUserID ?
-                    <ZegoAudioVideoView
-                        key={localUserID}
-                        userID={localUserID}
-                        audioViewBackgroudColor={smallViewBackgroundColor}
-                        audioViewBackgroudImage={smallViewBackgroundImage}
-                        showSoundWave={showSoundWavesInAudioMode}
-                        useVideoViewAspectFill={useVideoViewAspectFill}
-                        foregroundBuilder={foregroundBuilder}
-                    /> :
-                    <View />) :
-                (remoteUserID ?
-                    <ZegoAudioVideoView
-                        key={remoteUserID}
-                        userID={remoteUserID}
-                        audioViewBackgroudColor={smallViewBackgroundColor}
-                        audioViewBackgroudImage={smallViewBackgroundImage}
-                        showSoundWave={showSoundWavesInAudioMode}
-                        useVideoViewAspectFill={useVideoViewAspectFill}
-                        foregroundBuilder={foregroundBuilder}
-                    /> :
-                    <View />)
+        <View style={[styles.smallViewContainer, getSmallViewPostStyle()]}>
+            {
+                globalAudioVideoUserList.slice(1, 4).map((user, index) => <View
+                    key={user.userID}
+                    pointerEvents='auto'
+                    onTouchStart={switchLargeOrSmallView.bind(this, index, user)}
+                    style={[
+                        styles.smallView,
+                        styles.smallViewBorder,
+                        getSmallViewSize(smallViewSize.width, smallViewSize.height).smallViewSize,
+                        getSmallViewSpacing(spacingBetweenSmallViews).smallViewSpacing,
+                    ]}>
+                        <ZegoAudioVideoView
+                            key={user.userID}
+                            userID={user.userID}
+                            audioViewBackgroudColor={smallViewBackgroundColor}
+                            audioViewBackgroudImage={smallViewBackgroundImage}
+                            showSoundWave={showSoundWavesInAudioMode}
+                            useVideoViewAspectFill={useVideoViewAspectFill}
+                            foregroundBuilder={foregroundBuilder}
+                        />
+                </View>)
             }
         </View>
         <View style={styles.bigView}>
-            {showMeOnSmallView ?
-                (remoteUserID ?
-                    <ZegoAudioVideoView
-                        key={remoteUserID}
-                        userID={remoteUserID}
-                        audioViewBackgroudColor={largeViewBackgroundColor}
-                        audioViewBackgroudImage={largeViewBackgroundImage}
-                        showSoundWave={showSoundWavesInAudioMode}
-                        useVideoViewAspectFill={useVideoViewAspectFill}
-                        foregroundBuilder={foregroundBuilder}
-                    /> :
-                    <View />) :
-                (localUserID ?
-                    <ZegoAudioVideoView
-                        key={localUserID}
-                        userID={localUserID}
-                        audioViewBackgroudColor={largeViewBackgroundColor}
-                        audioViewBackgroudImage={largeViewBackgroundImage}
-                        showSoundWave={showSoundWavesInAudioMode}
-                        useVideoViewAspectFill={useVideoViewAspectFill}
-                        foregroundBuilder={foregroundBuilder}
-                    /> :
-                    <View />)
+            {globalAudioVideoUserList[0] ?
+                <ZegoAudioVideoView
+                    key={globalAudioVideoUserList[0].userID}
+                    userID={globalAudioVideoUserList[0].userID}
+                    audioViewBackgroudColor={largeViewBackgroundColor}
+                    audioViewBackgroudImage={largeViewBackgroundImage}
+                    showSoundWave={showSoundWavesInAudioMode}
+                    useVideoViewAspectFill={useVideoViewAspectFill}
+                    foregroundBuilder={foregroundBuilder}
+                /> :
+                <View />
             }
         </View>
     </View>)
 }
 
+const getSmallViewSize = (width, height) => StyleSheet.create({
+    smallViewSize: {
+        width,
+        height,
+    },
+});
+const getSmallViewSpacing = (margin) => StyleSheet.create({
+    smallViewSpacing: {
+        marginBottom: margin,
+    },
+});
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         width: '100%',
         height: '100%',
-    },
-    emptyView: {
-        backgroundColor: '#4A4B4D'
     },
     bigView: {
         flex: 1,
@@ -174,14 +141,12 @@ const styles = StyleSheet.create({
         backgroundColor: '#4A4B4D',
         zIndex: 1,
     },
-    smallView: {
+    smallViewContainer: {
         flex: 1,
-        height: 169,
-        width: 95,
         position: 'absolute',
-        top: 70,
-        right: 12,
-        zIndex: 2,
+        zIndex: 12,
+    },
+    smallView: {
         borderRadius: 10,
         overflow: 'hidden',
         backgroundColor: '#4A4B4D',
@@ -202,7 +167,7 @@ const styles = StyleSheet.create({
         bottom: 70,
         left: 12,
     },
-    smallViewPostBottomRgith: {
+    smallViewPostBottomRight: {
         bottom: 70,
         right: 12,
     }

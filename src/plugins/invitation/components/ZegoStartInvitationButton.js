@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { Fragment } from 'react';
+import { Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import ZegoUIKitInvitationService from '../services';
 import ZegoInvitationType from './ZegoInvitationType';
 import { zloginfo, zlogerror } from '../../../utils/logger';
@@ -13,6 +13,14 @@ export default function ZegoStartInvitationButton(props) {
     data,
     timeout = 60,
     onPressed,
+    onWillPressed,
+    backgroundColor = '#F3F4F7',
+    fontSize = 16,
+    color = '#2A2A2A',
+    width = 42,
+    height = 42,
+    borderRadius = 1000,
+    verticalLayout, // Default row layout, no layout parameters default to precedence icon
   } = props;
   const getImageSourceByPath = () => {
     if (type === ZegoInvitationType.videoCall) {
@@ -23,20 +31,50 @@ export default function ZegoStartInvitationButton(props) {
   };
   const getRenderView = () => {
     let renderView;
-    if (icon) {
-      renderView = <Image resizeMode="contain" source={icon} />;
-    } else {
-      if (!text) {
-        renderView = (
-          <Image resizeMode="contain" source={getImageSourceByPath()} />
-        );
+    if (verticalLayout === undefined) {
+      // Choose between icon and text
+      if (icon) {
+        renderView = <Image resizeMode="contain" source={icon} />;
       } else {
-        renderView = <View style={styles.text}>text</View>;
+        if (!text) {
+          renderView = (
+            <Image resizeMode="contain" source={getImageSourceByPath()} />
+          );
+        } else {
+          renderView = <Text style={getCustomTextStyle(fontSize, color).text}>{text}</Text>;
+        }
       }
+    } else {
+      // Both icon and text exist
+      renderView = <Fragment>
+        <Image resizeMode="contain" source={icon || getImageSourceByPath()} style={{marginRight: 6}}/>
+        <Text style={getCustomTextStyle(fontSize, color).text}>{text}</Text>
+      </Fragment>
     }
     return renderView;
   };
+  const getCustomTextStyle = (fontSize, color) => StyleSheet.create({
+    text: {
+      fontSize,
+      color,
+    },
+  });
+  const getCustomContainerStyle = (width, height, borderRadius, backgroundColor, verticalLayout) => StyleSheet.create({
+    customContainer: {
+      flexDirection: verticalLayout ? 'column' : 'row',
+      width,
+      height,
+      backgroundColor,
+      borderRadius,
+    },
+  });
+
   const onButtonPress = () => {
+    const canSendInvitation = typeof onWillPressed === 'function' ? onWillPressed() : true;
+    if (!canSendInvitation) return;
+    zloginfo(
+      `[Components]Send invitation start, invitees: ${invitees}, timeout: ${timeout}, type: ${type}, data: ${data}`
+    );
     ZegoUIKitInvitationService.sendInvitation(invitees, timeout, type, data)
       .then(({ code, message, callID, errorInvitees }) => {
         zloginfo(
@@ -65,7 +103,13 @@ export default function ZegoStartInvitationButton(props) {
       });
   };
   return (
-    <TouchableOpacity style={styles.container} onPress={onButtonPress}>
+    <TouchableOpacity
+      style={[
+        styles.container,
+        getCustomContainerStyle(width, height, borderRadius, backgroundColor, verticalLayout).customContainer
+      ]}
+      onPress={onButtonPress}
+    >
       {getRenderView()}
     </TouchableOpacity>
   );
@@ -73,15 +117,7 @@ export default function ZegoStartInvitationButton(props) {
 
 const styles = StyleSheet.create({
   container: {
-    width: 42,
-    height: 42,
-    backgroundColor: '#F3F4F7',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 1000,
-  },
-  text: {
-    fontSize: 16,
-    color: '#2A2A2A',
   },
 });
