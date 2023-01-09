@@ -49,6 +49,7 @@ export default function ZegoMemberList(props) {
   const [memberList, setMemberList] = useState([]);
 
   const refreshMemberList = () => {
+    console.log('############refreshMemberList')
     let memberList = ZegoUIKitInternal.getAllUsers();
     if (typeof sortUserList === 'function') {
       const temp = sortUserList(memberList) || memberList;
@@ -175,10 +176,20 @@ export default function ZegoMemberList(props) {
         setMemberList((arr) => [...userList]);
       }
     });
+    ZegoUIKitInternal.onMemberListForceSort(callbackID, (userList) => {
+      console.log('===============onMemberListForceSort==============', userList)
+      if (typeof sortUserList === 'function') {
+        const temp = sortUserList(userList) || userList;
+        setMemberList((arr) => [...temp]);
+      } else {
+        // Don't deal with
+      }
+    });
     return () => {
       ZegoUIKitInternal.onSDKConnected(callbackID);
       ZegoUIKitInternal.onRoomStateChanged(callbackID);
       ZegoUIKitInternal.onUserCountOrPropertyChanged(callbackID);
+      ZegoUIKitInternal.onMemberListForceSort(callbackID);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

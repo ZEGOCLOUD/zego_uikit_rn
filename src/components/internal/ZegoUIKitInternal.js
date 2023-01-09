@@ -30,7 +30,8 @@ var _onInRoomMessageReceivedCallbackMap = {};
 var _onInRoomMessageSentCallbackMap = {};
 var _onRoomPropertyUpdatedCallbackMap = {};
 var _onRoomPropertiesFullUpdatedCallbackMap = {};
-
+// Force update component callback
+var _onMemberListForceSortCallbackMap = {};
 
 var _localCoreUser = _createCoreUser('', '', '', {});
 var _streamCoreUserMap = {}; // <streamID, CoreUser>
@@ -1398,5 +1399,33 @@ export default {
   },
   notifyUserInfoUpdate(userID) {
     _notifyUserInfoUpdate(_coreUserMap[userID]);
+  },
+  // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Force update component <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+  forceSortMemberList() {
+    zloginfo('[forceSortMemberList callback]');
+    const userList = Object.values(_coreUserMap)
+      .sort((user1, user2) => {
+        return user2.joinTime - user1.joinTime;
+      })
+      .map((user) => _createPublicUser(user));
+    Object.keys(_onMemberListForceSortCallbackMap).forEach((callbackID) => {
+      if (_onMemberListForceSortCallbackMap[callbackID]) {
+        _onMemberListForceSortCallbackMap[callbackID](userList);
+      }
+    });
+  },
+  onMemberListForceSort(callbackID, callback) {
+    if (typeof callback !== 'function') {
+      if (callbackID in _onMemberListForceSortCallbackMap) {
+        zloginfo(
+          '[onMemberListForceSort] Remove callback for: [',
+          callbackID,
+          '] because callback is not a valid function!'
+        );
+        delete _onMemberListForceSortCallbackMap[callbackID];
+      }
+    } else {
+      _onMemberListForceSortCallbackMap[callbackID] = callback;
+    }
   },
 };
