@@ -593,7 +593,7 @@ const ZegoUIKitSignalingPluginImpl = {
         });
     });
   },
-  onRoomPropertyUpdated(callbackID, callback) {
+  onRoomPropertiesUpdated(callbackID, callback) {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return;

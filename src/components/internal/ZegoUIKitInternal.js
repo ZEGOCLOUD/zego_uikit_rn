@@ -28,7 +28,7 @@ var _onAudioVideoAvailableCallbackMap = {};
 var _onAudioVideoUnavailableCallbackMap = {};
 var _onInRoomMessageReceivedCallbackMap = {};
 var _onInRoomMessageSentCallbackMap = {};
-var _onRoomPropertyUpdatedCallbackMap = {};
+var _onRoomPropertiesUpdatedCallbackMap = {};
 var _onRoomPropertiesFullUpdatedCallbackMap = {};
 // Force update component callback
 var _onMemberListForceSortCallbackMap = {};
@@ -687,9 +687,9 @@ function _notifySoundLevelUpdate(userID, soundLevel) {
   });
 }
 function _notifyRoomPropertyUpdate(key, oldValue, value) {
-  Object.keys(_onRoomPropertyUpdatedCallbackMap).forEach((callbackID) => {
-    if (_onRoomPropertyUpdatedCallbackMap[callbackID]) {
-      _onRoomPropertyUpdatedCallbackMap[callbackID](key, oldValue, value);
+  Object.keys(_onRoomPropertiesUpdatedCallbackMap).forEach((callbackID) => {
+    if (_onRoomPropertiesUpdatedCallbackMap[callbackID]) {
+      _onRoomPropertiesUpdatedCallbackMap[callbackID](key, oldValue, value);
     }
   });
 }
@@ -1253,18 +1253,18 @@ export default {
   getRoomProperties() {
     return _roomProperties;
   },
-  onRoomPropertyUpdated(callbackID, callback) {
+  onRoomPropertiesUpdated(callbackID, callback) {
     if (typeof callback !== 'function') {
-      if (callbackID in _onRoomPropertyUpdatedCallbackMap) {
+      if (callbackID in _onRoomPropertiesUpdatedCallbackMap) {
         zloginfo(
-          '[onRoomPropertyUpdated] Remove callback for: [',
+          '[onRoomPropertiesUpdated] Remove callback for: [',
           callbackID,
           '] because callback is not a valid function!'
         );
-        delete _onRoomPropertyUpdatedCallbackMap[callbackID];
+        delete _onRoomPropertiesUpdatedCallbackMap[callbackID];
       }
     } else {
-      _onRoomPropertyUpdatedCallbackMap[callbackID] = callback;
+      _onRoomPropertiesUpdatedCallbackMap[callbackID] = callback;
     }
   },
   onRoomPropertiesFullUpdated(callbackID, callback) {

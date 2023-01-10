@@ -61,7 +61,7 @@ export default {
   setRoomProperty: ZegoUIKitInternal.setRoomProperty,
   updateRoomProperties: ZegoUIKitInternal.updateRoomProperties,
   getRoomProperties: ZegoUIKitInternal.getRoomProperties,
-  onRoomPropertyUpdated: ZegoUIKitInternal.onRoomPropertyUpdated,
+  onRoomPropertiesUpdated: ZegoUIKitInternal.onRoomPropertiesUpdated,
   onRoomPropertiesFullUpdated: ZegoUIKitInternal.onRoomPropertiesFullUpdated,
   forceSortMemberList: ZegoUIKitInternal.forceSortMemberList,
   startPlayingAllAudioVideo: ZegoUIKitInternal.startPlayingAllAudioVideo,
