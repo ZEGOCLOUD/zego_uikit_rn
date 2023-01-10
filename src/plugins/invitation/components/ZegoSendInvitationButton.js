@@ -4,7 +4,7 @@ import ZegoUIKitInvitationService from '../services';
 import ZegoInvitationType from './ZegoInvitationType';
 import { zloginfo, zlogerror } from '../../../utils/logger';
 
-export default function ZegoStartInvitationButton(props) {
+export default function ZegoSendInvitationButton(props) {
   const {
     icon,
     text,
@@ -21,6 +21,9 @@ export default function ZegoStartInvitationButton(props) {
     height = 42,
     borderRadius = 1000,
     verticalLayout, // Default row layout, no layout parameters default to precedence icon
+    resourceID,
+    notificationTitle,
+    notificationMessage
   } = props;
   const getImageSourceByPath = () => {
     if (type === ZegoInvitationType.videoCall) {
@@ -75,7 +78,7 @@ export default function ZegoStartInvitationButton(props) {
     zloginfo(
       `[Components]Send invitation start, invitees: ${invitees}, timeout: ${timeout}, type: ${type}, data: ${data}`
     );
-    ZegoUIKitInvitationService.sendInvitation(invitees, timeout, type, data)
+    ZegoUIKitInvitationService.sendInvitation(invitees, timeout, type, data, { resourceID, title: notificationTitle, message: notificationMessage })
       .then(({ code, message, callID, errorInvitees }) => {
         zloginfo(
           `[Components]Send invitation success, code: ${code}, message: ${message}, errorInvitees: ${errorInvitees}`
@@ -90,7 +93,10 @@ export default function ZegoStartInvitationButton(props) {
               index !== -1 && inviteesBackup.splice(index, 1);
             });
             onPressed({
-              callID,
+              invitationID: callID,
+              errorCode: code,
+              errorMessage: message,
+              errorInvitees,
               invitees: inviteesBackup,
             });
           }
