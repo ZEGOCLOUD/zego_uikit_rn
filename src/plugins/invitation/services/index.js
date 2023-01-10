@@ -600,13 +600,13 @@ const ZegoUIKitSignalingPluginImpl = {
     }
     if (typeof callback !== 'function') {
       ZegoUIKitSignalingPlugin.getInstance().registerPluginEventHandler(
-        'roomPropertyUpdated',
+        'roomPropertiesUpdated',
         callbackID,
         callback
       );
     } else {
       ZegoUIKitSignalingPlugin.getInstance().registerPluginEventHandler(
-        'roomPropertyUpdated',
+        'roomPropertiesUpdated',
         callbackID,
         (info) => {
           const oldRoomAttributes = JSON.parse(JSON.stringify(_roomAttributes));
