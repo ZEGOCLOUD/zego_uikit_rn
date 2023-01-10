@@ -12,7 +12,7 @@ export default function PictureInPictureLayout(props) {
         largeViewBackgroundColor = '',
         smallViewBackgroundImage = '',
         largeViewBackgroundImage = '',
-        smallViewPostion = ZegoViewPostion.topRight,
+        smallViewPostion = ZegoViewPostion.bottomRight,
         switchLargeOrSmallViewByClick = true,
         smallViewSize = { width: 105, height: 169 },
         spacingBetweenSmallViews = 8,
