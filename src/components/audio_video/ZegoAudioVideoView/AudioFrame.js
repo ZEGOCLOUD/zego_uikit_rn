@@ -19,6 +19,7 @@ export default function AudioFrame(props) {
 
   const [soundLevel, setSoundLevel] = useState(0);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [isLoadError, setIsLoadError] = useState(false);
 
   const getShotName = (name) => {
     if (!name) {
@@ -128,9 +129,17 @@ export default function AudioFrame(props) {
           ]}
         >
           {
-            !avatar ?
+            (!avatar || isLoadError) ?
               <Text style={styles.nameLabel}>{getShotName(userInfo.userName)}</Text> :
-              <Image style={{ width: '100%', height: '100%', resizeMode: 'contain' }} resizeMode="contain" source={{ uri: avatar }} />
+              <Image 
+                style={{ width: '100%', height: '100%', resizeMode: 'contain' }}
+                resizeMode="contain"
+                source={{ uri: avatar }}
+                onLoadStart={() =>  console.log('avatar onLoadStart')}
+                onLoadEnd={() =>  console.log('avatar onLoadEnd')}
+                onError={() =>  { console.log('avatar onError'); setIsLoadError(true);}}
+                onLoad={() =>  { console.log('avatar onLoad'); setIsLoadError(false);}}
+              />
           }
         </View>
       </ImageBackground>
