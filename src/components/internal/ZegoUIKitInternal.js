@@ -1,6 +1,7 @@
 import ZegoExpressEngine from 'zego-express-engine-reactnative';
 import { zlogerror, zloginfo, zlogwarning } from '../../utils/logger';
 import ZegoChangedCountOrProperty from './ZegoChangedCountOrProperty';
+import { ZegoAudioVideoResourceMode } from './defines';
 
 var _appInfo = {
   appID: 0,
@@ -35,6 +36,7 @@ var _coreUserMap = {}; // <userID, CoreUser>
 var _qualityUpdateLogCounter = 0;
 
 var _inRoomMessageList = [];
+var _audioVideoResourceMode = ZegoAudioVideoResourceMode.Default;
 
 function _resetData() {
   zloginfo('Reset all data.');
@@ -47,6 +49,7 @@ function _resetData() {
   _isRoomConnected = false;
   _audioOutputType = 0;
   _inRoomMessageList = [];
+  _audioVideoResourceMode = ZegoAudioVideoResourceMode.Default;
 }
 
 function _resetDataForLeavingRoom() {
@@ -605,9 +608,13 @@ function _tryStartPlayStream(userID) {
           reactTag: user.viewID,
           viewMode: user.fillMode,
           backgroundColor: 0,
+        }, {
+          resourceMode: _audioVideoResourceMode,
         });
       } else {
-        ZegoExpressEngine.instance().startPlayingStream(user.streamID);
+        ZegoExpressEngine.instance().startPlayingStream(user.streamID, undefined, {
+          resourceMode: _audioVideoResourceMode,
+        });
       }
     }
   }
@@ -646,6 +653,9 @@ export default {
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Internal <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
   isRoomConnected() {
     return _isRoomConnected;
+  },
+  setAudioVideoResourceMode(audioVideoResourceMode) {
+    _audioVideoResourceMode = audioVideoResourceMode || ZegoAudioVideoResourceMode.Default;
   },
   updateRenderingProperty(userID, viewID, fillMode) {
     zloginfo(

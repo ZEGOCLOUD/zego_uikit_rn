@@ -16,6 +16,7 @@ import ZegoLeaveButton from './components/audio_video/ZegoLeaveButton';
 import ZegoInRoomMessageInput from './components/in_room_message/ZegoInRoomMessageInput';
 import ZegoInRoomMessageView from './components/in_room_message/ZegoInRoomMessageView';
 import ZegoMemberList from './components/in_room_member/ZegoMemberList';
+import { ZegoAudioVideoResourceMode } from './components/internal/defines';
 import ZegoUIKitSignalingPluginImpl, {
   ZegoInvitationConnectionState,
   ZegoStartInvitationButton,
@@ -58,6 +59,7 @@ export default {
   sendInRoomMessage: ZegoUIKitInternal.sendInRoomMessage,
   onInRoomMessageReceived: ZegoUIKitInternal.onInRoomMessageReceived,
   onInRoomMessageSent: ZegoUIKitInternal.onInRoomMessageSent,
+  setAudioVideoResourceMode: ZegoUIKitInternal.setAudioVideoResourceMode,
   installPlugins: ZegoUIKitCorePlugin.installPlugins,
   getPlugin: ZegoUIKitCorePlugin.getPlugin,
   getSignalingPlugin: () => ZegoUIKitSignalingPluginImpl,
@@ -83,4 +85,5 @@ export {
   ZegoRefuseInvitationButton,
   ZegoUIKitPluginType,
   ZegoInvitationConnectionState,
+  ZegoAudioVideoResourceMode,
 };
