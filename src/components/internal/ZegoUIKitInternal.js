@@ -600,7 +600,8 @@ function _tryStartPlayStream(userID) {
     zloginfo(
       '########_tryStartPlayStream##############: ',
       user,
-      user.fillMode
+      user.fillMode,
+      _audioVideoResourceMode,
     );
     if (user.streamID !== '') {
       if (user.viewID > 0) {
@@ -655,6 +656,7 @@ export default {
     return _isRoomConnected;
   },
   setAudioVideoResourceMode(audioVideoResourceMode) {
+    zloginfo('setAudioVideoResourceMode', audioVideoResourceMode);
     _audioVideoResourceMode = audioVideoResourceMode || ZegoAudioVideoResourceMode.Default;
   },
   updateRenderingProperty(userID, viewID, fillMode) {
