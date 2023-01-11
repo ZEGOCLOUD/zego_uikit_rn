@@ -1,4 +1,4 @@
-import { View, StyleSheet, Text, ImageBackground } from 'react-native';
+import { View, StyleSheet, Text, ImageBackground, Image } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import ZegoUIKitInternal from '../../internal/ZegoUIKitInternal';
 
@@ -14,6 +14,7 @@ export default function AudioFrame(props) {
     avatarSize,
     avatarAlignment,
     soundWaveColor = '#6B6A71',
+    avatar = '',
   } = props;
 
   const [soundLevel, setSoundLevel] = useState(0);
@@ -126,7 +127,11 @@ export default function AudioFrame(props) {
             },
           ]}
         >
-          <Text style={styles.nameLabel}>{getShotName(userInfo.userName)}</Text>
+          {
+            !avatar ?
+              <Text style={styles.nameLabel}>{getShotName(userInfo.userName)}</Text> :
+              <Image style={{ width: '100%', height: '100%', resizeMode: 'contain' }} resizeMode="contain" source={{ uri: avatar }} />
+          }
         </View>
       </ImageBackground>
     </View>

@@ -295,6 +295,7 @@ const ZegoUIKitSignalingPluginImpl = {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return;
     }
+    // The call to the local end also triggers the corresponding callback on the local end
     return new Promise((resolve, reject) => {
       ZegoUIKitSignalingPlugin.getInstance()
         .invoke('setUsersInRoomAttributes', {

@@ -58,6 +58,7 @@ export default {
   sendInRoomMessage: ZegoUIKitInternal.sendInRoomMessage,
   onInRoomMessageReceived: ZegoUIKitInternal.onInRoomMessageReceived,
   onInRoomMessageSent: ZegoUIKitInternal.onInRoomMessageSent,
+  onUserCountOrPropertyChanged: ZegoUIKitInternal.onUserCountOrPropertyChanged,
   installPlugins: ZegoUIKitCorePlugin.installPlugins,
   getPlugin: ZegoUIKitCorePlugin.getPlugin,
   getSignalingPlugin: () => ZegoUIKitSignalingPluginImpl,

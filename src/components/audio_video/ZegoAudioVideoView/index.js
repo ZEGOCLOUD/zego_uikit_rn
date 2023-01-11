@@ -34,11 +34,11 @@ export default function ZegoVideoView(props) {
   const [userInfo, setUserInfo] = useState({});
   const [isCameraOn, setIsCameraOn] = useState(true);
   const [propsData, setPropsData] = useState({ userInfo: {} });
+  const [avatar, setAvatarUrl] = useState(ZegoUIKitInternal.getUser(userID).inRoomAttributes.avatar || '');
 
   useEffect(() => {
     const user = ZegoUIKitInternal.getUser(userID);
     if (user) {
-      console.log('=========ZegoVideoView=========', user);
       setUserInfo(user);
       setPropsData({ userInfo: user });
       setIsCameraOn(user.isCameraDeviceOn);
@@ -51,7 +51,6 @@ export default function ZegoVideoView(props) {
     ZegoUIKitInternal.onSDKConnected(callbackID, () => {
       const user = ZegoUIKitInternal.getUser(userID);
       if (user) {
-        console.log('=========ZegoVideoView=========', user);
         setUserInfo(user);
         setPropsData({ userInfo: user });
         setIsCameraOn(user.isCameraDeviceOn);
@@ -60,7 +59,6 @@ export default function ZegoVideoView(props) {
     ZegoUIKitInternal.onUserInfoUpdate(callbackID, (info) => {
       if (info.userID == userID) {
         setIsCameraOn(info.isCameraDeviceOn);
-        console.log('=========ZegoVideoView=========', info);
         setUserInfo(info);
         setPropsData({ userInfo: info });
       }
@@ -76,10 +74,20 @@ export default function ZegoVideoView(props) {
         }
       }
     );
+    ZegoUIKitInternal.onUserCountOrPropertyChanged(callbackID, (userList) => {
+      console.log('=========[ZegoVideoView]onUserCountOrPropertyChanged=========', userID, userList);
+      userList.forEach((user) => {
+        const temp = user.inRoomAttributes.avatar;
+        if (user.userID === userID && temp) {
+          setAvatarUrl(temp);
+        }
+      });
+    });
     return () => {
       ZegoUIKitInternal.onSDKConnected(callbackID);
       ZegoUIKitInternal.onUserInfoUpdate(callbackID);
       ZegoUIKitInternal.onRoomStateChanged(callbackID);
+      ZegoUIKitInternal.onUserCountOrPropertyChanged(callbackID);
     };
   }, []);
 
@@ -99,6 +107,7 @@ export default function ZegoVideoView(props) {
             audioViewBackgroudImage={audioViewBackgroudImage}
             avatarSize={avatarSize}
             avatarAlignment={avatarAlignment}
+            avatar={avatar}
             soundWaveColor={soundWaveColor}
           />
         ) : null}
