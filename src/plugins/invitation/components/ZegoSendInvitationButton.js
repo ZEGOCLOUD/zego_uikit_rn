@@ -4,7 +4,7 @@ import ZegoUIKitInvitationService from '../services';
 import ZegoInvitationType from './ZegoInvitationType';
 import { zloginfo, zlogerror } from '../../../utils/logger';
 
-export default function ZegoStartInvitationButton(props) {
+export default function ZegoSendInvitationButton(props) {
   const {
     icon,
     text,
@@ -13,6 +13,9 @@ export default function ZegoStartInvitationButton(props) {
     data,
     timeout = 60,
     onPressed,
+    resourceID,
+    notificationTitle,
+    notificationMessage
   } = props;
   const getImageSourceByPath = () => {
     if (type === ZegoInvitationType.videoCall) {
@@ -37,7 +40,7 @@ export default function ZegoStartInvitationButton(props) {
     return renderView;
   };
   const onButtonPress = () => {
-    ZegoUIKitInvitationService.sendInvitation(invitees, timeout, type, data)
+    ZegoUIKitInvitationService.sendInvitation(invitees, timeout, type, data, { resourceID, title: notificationTitle, message: notificationMessage })
       .then(({ code, message, callID, errorInvitees }) => {
         zloginfo(
           `[Components]Send invitation success, code: ${code}, message: ${message}, errorInvitees: ${errorInvitees}`
@@ -52,7 +55,10 @@ export default function ZegoStartInvitationButton(props) {
               index !== -1 && inviteesBackup.splice(index, 1);
             });
             onPressed({
-              callID,
+              invitationID: callID,
+              errorCode: code,
+              errorMessage: message,
+              errorInvitees,
               invitees: inviteesBackup,
             });
           }
