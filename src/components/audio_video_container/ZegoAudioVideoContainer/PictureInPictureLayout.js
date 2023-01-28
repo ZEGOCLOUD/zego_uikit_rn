@@ -14,7 +14,7 @@ export default function PictureInPictureLayout(props) {
         largeViewBackgroundImage = '',
         smallViewPostion = ZegoViewPostion.bottomRight,
         switchLargeOrSmallViewByClick = true,
-        smallViewSize = { width: 105, height: 169 },
+        smallViewSize = { width: 105, height: '28%' },
         spacingBetweenSmallViews = 8,
     } = config;
     const {
@@ -145,6 +145,7 @@ const styles = StyleSheet.create({
         flex: 1,
         position: 'absolute',
         zIndex: 12,
+        height: '80%',
     },
     smallView: {
         borderRadius: 10,
@@ -156,19 +157,21 @@ const styles = StyleSheet.create({
         borderColor: '#A4A4A4',
     },
     smallViewPostTopLeft: {
-        top: 70,
+        top: 80,
         left: 12,
     },
     smallViewPostTopRight: {
-        top: 70,
+        top: 80,
         right: 12,
     },
     smallViewPostBottomLeft: {
         bottom: 70,
         left: 12,
+        justifyContent: 'flex-end'
     },
     smallViewPostBottomRight: {
         bottom: 70,
         right: 12,
+        justifyContent: 'flex-end'
     }
 })
