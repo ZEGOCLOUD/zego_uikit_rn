@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
         flex: 1,
         position: 'absolute',
         zIndex: 12,
-        height: '80%',
+        height: '76%',
     },
     smallView: {
         borderRadius: 10,
@@ -165,12 +165,12 @@ const styles = StyleSheet.create({
         right: 12,
     },
     smallViewPostBottomLeft: {
-        bottom: 70,
+        bottom: 100,
         left: 12,
         justifyContent: 'flex-end'
     },
     smallViewPostBottomRight: {
-        bottom: 70,
+        bottom: 100,
         right: 12,
         justifyContent: 'flex-end'
     }
