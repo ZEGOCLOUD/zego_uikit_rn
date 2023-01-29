@@ -48,11 +48,13 @@ export default function PictureInPictureLayout(props) {
             });
             console.log('<<<<<<<<<<<<<< globalAudioVideoUserList', globalAudioVideoUserList);
         });
+        ZegoUIKitInternal.onAudioVideoListForceSort(callbackID, () => {
+            console.log('<<<<<<<<<<<<<< onAudioVideoListForceSort');
+            setGlobalAudioVideoUserList((arr) => [...(sortAudioVideo ? sortAudioVideo(globalAudioVideoUserList) : globalAudioVideoUserList)]);
+        });
+
         return () => {
-            ZegoUIKitInternal.onSDKConnected(callbackID);
-            ZegoUIKitInternal.onRoomStateChanged(callbackID);
-            ZegoUIKitInternal.onUserJoin(callbackID);
-            ZegoUIKitInternal.onUserLeave(callbackID);
+            ZegoUIKitInternal.onAudioVideoListForceSort(callbackID);
             ZegoUIKitInternal.onAudioVideoAvailable(callbackID);
             ZegoUIKitInternal.onAudioVideoUnavailable(callbackID);
         }
@@ -68,8 +70,7 @@ export default function PictureInPictureLayout(props) {
     const switchLargeOrSmallView = (index, user) => {
         console.log('###########switchLargeOrSmallView', index, user, globalAudioVideoUserList, switchLargeOrSmallViewByClick);
         if (switchLargeOrSmallViewByClick) {
-            globalAudioVideoUserList.splice(index + 1, 1);
-            globalAudioVideoUserList.unshift(user);
+            globalAudioVideoUserList[0] = globalAudioVideoUserList.splice(index + 1, 1, globalAudioVideoUserList[0])[0];
             setGlobalAudioVideoUserList((arr) => [...globalAudioVideoUserList]);
         }
     }

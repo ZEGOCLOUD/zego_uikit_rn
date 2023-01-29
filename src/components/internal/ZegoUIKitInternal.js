@@ -1,6 +1,6 @@
 import ZegoExpressEngine from 'zego-express-engine-reactnative';
 import { zlogerror, zloginfo, zlogwarning } from '../../utils/logger';
-import ZegoChangedCountOrProperty from './ZegoChangedCountOrProperty';
+import { ZegoChangedCountOrProperty, ZegoRoomPropertyUpdateType } from './defines'
 
 var _appInfo = {
   appID: 0,
@@ -32,6 +32,7 @@ var _onRoomPropertiesUpdatedCallbackMap = {};
 var _onRoomPropertiesFullUpdatedCallbackMap = {};
 // Force update component callback
 var _onMemberListForceSortCallbackMap = {};
+var _onAudioVideoListForceSortCallbackMap = {};
 
 var _localCoreUser = _createCoreUser('', '', '', {});
 var _streamCoreUserMap = {}; // <streamID, CoreUser>
@@ -371,13 +372,13 @@ function _onRoomExtraInfoUpdate(roomID, roomExtraInfoList) {
         if (oldRoomProperties[propertyKey] !== roomProperties[propertyKey]) {
           updateKeys.push(propertyKey);
           _roomProperties[propertyKey] = roomProperties[propertyKey];
-          _notifyRoomPropertyUpdate(propertyKey, oldRoomProperties[propertyKey], roomProperties[propertyKey]);
+          _notifyRoomPropertyUpdate(propertyKey, oldRoomProperties[propertyKey], roomProperties[propertyKey], ZegoRoomPropertyUpdateType.remote);
         }
       })
     }
   });
   if (updateKeys.length > 0) {
-    _notifyRoomPropertiesFullUpdate(updateKeys, oldRoomProperties, JSON.parse(JSON.stringify(_roomProperties)));
+    _notifyRoomPropertiesFullUpdate(updateKeys, oldRoomProperties, JSON.parse(JSON.stringify(_roomProperties)), ZegoRoomPropertyUpdateType.remote);
   }
 }
 function _registerEngineCallback() {
@@ -686,17 +687,17 @@ function _notifySoundLevelUpdate(userID, soundLevel) {
     }
   });
 }
-function _notifyRoomPropertyUpdate(key, oldValue, value) {
+function _notifyRoomPropertyUpdate(key, oldValue, value, type) {
   Object.keys(_onRoomPropertiesUpdatedCallbackMap).forEach((callbackID) => {
     if (_onRoomPropertiesUpdatedCallbackMap[callbackID]) {
-      _onRoomPropertiesUpdatedCallbackMap[callbackID](key, oldValue, value);
+      _onRoomPropertiesUpdatedCallbackMap[callbackID](key, oldValue, value, type);
     }
   });
 }
-function _notifyRoomPropertiesFullUpdate(keys, oldRoomProperties, roomProperties) {
+function _notifyRoomPropertiesFullUpdate(keys, oldRoomProperties, roomProperties, type) {
   Object.keys(_onRoomPropertiesFullUpdatedCallbackMap).forEach((callbackID) => {
     if (_onRoomPropertiesFullUpdatedCallbackMap[callbackID]) {
-      _onRoomPropertiesFullUpdatedCallbackMap[callbackID](keys, oldRoomProperties, roomProperties);
+      _onRoomPropertiesFullUpdatedCallbackMap[callbackID](keys, oldRoomProperties, roomProperties, type);
     }
   });
 }
@@ -1193,8 +1194,8 @@ export default {
           zloginfo('[updateRoomProperties]Set success');
           resolve();
           // Notify
-          _notifyRoomPropertyUpdate(key, oldValue, value);
-          _notifyRoomPropertiesFullUpdate([key], oldRoomProperties, JSON.parse(extraInfo));
+          _notifyRoomPropertyUpdate(key, oldValue, value, ZegoRoomPropertyUpdateType.set);
+          _notifyRoomPropertiesFullUpdate([key], oldRoomProperties, JSON.parse(extraInfo), ZegoRoomPropertyUpdateType.set);
         } else {
           // Restore
           _roomProperties = JSON.parse(JSON.stringify(oldRoomProperties));
@@ -1233,9 +1234,9 @@ export default {
           updateKeys.forEach((updateKey) => {
             const oldValue = oldRoomProperties[updateKey];
             const value = newRoomProperties[updateKey];
-            _notifyRoomPropertyUpdate(updateKey, oldValue, value);
+            _notifyRoomPropertyUpdate(updateKey, oldValue, value, ZegoRoomPropertyUpdateType.update);
           })
-          updateKeys.length && _notifyRoomPropertiesFullUpdate(updateKeys, oldRoomProperties, JSON.parse(extraInfo));
+          updateKeys.length && _notifyRoomPropertiesFullUpdate(updateKeys, oldRoomProperties, JSON.parse(extraInfo), ZegoRoomPropertyUpdateType.update);
         } else {
           // Restore
           _roomProperties = JSON.parse(JSON.stringify(oldRoomProperties));
@@ -1472,6 +1473,28 @@ export default {
       }
     } else {
       _onMemberListForceSortCallbackMap[callbackID] = callback;
+    }
+  },
+  forceSortAudioVideoList() {
+    zloginfo('[forceSortAudioVideoList callback]');
+    Object.keys(_onAudioVideoListForceSortCallbackMap).forEach((callbackID) => {
+      if (_onAudioVideoListForceSortCallbackMap[callbackID]) {
+        _onAudioVideoListForceSortCallbackMap[callbackID]();
+      }
+    });
+  },
+  onAudioVideoListForceSort(callbackID, callback) {
+    if (typeof callback !== 'function') {
+      if (callbackID in _onAudioVideoListForceSortCallbackMap) {
+        zloginfo(
+          '[onAudioVideoListForceSort] Remove callback for: [',
+          callbackID,
+          '] because callback is not a valid function!'
+        );
+        delete _onAudioVideoListForceSortCallbackMap[callbackID];
+      }
+    } else {
+      _onAudioVideoListForceSortCallbackMap[callbackID] = callback;
     }
   },
 };

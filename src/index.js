@@ -2,6 +2,7 @@ import ZegoUIKitInternal from './components/internal/ZegoUIKitInternal';
 import ZegoUIKitCorePlugin, {
   ZegoUIKitPluginType,
 } from './components/internal/ZegoUIKitCorePlugin';
+import { ZegoRoomPropertyUpdateType } from './components/internal/defines';
 import ZegoAudioVideoView from './components/audio_video/ZegoAudioVideoView';
 import ZegoCameraStateIcon from './components/audio_video/ZegoCameraStateIcon';
 import ZegoMicrophoneStateIcon from './components/audio_video/ZegoMicrophoneStateIcon';
@@ -64,6 +65,7 @@ export default {
   onRoomPropertiesUpdated: ZegoUIKitInternal.onRoomPropertiesUpdated,
   onRoomPropertiesFullUpdated: ZegoUIKitInternal.onRoomPropertiesFullUpdated,
   forceSortMemberList: ZegoUIKitInternal.forceSortMemberList,
+  forceSortAudioVideoList: ZegoUIKitInternal.forceSortAudioVideoList,
   startPlayingAllAudioVideo: ZegoUIKitInternal.startPlayingAllAudioVideo,
   stopPlayingAllAudioVideo: ZegoUIKitInternal.stopPlayingAllAudioVideo,
   installPlugins: ZegoUIKitCorePlugin.installPlugins,
@@ -89,6 +91,7 @@ export {
   ZegoCancelInvitationButton,
   ZegoAcceptInvitationButton,
   ZegoRefuseInvitationButton,
+  ZegoRoomPropertyUpdateType,
   ZegoUIKitPluginType,
   ZegoInvitationConnectionState,
 };
