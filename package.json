@@ -1,6 +1,6 @@
 {
   "name": "@zegocloud/zego-uikit-rn",
-  "version": "1.10.2",
+  "version": "1.10.3",
   "description": "ZegoUIKit is a low-code offering with pre-built and UI-ready components, such as AudioVideoView, CameraButtons, etc. Save time and assemble features fast with ZegoUIKit.",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
