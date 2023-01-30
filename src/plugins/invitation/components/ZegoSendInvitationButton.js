@@ -12,6 +12,7 @@ export default function ZegoSendInvitationButton(props) {
     type = ZegoInvitationType.videoCall,
     data,
     timeout = 60,
+    onWillPressed,
     onPressed,
     resourceID,
     notificationTitle,
@@ -39,7 +40,34 @@ export default function ZegoSendInvitationButton(props) {
     }
     return renderView;
   };
-  const onButtonPress = () => {
+  const onButtonPress = async () => {
+    let canSendInvitation = true;
+    if (onWillPressed) {
+      console.log('#########onWillPressed judge', typeof onWillPressed === 'object', typeof (onWillPressed.then) === 'function', typeof (onWillPressed.catch) === 'function');
+      if (typeof onWillPressed === 'object' && typeof (onWillPressed.then) === 'function' && typeof (onWillPressed.catch) === 'function') {
+        // Promise
+        console.log('#########onWillPressed promise', onWillPressed);
+        try {
+          canSendInvitation = await onWillPressed();
+        } catch (error) {
+          // canSendInvitation = false;
+        }
+      } else if (typeof onWillPressed === 'function') {
+        console.log('#########onWillPressed function', onWillPressed);
+        const temp = onWillPressed();
+        if (typeof temp === 'object' && typeof (temp.then) === 'function' && typeof (temp.catch) === 'function') {
+          console.log('#########onWillPressed promise', temp);
+          try {
+            canSendInvitation = await temp();
+          } catch (error) {
+            // canSendInvitation = false;
+          }
+        } else {
+          canSendInvitation = temp;
+        }
+      }
+    }
+    if (!canSendInvitation) return;
     ZegoUIKitInvitationService.sendInvitation(invitees, timeout, type, data, { resourceID, title: notificationTitle, message: notificationMessage })
       .then(({ code, message, callID, errorInvitees }) => {
         zloginfo(
