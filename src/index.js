@@ -53,6 +53,7 @@ export default {
   getLocalUserInfo: ZegoUIKitInternal.getLocalUserInfo,
   onUserJoin: ZegoUIKitInternal.onUserJoin,
   onUserLeave: ZegoUIKitInternal.onUserLeave,
+  onUserInfoUpdate: ZegoUIKitInternal.onUserInfoUpdate,
   onAudioVideoAvailable: ZegoUIKitInternal.onAudioVideoAvailable,
   onAudioVideoUnavailable: ZegoUIKitInternal.onAudioVideoUnavailable,
   getInRoomMessages: ZegoUIKitInternal.getInRoomMessages,

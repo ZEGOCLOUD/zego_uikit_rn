@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import ZegoUIKitInternal from "../../internal/ZegoUIKitInternal";
 import ZegoAudioVideoView from "../../audio_video/ZegoAudioVideoView";
 import { StyleSheet, View } from 'react-native'
@@ -21,36 +21,32 @@ export default function PictureInPictureLayout(props) {
         useVideoViewAspectFill = false,
         showSoundWavesInAudioMode = true,
     } = audioVideoConfig;
-
+    const realTimeData = useRef();
     const [globalAudioVideoUserList, setGlobalAudioVideoUserList] = useState([]);
 
     useEffect(() => {
+        realTimeData.current = [];
         const callbackID = 'PictureInPictureLayout' + String(Math.floor(Math.random() * 10000));
         ZegoUIKitInternal.onAudioVideoAvailable(callbackID, (userList) => {
-            console.log('<<<<<<<<<<<<<< onAudioVideoAvailable', userList)
             userList.forEach((user) => {
-                const result = globalAudioVideoUserList.find((item) => user.userID === item.userID);
+                const result = realTimeData.current.find((item) => user.userID === item.userID);
                 if (!result) {
-                    globalAudioVideoUserList.push(user);
-                    setGlobalAudioVideoUserList((arr) => [...(sortAudioVideo ? sortAudioVideo(globalAudioVideoUserList) : globalAudioVideoUserList)]);
+                    realTimeData.current.push(user);
+                    setGlobalAudioVideoUserList((arr) => [...(sortAudioVideo ? sortAudioVideo(realTimeData.current) : realTimeData.current)]);
                 }
             });
-            console.log('<<<<<<<<<<<<<< globalAudioVideoUserList', globalAudioVideoUserList);
         });
         ZegoUIKitInternal.onAudioVideoUnavailable(callbackID, (userList) => {
-            console.log('<<<<<<<<<<<<<< onAudioVideoUnavailable', userList)
             userList.forEach((user) => {
-                const result = globalAudioVideoUserList.findIndex((item) => user.userID === item.userID);
+                const result = realTimeData.current.findIndex((item) => user.userID === item.userID);
                 if (result !== -1) {
-                    globalAudioVideoUserList.splice(result, 1);
-                    setGlobalAudioVideoUserList((arr) => [...(sortAudioVideo ? sortAudioVideo(globalAudioVideoUserList) : globalAudioVideoUserList)]);
+                    realTimeData.current.splice(result, 1);
+                    setGlobalAudioVideoUserList((arr) => [...(sortAudioVideo ? sortAudioVideo(realTimeData.current) : realTimeData.current)]);
                 }
             });
-            console.log('<<<<<<<<<<<<<< globalAudioVideoUserList', globalAudioVideoUserList);
         });
         ZegoUIKitInternal.onAudioVideoListForceSort(callbackID, () => {
-            console.log('<<<<<<<<<<<<<< onAudioVideoListForceSort');
-            setGlobalAudioVideoUserList((arr) => [...(sortAudioVideo ? sortAudioVideo(globalAudioVideoUserList) : globalAudioVideoUserList)]);
+            setGlobalAudioVideoUserList((arr) => [...(sortAudioVideo ? sortAudioVideo(realTimeData.current) : realTimeData.current)]);
         });
 
         return () => {
@@ -68,10 +64,10 @@ export default function PictureInPictureLayout(props) {
         }
     }
     const switchLargeOrSmallView = (index, user) => {
-        console.log('###########switchLargeOrSmallView', index, user, globalAudioVideoUserList, switchLargeOrSmallViewByClick);
         if (switchLargeOrSmallViewByClick) {
             globalAudioVideoUserList[0] = globalAudioVideoUserList.splice(index + 1, 1, globalAudioVideoUserList[0])[0];
             setGlobalAudioVideoUserList((arr) => [...globalAudioVideoUserList]);
+            realTimeData.current = globalAudioVideoUserList;
         }
     }
 
