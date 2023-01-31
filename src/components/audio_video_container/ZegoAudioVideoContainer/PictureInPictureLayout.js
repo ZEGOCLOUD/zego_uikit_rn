@@ -14,7 +14,7 @@ export default function PictureInPictureLayout(props) {
         largeViewBackgroundImage = '',
         smallViewPostion = ZegoViewPostion.bottomRight,
         switchLargeOrSmallViewByClick = true,
-        smallViewSize = { width: 95, height: 169 },
+        smallViewSize = { width: 85, height: 151 },
         spacingBetweenSmallViews = 8,
     } = config;
     const {
@@ -70,9 +70,15 @@ export default function PictureInPictureLayout(props) {
             realTimeData.current = globalAudioVideoUserList;
         }
     }
+    const layoutHandle = (event) => {
+        const { nativeEvent } = event;
+        const { layout } = nativeEvent;
+        const { width, height, x, y } = layout;
+        console.log('######layoutHandle', layout);
+    }
 
     return (<View style={styles.container}>
-        <View style={[styles.smallViewContainer, getSmallViewPostStyle()]}>
+        <View style={[styles.smallViewContainer, getSmallViewPostStyle()]} onLayout={layoutHandle}>
             {
                 globalAudioVideoUserList.slice(1, 4).map((user, index) => <View
                     key={user.userID}
