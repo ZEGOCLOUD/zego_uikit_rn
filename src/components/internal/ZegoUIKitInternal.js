@@ -362,7 +362,6 @@ function _onRequireNewToken() {
 }
 function _onRoomExtraInfoUpdate(roomID, roomExtraInfoList) {
   zloginfo('$$$$$$$$Room extra info update: ', roomID, roomExtraInfoList);
-  console.error('####Room extra info update time', Date.now());
   const updateKeys = [];
   const oldRoomProperties = JSON.parse(JSON.stringify(_roomProperties));
   roomExtraInfoList.forEach(({ key, updateTime, updateUser, value }) => {
@@ -387,7 +386,6 @@ function _registerEngineCallback() {
     'roomUserUpdate',
     (roomID, updateType, userList) => {
       zloginfo('[roomUserUpdate callback]', roomID, updateType, userList);
-      console.error('####Room user update time', Date.now());
       _onRoomUserUpdate(roomID, updateType, userList);
     }
   );
@@ -395,7 +393,6 @@ function _registerEngineCallback() {
     'roomStreamUpdate',
     (roomID, updateType, streamList) => {
       zloginfo('[roomStreamUpdate callback]', roomID, updateType, streamList);
-      console.error('####Room stream update time', Date.now());
       _onRoomStreamUpdate(roomID, updateType, streamList);
     }
   );
@@ -1104,7 +1101,6 @@ export default {
         .loginRoom(roomID, user, config)
         .then(() => {
           zloginfo('Join room success.', user);
-          console.error('####Join room success time', Date.now());
           ZegoExpressEngine.instance().startSoundLevelMonitor();
 
           _localCoreUser.streamID = _getPublishStreamID();
