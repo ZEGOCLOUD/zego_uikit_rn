@@ -34,7 +34,8 @@ export default function ZegoVideoView(props) {
   const [userInfo, setUserInfo] = useState({});
   const [isCameraOn, setIsCameraOn] = useState(true);
   const [propsData, setPropsData] = useState({ userInfo: {} });
-  const inRoomAttributes = ZegoUIKitInternal.getUser(userID).inRoomAttributes;
+  const userInfo_ = ZegoUIKitInternal.getUser(userID);
+  const inRoomAttributes = userInfo_ ? userInfo_.inRoomAttributes : {};
   const [avatar, setAvatarUrl] = useState(inRoomAttributes ? (inRoomAttributes.avatar || '') : '');
 
   useEffect(() => {
