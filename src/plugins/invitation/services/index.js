@@ -1,7 +1,6 @@
 import ZegoUIKitInternal from '../../../components/internal/ZegoUIKitInternal';
-import ZegoChangedCountOrProperty from '../../../components/internal/ZegoChangedCountOrProperty';
+import { ZegoChangedCountOrProperty, ZegoUIKitPluginType } from '../../../components/internal/defines';
 import ZegoUIKitCorePlugin from '../../../components/internal/ZegoUIKitCorePlugin';
-import ZegoUIKitPluginType from '../../../components/internal/ZegoUIKitPluginType';
 import { zlogerror, zloginfo } from '../../../utils/logger';
 import { ZegoInvitationImplResult } from './defines';
 

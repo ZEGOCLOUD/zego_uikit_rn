@@ -1,5 +1,5 @@
 import { zloginfo, zlogwarning, zlogerror } from '../../utils/logger';
-import ZegoUIKitPluginType from './ZegoUIKitPluginType';
+import { ZegoUIKitPluginType } from './defines';
 
 const _plugins = new Map(); // type -> plugin
 const ZegoUIKitCorePlugin = {

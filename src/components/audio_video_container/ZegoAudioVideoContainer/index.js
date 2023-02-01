@@ -2,10 +2,10 @@ import React from "react";
 import { Text, View, StyleSheet } from "react-native"
 import PictureInPictureWindow from './PictureInPictureLayout'
 import GalleryLayout from './GalleryLayout'
-import ZegoLayoutMode from "./ZegoLayotMode";
+import { ZegoLayoutMode } from "./defines";
 
 export default function ZegoAudioVideoContainer(props) {
-  const { foregroundBuilder, layout, audioVideoConfig = {} } = props;
+  const { foregroundBuilder, layout, audioVideoConfig = {}, sortAudioVideo } = props;
   const { mode = ZegoLayoutMode.pictureInPicture } = layout;
 
   return (<View style={styles.container}>
@@ -13,10 +13,12 @@ export default function ZegoAudioVideoContainer(props) {
       <PictureInPictureWindow
         audioVideoConfig={audioVideoConfig}
         config={layout}
+        sortAudioVideo={sortAudioVideo}
         foregroundBuilder={foregroundBuilder} /> :
       <GalleryLayout 
         audioVideoConfig={audioVideoConfig}
         config={layout}
+        sortAudioVideo={sortAudioVideo}
         foregroundBuilder={foregroundBuilder} />
     }
   </View>)

@@ -11,7 +11,6 @@ import ZegoUIKitInternal from '../internal/ZegoUIKitInternal';
 import ZegoMicrophoneStateIcon from '../audio_video/ZegoMicrophoneStateIcon';
 import ZegoCameraStateIcon from '../audio_video/ZegoCameraStateIcon';
 import Delegate from 'react-delegate-component';
-import { ZegoLiveAudioRoomRole } from '../../plugins/invitation/services/defines';
 
 export default function ZegoMemberList(props) {
   const { showMicrophoneState, showCameraState, itemBuilder, sortUserList } =
@@ -50,8 +49,8 @@ export default function ZegoMemberList(props) {
   const [memberList, setMemberList] = useState([]);
 
   const refreshMemberList = () => {
+    console.log('############refreshMemberList')
     let memberList = ZegoUIKitInternal.getAllUsers();
-    console.warn('===============refreshMemberList==============', memberList);
     if (typeof sortUserList === 'function') {
       const temp = sortUserList(memberList) || memberList;
       setMemberList((arr) => [...temp]);
@@ -107,12 +106,6 @@ export default function ZegoMemberList(props) {
     ) : (
       <View />
     );
-  const itemBuilderView = (item) =>
-    itemBuilder ? (
-      <Delegate to={itemBuilder} props={{ userInfo: item }} />
-    ) : (
-      <View />
-    );
 
   const roleDescription = (item) => {
     console.warn('===============roleDescription==============', item);
@@ -142,7 +135,7 @@ export default function ZegoMemberList(props) {
         </View>
       </View>
     ) : (
-      itemBuilderView(item)
+      <Delegate to={itemBuilder} props={{ userInfo: item }} />
     );
 
   useEffect(() => {
@@ -183,10 +176,20 @@ export default function ZegoMemberList(props) {
         setMemberList((arr) => [...userList]);
       }
     });
+    ZegoUIKitInternal.onMemberListForceSort(callbackID, (userList) => {
+      console.log('===============onMemberListForceSort==============', userList)
+      if (typeof sortUserList === 'function') {
+        const temp = sortUserList(userList) || userList;
+        setMemberList((arr) => [...temp]);
+      } else {
+        // Don't deal with
+      }
+    });
     return () => {
       ZegoUIKitInternal.onSDKConnected(callbackID);
       ZegoUIKitInternal.onRoomStateChanged(callbackID);
       ZegoUIKitInternal.onUserCountOrPropertyChanged(callbackID);
+      ZegoUIKitInternal.onMemberListForceSort(callbackID);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

@@ -2,6 +2,7 @@ import ZegoUIKitInternal from './components/internal/ZegoUIKitInternal';
 import ZegoUIKitCorePlugin, {
   ZegoUIKitPluginType,
 } from './components/internal/ZegoUIKitCorePlugin';
+import { ZegoRoomPropertyUpdateType } from './components/internal/defines';
 import ZegoAudioVideoView from './components/audio_video/ZegoAudioVideoView';
 import ZegoCameraStateIcon from './components/audio_video/ZegoCameraStateIcon';
 import ZegoMicrophoneStateIcon from './components/audio_video/ZegoMicrophoneStateIcon';
@@ -53,6 +54,7 @@ export default {
   getLocalUserInfo: ZegoUIKitInternal.getLocalUserInfo,
   onUserJoin: ZegoUIKitInternal.onUserJoin,
   onUserLeave: ZegoUIKitInternal.onUserLeave,
+  onUserInfoUpdate: ZegoUIKitInternal.onUserInfoUpdate,
   onAudioVideoAvailable: ZegoUIKitInternal.onAudioVideoAvailable,
   onAudioVideoUnavailable: ZegoUIKitInternal.onAudioVideoUnavailable,
   getInRoomMessages: ZegoUIKitInternal.getInRoomMessages,
@@ -61,6 +63,15 @@ export default {
   onInRoomMessageSent: ZegoUIKitInternal.onInRoomMessageSent,
   onUserCountOrPropertyChanged: ZegoUIKitInternal.onUserCountOrPropertyChanged,
   setAudioVideoResourceMode: ZegoUIKitInternal.setAudioVideoResourceMode,
+  setRoomProperty: ZegoUIKitInternal.setRoomProperty,
+  updateRoomProperties: ZegoUIKitInternal.updateRoomProperties,
+  getRoomProperties: ZegoUIKitInternal.getRoomProperties,
+  onRoomPropertyUpdated: ZegoUIKitInternal.onRoomPropertyUpdated,
+  onRoomPropertiesFullUpdated: ZegoUIKitInternal.onRoomPropertiesFullUpdated,
+  forceSortMemberList: ZegoUIKitInternal.forceSortMemberList,
+  forceSortAudioVideoList: ZegoUIKitInternal.forceSortAudioVideoList,
+  startPlayingAllAudioVideo: ZegoUIKitInternal.startPlayingAllAudioVideo,
+  stopPlayingAllAudioVideo: ZegoUIKitInternal.stopPlayingAllAudioVideo,
   installPlugins: ZegoUIKitCorePlugin.installPlugins,
   getPlugin: ZegoUIKitCorePlugin.getPlugin,
   getSignalingPlugin: () => ZegoUIKitSignalingPluginImpl,
@@ -84,6 +95,7 @@ export {
   ZegoCancelInvitationButton,
   ZegoAcceptInvitationButton,
   ZegoRefuseInvitationButton,
+  ZegoRoomPropertyUpdateType,
   ZegoUIKitPluginType,
   ZegoInvitationConnectionState,
   ZegoAudioVideoResourceMode,

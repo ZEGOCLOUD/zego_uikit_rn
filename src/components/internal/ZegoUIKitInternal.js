@@ -1,7 +1,6 @@
 import ZegoExpressEngine from 'zego-express-engine-reactnative';
 import { zlogerror, zloginfo, zlogwarning } from '../../utils/logger';
-import ZegoChangedCountOrProperty from './ZegoChangedCountOrProperty';
-import { ZegoAudioVideoResourceMode } from './defines';
+import { ZegoAudioVideoResourceMode, ZegoChangedCountOrProperty, ZegoRoomPropertyUpdateType } from './defines'
 
 var _appInfo = {
   appID: 0,
@@ -29,6 +28,11 @@ var _onAudioVideoAvailableCallbackMap = {};
 var _onAudioVideoUnavailableCallbackMap = {};
 var _onInRoomMessageReceivedCallbackMap = {};
 var _onInRoomMessageSentCallbackMap = {};
+var _onRoomPropertyUpdatedCallbackMap = {};
+var _onRoomPropertiesFullUpdatedCallbackMap = {};
+// Force update component callback
+var _onMemberListForceSortCallbackMap = {};
+var _onAudioVideoListForceSortCallbackMap = {};
 
 var _localCoreUser = _createCoreUser('', '', '', {});
 var _streamCoreUserMap = {}; // <streamID, CoreUser>
@@ -37,6 +41,7 @@ var _qualityUpdateLogCounter = 0;
 
 var _inRoomMessageList = [];
 var _audioVideoResourceMode = ZegoAudioVideoResourceMode.Default;
+var _roomProperties = {};
 
 function _resetData() {
   zloginfo('Reset all data.');
@@ -63,6 +68,7 @@ function _resetDataForLeavingRoom() {
   _localCoreUser = _createCoreUser(userID, userName, profileUrl, extendInfo);
   _coreUserMap[_localCoreUser.userID] = _localCoreUser;
   _inRoomMessageList = [];
+  _roomProperties = {};
 }
 
 function _createPublicUser(coreUser) {
@@ -356,6 +362,26 @@ function _onRequireNewToken() {
     }
   });
 }
+function _onRoomExtraInfoUpdate(roomID, roomExtraInfoList) {
+  zloginfo('$$$$$$$$Room extra info update: ', roomID, roomExtraInfoList);
+  const updateKeys = [];
+  const oldRoomProperties = JSON.parse(JSON.stringify(_roomProperties));
+  roomExtraInfoList.forEach(({ key, updateTime, updateUser, value }) => {
+    if (key === 'extra_info') {
+      const roomProperties = JSON.parse(value);
+      Object.keys(roomProperties).forEach((propertyKey) => {
+        if (oldRoomProperties[propertyKey] !== roomProperties[propertyKey]) {
+          updateKeys.push(propertyKey);
+          _roomProperties[propertyKey] = roomProperties[propertyKey];
+          _notifyRoomPropertyUpdate(propertyKey, oldRoomProperties[propertyKey], roomProperties[propertyKey], ZegoRoomPropertyUpdateType.remote);
+        }
+      })
+    }
+  });
+  if (updateKeys.length > 0) {
+    _notifyRoomPropertiesFullUpdate(updateKeys, oldRoomProperties, JSON.parse(JSON.stringify(_roomProperties)), ZegoRoomPropertyUpdateType.remote);
+  }
+}
 function _registerEngineCallback() {
   zloginfo('Register callback for ZegoExpressEngine...');
   ZegoExpressEngine.instance().on(
@@ -480,6 +506,9 @@ function _registerEngineCallback() {
       _onRequireNewToken();
     }
   );
+  ZegoExpressEngine.instance().on('roomExtraInfoUpdate', (roomID, roomExtraInfoList) => {
+    _onRoomExtraInfoUpdate(roomID, roomExtraInfoList);
+  });
   ZegoExpressEngine.instance().on('roomStreamExtraInfoUpdate', (roomID, streamList) => {
     zloginfo('roomStreamExtraInfoUpdate', streamList)
     streamList.forEach((stream) => {
@@ -511,6 +540,7 @@ function _unregisterEngineCallback() {
   ZegoExpressEngine.instance().off('roomStateChanged');
   ZegoExpressEngine.instance().off('audioRouteChange');
   ZegoExpressEngine.instance().off('IMRecvBroadcastMessage');
+  ZegoExpressEngine.instance().off('roomExtraInfoUpdate');
   ZegoExpressEngine.instance().off('roomStreamExtraInfoUpdate');
 }
 function _notifyUserCountOrPropertyChanged(type) {
@@ -569,9 +599,11 @@ function _tryStartPublishStream() {
     ZegoExpressEngine.instance()
       .startPublishingStream(_localCoreUser.streamID)
       .then(() => {
-        if (_localCoreUser.streamID in _streamCoreUserMap) {
+        zloginfo('Notify local user audioVideoAvailable start', _localCoreUser.streamID + '', JSON.parse(JSON.stringify(_streamCoreUserMap)));
+        // if (_localCoreUser.streamID in _streamCoreUserMap) {
           _streamCoreUserMap[_localCoreUser.streamID] = _localCoreUser;
 
+          zloginfo('Notify local user audioVideoAvailable end', _localCoreUser);
           Object.keys(_onAudioVideoAvailableCallbackMap).forEach(
             (callbackID) => {
               if (_onAudioVideoAvailableCallbackMap[callbackID]) {
@@ -579,7 +611,7 @@ function _tryStartPublishStream() {
               }
             }
           );
-        }
+        // }
       });
     zloginfo('ZegoExpressEngine startPreview:', _localCoreUser);
     if (_localCoreUser.viewID > 0) {
@@ -656,6 +688,20 @@ function _notifySoundLevelUpdate(userID, soundLevel) {
   Object.keys(_onSoundLevelUpdateCallbackMap).forEach((callbackID) => {
     if (_onSoundLevelUpdateCallbackMap[callbackID]) {
       _onSoundLevelUpdateCallbackMap[callbackID](userID, soundLevel);
+    }
+  });
+}
+function _notifyRoomPropertyUpdate(key, oldValue, value, type) {
+  Object.keys(_onRoomPropertyUpdatedCallbackMap).forEach((callbackID) => {
+    if (_onRoomPropertyUpdatedCallbackMap[callbackID]) {
+      _onRoomPropertyUpdatedCallbackMap[callbackID](key, oldValue, value, type);
+    }
+  });
+}
+function _notifyRoomPropertiesFullUpdate(keys, oldRoomProperties, roomProperties, type) {
+  Object.keys(_onRoomPropertiesFullUpdatedCallbackMap).forEach((callbackID) => {
+    if (_onRoomPropertiesFullUpdatedCallbackMap[callbackID]) {
+      _onRoomPropertiesFullUpdatedCallbackMap[callbackID](keys, oldRoomProperties, roomProperties, type);
     }
   });
 }
@@ -1038,6 +1084,14 @@ export default {
       _onAudioVideoUnavailableCallbackMap[callbackID] = callback;
     }
   },
+  startPlayingAllAudioVideo() {
+    ZegoExpressEngine.instance().muteAllPlayStreamAudio(false);
+    ZegoExpressEngine.instance().muteAllPlayStreamVideo(false);
+  },
+  stopPlayingAllAudioVideo() {
+    ZegoExpressEngine.instance().muteAllPlayStreamAudio(true);
+    ZegoExpressEngine.instance().muteAllPlayStreamVideo(true);
+  },
 
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Room <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
   joinRoom(roomID, token) {
@@ -1128,6 +1182,113 @@ export default {
       _onRequireNewTokenCallbackMap[callbackID] = callback;
     }
   },
+  setRoomProperty(key, value) {
+    if (!_isRoomConnected) {
+      zlogerror('You need to join the room before using this interface!');
+      return;
+    }
+    if (_roomProperties[key] === value) {
+      return;
+    }
+    const oldValue = _roomProperties[key];
+    const oldRoomProperties = JSON.parse(JSON.stringify(_roomProperties));
+    _roomProperties[key] = value;
+    const extraInfo = JSON.stringify(_roomProperties);
+    zloginfo('[updateRoomProperties]Set start', extraInfo);
+    return new Promise((resolve, reject) => {
+      ZegoExpressEngine.instance().setRoomExtraInfo(_currentRoomID, 'extra_info', extraInfo).then(({ errorCode }) => {
+        if (errorCode === 0) {
+          zloginfo('[updateRoomProperties]Set success');
+          resolve();
+          // Notify
+          _notifyRoomPropertyUpdate(key, oldValue, value, ZegoRoomPropertyUpdateType.set);
+          _notifyRoomPropertiesFullUpdate([key], oldRoomProperties, JSON.parse(extraInfo), ZegoRoomPropertyUpdateType.set);
+        } else {
+          // Restore
+          _roomProperties = JSON.parse(JSON.stringify(oldRoomProperties));
+          zlogwarning('[setRoomProperty]Set failed, errorCode: ', errorCode);
+          reject({ code: errorCode });
+        }
+      }).catch((error) => {
+        // Restore
+        _roomProperties = JSON.parse(JSON.stringify(oldRoomProperties));
+        zlogerror('[setRoomProperty]Set error', error);
+        reject(error);
+      });
+    });
+  },
+  updateRoomProperties(newRoomProperties) {
+    if (!_isRoomConnected) {
+      zlogerror('You need to join the room before using this interface!');
+      return Promise.reject();
+    }
+    const updateKeys = [];
+    const oldRoomProperties = JSON.parse(JSON.stringify(_roomProperties));
+    Object.keys(newRoomProperties).forEach((key) => {
+      if (oldRoomProperties[key] !== newRoomProperties[key]) {
+        updateKeys.push(key);
+        _roomProperties[key] = newRoomProperties[key];
+      }
+    })
+    const extraInfo = JSON.stringify(_roomProperties);
+    zloginfo('[updateRoomProperties]Update start', extraInfo);
+    return new Promise((resolve, reject) => {
+      ZegoExpressEngine.instance().setRoomExtraInfo(_currentRoomID, 'extra_info', extraInfo).then(({ errorCode }) => {
+        if (errorCode === 0) {
+          zloginfo('[updateRoomProperties]Update success');
+          resolve();
+          // Notify
+          updateKeys.forEach((updateKey) => {
+            const oldValue = oldRoomProperties[updateKey];
+            const value = newRoomProperties[updateKey];
+            _notifyRoomPropertyUpdate(updateKey, oldValue, value, ZegoRoomPropertyUpdateType.update);
+          })
+          updateKeys.length && _notifyRoomPropertiesFullUpdate(updateKeys, oldRoomProperties, JSON.parse(extraInfo), ZegoRoomPropertyUpdateType.update);
+        } else {
+          // Restore
+          _roomProperties = JSON.parse(JSON.stringify(oldRoomProperties));
+          zlogwarning('[updateRoomProperties]Update failed, errorCode: ', errorCode);
+          reject({ code: errorCode });
+        }
+      }).catch((error) => {
+        // Restore
+        _roomProperties = JSON.parse(JSON.stringify(oldRoomProperties));
+        zlogerror('[updateRoomProperties]Update error', error);
+        reject(error);
+      });
+    });
+  },
+  getRoomProperties() {
+    return _roomProperties;
+  },
+  onRoomPropertyUpdated(callbackID, callback) {
+    if (typeof callback !== 'function') {
+      if (callbackID in _onRoomPropertyUpdatedCallbackMap) {
+        zloginfo(
+          '[onRoomPropertyUpdated] Remove callback for: [',
+          callbackID,
+          '] because callback is not a valid function!'
+        );
+        delete _onRoomPropertyUpdatedCallbackMap[callbackID];
+      }
+    } else {
+      _onRoomPropertyUpdatedCallbackMap[callbackID] = callback;
+    }
+  },
+  onRoomPropertiesFullUpdated(callbackID, callback) {
+    if (typeof callback !== 'function') {
+      if (callbackID in _onRoomPropertiesFullUpdatedCallbackMap) {
+        zloginfo(
+          '[onRoomPropertiesFullUpdated] Remove callback for: [',
+          callbackID,
+          '] because callback is not a valid function!'
+        );
+        delete _onRoomPropertiesFullUpdatedCallbackMap[callbackID];
+      }
+    } else {
+      _onRoomPropertiesFullUpdatedCallbackMap[callbackID] = callback;
+    }
+  },   
 
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> User <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
   connectUser(userID, userName) {
@@ -1292,5 +1453,55 @@ export default {
   },
   notifyUserInfoUpdate(userID) {
     _notifyUserInfoUpdate(_coreUserMap[userID]);
+  },
+  // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Force update component <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+  forceSortMemberList() {
+    zloginfo('[forceSortMemberList callback]');
+    const userList = Object.values(_coreUserMap)
+      .sort((user1, user2) => {
+        return user2.joinTime - user1.joinTime;
+      })
+      .map((user) => _createPublicUser(user));
+    Object.keys(_onMemberListForceSortCallbackMap).forEach((callbackID) => {
+      if (_onMemberListForceSortCallbackMap[callbackID]) {
+        _onMemberListForceSortCallbackMap[callbackID](userList);
+      }
+    });
+  },
+  onMemberListForceSort(callbackID, callback) {
+    if (typeof callback !== 'function') {
+      if (callbackID in _onMemberListForceSortCallbackMap) {
+        zloginfo(
+          '[onMemberListForceSort] Remove callback for: [',
+          callbackID,
+          '] because callback is not a valid function!'
+        );
+        delete _onMemberListForceSortCallbackMap[callbackID];
+      }
+    } else {
+      _onMemberListForceSortCallbackMap[callbackID] = callback;
+    }
+  },
+  forceSortAudioVideoList() {
+    zloginfo('[forceSortAudioVideoList callback]');
+    Object.keys(_onAudioVideoListForceSortCallbackMap).forEach((callbackID) => {
+      if (_onAudioVideoListForceSortCallbackMap[callbackID]) {
+        _onAudioVideoListForceSortCallbackMap[callbackID]();
+      }
+    });
+  },
+  onAudioVideoListForceSort(callbackID, callback) {
+    if (typeof callback !== 'function') {
+      if (callbackID in _onAudioVideoListForceSortCallbackMap) {
+        zloginfo(
+          '[onAudioVideoListForceSort] Remove callback for: [',
+          callbackID,
+          '] because callback is not a valid function!'
+        );
+        delete _onAudioVideoListForceSortCallbackMap[callbackID];
+      }
+    } else {
+      _onAudioVideoListForceSortCallbackMap[callbackID] = callback;
+    }
   },
 };

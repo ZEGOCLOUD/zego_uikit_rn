@@ -34,7 +34,8 @@ export default function ZegoVideoView(props) {
   const [userInfo, setUserInfo] = useState({});
   const [isCameraOn, setIsCameraOn] = useState(true);
   const [propsData, setPropsData] = useState({ userInfo: {} });
-  const [avatar, setAvatarUrl] = useState(ZegoUIKitInternal.getUser(userID).inRoomAttributes.avatar || '');
+  const inRoomAttributes = ZegoUIKitInternal.getUser(userID).inRoomAttributes;
+  const [avatar, setAvatarUrl] = useState(inRoomAttributes ? (inRoomAttributes.avatar || '') : '');
 
   useEffect(() => {
     const user = ZegoUIKitInternal.getUser(userID);
@@ -77,7 +78,7 @@ export default function ZegoVideoView(props) {
     ZegoUIKitInternal.onUserCountOrPropertyChanged(callbackID, (userList) => {
       console.log('=========[ZegoVideoView]onUserCountOrPropertyChanged=========', userID, userList);
       userList.forEach((user) => {
-        const temp = user.inRoomAttributes.avatar;
+        const temp = user.inRoomAttributes ? user.inRoomAttributes.avatar : '';
         if (user.userID === userID && temp) {
           setAvatarUrl(temp);
         }
@@ -148,6 +149,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '100%',
     height: '100%',
+    zIndex: 2,
   },
   defaultMaskNameLabelContainer: {
     flex: 1,

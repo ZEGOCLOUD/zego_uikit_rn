@@ -3,6 +3,7 @@ import { FlatList, Text, StyleSheet, View } from 'react-native';
 import ZegoUIKitInternal from '../internal/ZegoUIKitInternal';
 
 export default function ZegoInRoomMessageView(props) {
+  const { itemBuilder } = props;
   const listRef = useRef(null);
   const [messageList, setMessageList] = useState([]);
 
@@ -11,6 +12,17 @@ export default function ZegoInRoomMessageView(props) {
     // Update list like this will cause rerender
     setMessageList((arr) => [...ZegoUIKitInternal.getInRoomMessages()]);
   };
+  const renderItem = ({ item }) => {
+    return (
+      !itemBuilder ? <View style={styles.messageContainer}>
+        <Text style={styles.nameLabel}>
+          {item.sender.userName}
+          <Text style={styles.messageLabel}> {item.message}</Text>
+        </Text>
+      </View> : <Delegate to={itemBuilder} props={{ message: item }} />
+    );
+  }
+
   useEffect(() => {
     refreshMessage();
   }, []);
@@ -36,16 +48,7 @@ export default function ZegoInRoomMessageView(props) {
       data={messageList}
       // https://stackoverflow.com/questions/46304677/scrolltoend-after-update-data-for-flatlist
       onContentSizeChange={() => listRef.current.scrollToEnd()}
-      renderItem={({ item }) => {
-        return (
-          <View style={styles.messageContainer}>
-            <Text style={styles.nameLabel}>
-              {item.sender.userName}
-              <Text style={styles.messageLabel}> {item.message}</Text>
-            </Text>
-          </View>
-        );
-      }}
+      renderItem={renderItem}
     />
   );
 }
