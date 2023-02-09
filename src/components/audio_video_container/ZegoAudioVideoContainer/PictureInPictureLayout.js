@@ -16,6 +16,7 @@ export default function PictureInPictureLayout(props) {
         switchLargeOrSmallViewByClick = true,
         smallViewSize = { width: 85, height: 151 },
         spacingBetweenSmallViews = 8,
+        removeViewWhenAudioVideoUnavailable = false,
     } = config;
     const {
         useVideoViewAspectFill = false,
@@ -37,22 +38,35 @@ export default function PictureInPictureLayout(props) {
             });
         });
         ZegoUIKitInternal.onAudioVideoUnavailable(callbackID, (userList) => {
-            userList.forEach((user) => {
-                const result = realTimeData.current.findIndex((item) => user.userID === item.userID);
-                if (result !== -1) {
-                    realTimeData.current.splice(result, 1);
-                    setGlobalAudioVideoUserList((arr) => [...(sortAudioVideo ? sortAudioVideo(realTimeData.current) : realTimeData.current)]);
-                }
-            });
+            if (removeViewWhenAudioVideoUnavailable) {
+                userList.forEach((user) => {
+                    const result = realTimeData.current.findIndex((item) => user.userID === item.userID);
+                    if (result !== -1) {
+                        realTimeData.current.splice(result, 1);
+                        setGlobalAudioVideoUserList((arr) => [...(sortAudioVideo ? sortAudioVideo(realTimeData.current) : realTimeData.current)]);
+                    }
+                });
+            }
         });
         ZegoUIKitInternal.onAudioVideoListForceSort(callbackID, () => {
             setGlobalAudioVideoUserList((arr) => [...(sortAudioVideo ? sortAudioVideo(realTimeData.current) : realTimeData.current)]);
         });
-
+        ZegoUIKitInternal.onUserLeave(callbackID, (userList) => {
+            if (!removeViewWhenAudioVideoUnavailable) {
+                userList.forEach((user) => {
+                    const result = realTimeData.current.findIndex((item) => user.userID === item.userID);
+                    if (result !== -1) {
+                        realTimeData.current.splice(result, 1);
+                        setGlobalAudioVideoUserList((arr) => [...(sortAudioVideo ? sortAudioVideo(realTimeData.current) : realTimeData.current)]);
+                    }
+                });
+            }
+        });
         return () => {
             ZegoUIKitInternal.onAudioVideoListForceSort(callbackID);
             ZegoUIKitInternal.onAudioVideoAvailable(callbackID);
             ZegoUIKitInternal.onAudioVideoUnavailable(callbackID);
+            ZegoUIKitInternal.onUserLeave(callbackID);
         }
     }, [])
     const getSmallViewPostStyle = () => {
