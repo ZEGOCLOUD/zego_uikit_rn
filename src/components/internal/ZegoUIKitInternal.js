@@ -442,6 +442,7 @@ function _onIMCustomCommandReceived(roomID, fromUser, command) {
   } catch (error) {
     console.error(error);
   }
+  zloginfo('_onIMCustomCommandReceived: ', roomID, fromUser, command);
   Object.keys(_onInRoomCommandReceivedCallbackMap).forEach((callbackID) => {
     if (callbackID in _onInRoomCommandReceivedCallbackMap) {
       if (_onInRoomCommandReceivedCallbackMap[callbackID]) {
