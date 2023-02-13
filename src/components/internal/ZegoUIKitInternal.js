@@ -30,6 +30,11 @@ var _onInRoomMessageReceivedCallbackMap = {};
 var _onInRoomMessageSentCallbackMap = {};
 var _onRoomPropertyUpdatedCallbackMap = {};
 var _onRoomPropertiesFullUpdatedCallbackMap = {};
+var _onInRoomCommandReceivedCallbackMap = {};
+var _onMeRemovedFromRoomCallbackMap = {};
+var _onTurnOnYourCameraRequestCallbackMap = {};
+var _onTurnOnYourMicrophoneRequestCallbackMap = {};
+
 // Force update component callback
 var _onMemberListForceSortCallbackMap = {};
 var _onAudioVideoListForceSortCallbackMap = {};
@@ -42,6 +47,9 @@ var _qualityUpdateLogCounter = 0;
 var _inRoomMessageList = [];
 var _audioVideoResourceMode = ZegoAudioVideoResourceMode.Default;
 var _roomProperties = {};
+var _isLargeRoom = false;
+var _roomMemberCount = 0;
+var _markAsLargeRoom = false;
 
 function _resetData() {
   zloginfo('Reset all data.');
@@ -55,6 +63,9 @@ function _resetData() {
   _audioOutputType = 0;
   _inRoomMessageList = [];
   _audioVideoResourceMode = ZegoAudioVideoResourceMode.Default;
+  _isLargeRoom = false;
+  _roomMemberCount = 0;
+  _markAsLargeRoom = false;
 }
 
 function _resetDataForLeavingRoom() {
@@ -69,6 +80,9 @@ function _resetDataForLeavingRoom() {
   _coreUserMap[_localCoreUser.userID] = _localCoreUser;
   _inRoomMessageList = [];
   _roomProperties = {};
+  _isLargeRoom = false;
+  _roomMemberCount = 0;
+  _markAsLargeRoom = false;
 }
 
 function _createPublicUser(coreUser) {
@@ -118,6 +132,10 @@ function _onRoomUserUpdate(roomID, updateType, userList) {
   // No need for roomID, does not support multi-room right now.
   const userInfoList = [];
   if (updateType == 0) {
+    _roomMemberCount += userList.length;
+    if (_roomMemberCount >= 500) {
+      _isLargeRoom = true;
+    }
     userList.forEach((user) => {
       if (!(user.userID in _coreUserMap)) {
         const coreUser = _createCoreUser(user.userID, user.userName);
@@ -144,6 +162,7 @@ function _onRoomUserUpdate(roomID, updateType, userList) {
       }
     });
   } else {
+    _roomMemberCount -= userList.length;
     userList.forEach((user) => {
       if (user.userID in _coreUserMap) {
         const coreUser = _coreUserMap[user.userID];
@@ -302,6 +321,10 @@ function _onRoomStateChanged(roomID, reason, errorCode, extendedData) {
     _tryStartPublishStream();
   } else {
     _isRoomConnected = false;
+    if (reason == 6) {
+      // KickOut
+      _notifyMeRemovedFromRoom();
+    }
   }
   _currentRoomState = reason;
 
@@ -381,6 +404,188 @@ function _onRoomExtraInfoUpdate(roomID, roomExtraInfoList) {
   if (updateKeys.length > 0) {
     _notifyRoomPropertiesFullUpdate(updateKeys, oldRoomProperties, JSON.parse(JSON.stringify(_roomProperties)), ZegoRoomPropertyUpdateType.remote);
   }
+}
+function _onIMCustomCommandReceived(roomID, fromUser, command) {
+  try {
+    const commandObj = JSON.parse(command);
+    if (commandObj && typeof commandObj === 'object') {
+      fromUser = _createPublicUser(_coreUserMap[fromUser.userID] || fromUser);
+      const removeUserIDList = commandObj.zego_remove_user;
+      const turnCameraOnUserID = commandObj.zego_turn_camera_on;
+      const turnCameraOffUserID = commandObj.zego_turn_camera_off;
+      const turnMicrophoneOnUserID = commandObj.zego_turn_microphone_on;
+      const turnMicrophoneOffUserID = commandObj.zego_turn_microphone_off;
+      if (removeUserIDList && removeUserIDList.find((removeUserID) => removeUserID === _localCoreUser.userID)) {
+        _notifyMeRemovedFromRoom();
+        // Leave the room automatically
+        _leaveRoom();
+      } else if (turnCameraOnUserID === _localCoreUser.userID) {
+        Object.keys(_onTurnOnYourCameraRequestCallbackMap).forEach((callbackID) => {
+          if (_onTurnOnYourCameraRequestCallbackMap[callbackID]) {
+            _onTurnOnYourCameraRequestCallbackMap[callbackID](fromUser);
+          }
+        });
+      } else if (turnMicrophoneOnUserID === _localCoreUser.userID) {
+        Object.keys(_onTurnOnYourMicrophoneRequestCallbackMap).forEach((callbackID) => {
+          if (_onTurnOnYourMicrophoneRequestCallbackMap[callbackID]) {
+            _onTurnOnYourMicrophoneRequestCallbackMap[callbackID](fromUser);
+          }
+        });
+      } else if (turnCameraOffUserID === _localCoreUser.userID) {
+        _turnCameraDeviceOn(_localCoreUser.userID, false);
+        // Automatic shutdown
+      } else if (turnMicrophoneOffUserID === _localCoreUser.userID) {
+        // Automatic shutdown
+        _turnMicDeviceOn(_localCoreUser.userID, false);
+      }
+    }
+  } catch (error) {
+    console.error(error);
+  }
+  Object.keys(_onInRoomCommandReceivedCallbackMap).forEach((callbackID) => {
+    if (callbackID in _onInRoomCommandReceivedCallbackMap) {
+      if (_onInRoomCommandReceivedCallbackMap[callbackID]) {
+        _onInRoomCommandReceivedCallbackMap[callbackID](fromUser, command);
+      }
+    }
+  });
+}
+function _sendInRoomCommand(command, toUserList) {
+  if (!_isRoomConnected) {
+    zlogerror('You need to join the room before using this interface!');
+    return Promise.reject();
+  }
+  return new Promise((resolve, reject) => {
+    ZegoExpressEngine.instance().sendCustomCommand(_currentRoomID, command, toUserList).then(({ errorCode }) => {
+      if (errorCode === 0) {
+        zloginfo('[sendInRoomCommand]Send successfully', toUserList);
+        resolve();
+      } else {
+        zloginfo('[sendInRoomCommand]Send failure', toUserList);
+        reject();
+      }
+    }).catch((error) => {
+      zloginfo('[sendInRoomCommand]Send error', error);
+      reject();
+    })
+  });
+}
+function _leaveRoom() {
+  return new Promise((resolve, reject) => {
+    if (_currentRoomID == '') {
+      zlogwarning('You are not join in any room, no need to leave room.');
+      resolve();
+    } else {
+      zloginfo('leaveRoom: ', _currentRoomID);
+      ZegoExpressEngine.instance()
+        .logoutRoom(_currentRoomID)
+        .then(() => {
+          zloginfo('Leave room succeed.');
+          ZegoExpressEngine.instance().stopSoundLevelMonitor();
+          _notifyUserCountOrPropertyChanged(
+            ZegoChangedCountOrProperty.userDelete
+          );
+          _resetDataForLeavingRoom();
+          resolve();
+        })
+        .catch((error) => {
+          zlogerror('Leave room failed: ', error);
+          reject(error);
+        });
+    }
+  });
+}
+function _turnMicDeviceOn(userID, on) {
+  return new Promise((resolve, reject) => {
+    if (_isLocalUser(userID)) {
+      zloginfo('turnMicDeviceOn: ', _localCoreUser.userID, on);
+      ZegoExpressEngine.instance().muteMicrophone(!on);
+
+      _onRemoteMicStateUpdate(_localCoreUser.userID, on);
+
+      _localCoreUser.isMicDeviceOn = on;
+      _coreUserMap[_localCoreUser.userID].isMicDeviceOn = on;
+      _notifyUserInfoUpdate(_localCoreUser);
+      _notifyUserCountOrPropertyChanged(
+        ZegoChangedCountOrProperty.microphoneStateUpdate
+      );
+
+      // sync device status via stream extra info
+      var extraInfo = {
+          isCameraOn : _localCoreUser.isCameraDeviceOn,
+          isMicrophoneOn : on
+      }
+      ZegoExpressEngine.instance().setStreamExtraInfo(JSON.stringify(extraInfo))
+
+      if (on) {
+        _tryStartPublishStream();
+      } else {
+        _tryStopPublishStream();
+      }
+      resolve();
+    } else {
+      const isLargeRoom = _isLargeRoom || _markAsLargeRoom;
+      const command = on ? JSON.stringify({ zego_turn_microphone_on: userID }) : JSON.stringify({ zego_turn_microphone_off: userID });
+      const userInfo = _coreUserMap[userID];
+      const userName = userInfo ? (userInfo.userName || '') : '';
+      const toUserList = isLargeRoom ? [] : [{ userID, userName }];
+      _sendInRoomCommand(command, toUserList).then(() => {
+        zloginfo('turnMicDeviceOn others: ', userID, on);
+        resolve();
+      }).catch(() => {
+        zlogerror('turnMicDeviceOn others error: ', userID, on);
+        reject();
+      });
+    }
+  });
+}
+function _turnCameraDeviceOn(userID, on) {
+  return new Promise((resolve, reject) => {
+    if (_isLocalUser(userID)) {
+      // Default to Main Channel
+      zloginfo('turnCameraDeviceOn: ', _localCoreUser.userID, on);
+      ZegoExpressEngine.instance().enableCamera(on, 0);
+
+      _onRemoteCameraStateUpdate(_localCoreUser.userID, on);
+
+      _localCoreUser.isCameraDeviceOn = on;
+      // if (!on) {
+      //     _localCoreUser.viewID = -1;
+      // }
+      _coreUserMap[_localCoreUser.userID] = _localCoreUser;
+      _notifyUserInfoUpdate(_localCoreUser);
+      _notifyUserCountOrPropertyChanged(
+        ZegoChangedCountOrProperty.cameraStateUpdate
+      );
+
+      // sync device status via stream extra info
+      var extraInfo = {
+          isCameraOn : on,
+          isMicrophoneOn : _localCoreUser.isMicDeviceOn
+      }
+      ZegoExpressEngine.instance().setStreamExtraInfo(JSON.stringify(extraInfo))
+
+      if (on) {
+        _tryStartPublishStream();
+      } else {
+        _tryStopPublishStream();
+      }
+      resolve();
+    } else {
+      const isLargeRoom = _isLargeRoom || _markAsLargeRoom;
+      const command = on ? JSON.stringify({ zego_turn_camera_on: userID }) : JSON.stringify({ zego_turn_camera_off: userID });
+      const userInfo = _coreUserMap[userID];
+      const userName = userInfo ? (userInfo.userName || '') : '';
+      const toUserList = isLargeRoom ? [] : [{ userID, userName }];
+      _sendInRoomCommand(command, toUserList).then(() => {
+        zloginfo('turnCameraDeviceOn others: ', userID, on);
+        resolve();
+      }).catch(() => {
+        zlogerror('turnCameraDeviceOn others error: ', userID, on);
+        reject();
+      });
+    }
+  });
 }
 function _registerEngineCallback() {
   zloginfo('Register callback for ZegoExpressEngine...');
@@ -524,7 +729,11 @@ function _registerEngineCallback() {
             zlogerror('roomStreamExtraInfoUpdate ERROR: ', error)
         }
     })
-  })
+  });
+  ZegoExpressEngine.instance().on('IMRecvCustomCommand', (roomID, fromUser, command) => {
+    zloginfo('IMRecvCustomCommand', roomID, fromUser, command);
+    _onIMCustomCommandReceived(roomID, fromUser, command);
+  });
 }
 function _unregisterEngineCallback() {
   zloginfo('Unregister callback from ZegoExpressEngine...');
@@ -542,6 +751,7 @@ function _unregisterEngineCallback() {
   ZegoExpressEngine.instance().off('IMRecvBroadcastMessage');
   ZegoExpressEngine.instance().off('roomExtraInfoUpdate');
   ZegoExpressEngine.instance().off('roomStreamExtraInfoUpdate');
+  ZegoExpressEngine.instance().off('IMRecvCustomCommand');
 }
 function _notifyUserCountOrPropertyChanged(type) {
   const msg = [
@@ -702,6 +912,13 @@ function _notifyRoomPropertiesFullUpdate(keys, oldRoomProperties, roomProperties
   Object.keys(_onRoomPropertiesFullUpdatedCallbackMap).forEach((callbackID) => {
     if (_onRoomPropertiesFullUpdatedCallbackMap[callbackID]) {
       _onRoomPropertiesFullUpdatedCallbackMap[callbackID](keys, oldRoomProperties, roomProperties, type);
+    }
+  });
+}
+function _notifyMeRemovedFromRoom() {
+  Object.keys(_onMeRemovedFromRoomCallbackMap).forEach((callbackID) => {
+    if (_onMeRemovedFromRoomCallbackMap[callbackID]) {
+      _onMeRemovedFromRoomCallbackMap[callbackID]();
     }
   });
 }
@@ -932,78 +1149,10 @@ export default {
     return _audioOutputType;
   },
   turnMicDeviceOn(userID, on) {
-    return new Promise((resolve, reject) => {
-      if (_isLocalUser(userID)) {
-        zloginfo('turnMicDeviceOn: ', _localCoreUser.userID, on);
-        ZegoExpressEngine.instance().muteMicrophone(!on);
-
-        _onRemoteMicStateUpdate(_localCoreUser.userID, on);
-
-        _localCoreUser.isMicDeviceOn = on;
-        _coreUserMap[_localCoreUser.userID].isMicDeviceOn = on;
-        _notifyUserInfoUpdate(_localCoreUser);
-        _notifyUserCountOrPropertyChanged(
-          ZegoChangedCountOrProperty.microphoneStateUpdate
-        );
-
-        // sync device status via stream extra info
-        var extraInfo = {
-            isCameraOn : _localCoreUser.isCameraDeviceOn,
-            isMicrophoneOn : on
-        }
-        ZegoExpressEngine.instance().setStreamExtraInfo(JSON.stringify(extraInfo))
-
-        if (on) {
-          _tryStartPublishStream();
-        } else {
-          _tryStopPublishStream();
-        }
-        resolve();
-      } else {
-        // TODO
-        zlogwarning("Can not turn on other's mic device on this version");
-        reject();
-      }
-    });
+    return _turnMicDeviceOn(userID, on);
   },
   turnCameraDeviceOn(userID, on) {
-    return new Promise((resolve, reject) => {
-      if (_isLocalUser(userID)) {
-        // Default to Main Channel
-        zloginfo('turnCameraDeviceOn: ', _localCoreUser.userID, on);
-        ZegoExpressEngine.instance().enableCamera(on, 0);
-
-        _onRemoteCameraStateUpdate(_localCoreUser.userID, on);
-
-        _localCoreUser.isCameraDeviceOn = on;
-        // if (!on) {
-        //     _localCoreUser.viewID = -1;
-        // }
-        _coreUserMap[_localCoreUser.userID] = _localCoreUser;
-        _notifyUserInfoUpdate(_localCoreUser);
-        _notifyUserCountOrPropertyChanged(
-          ZegoChangedCountOrProperty.cameraStateUpdate
-        );
-
-        // sync device status via stream extra info
-        var extraInfo = {
-            isCameraOn : on,
-            isMicrophoneOn : _localCoreUser.isMicDeviceOn
-        }
-        ZegoExpressEngine.instance().setStreamExtraInfo(JSON.stringify(extraInfo))
-
-        if (on) {
-          _tryStartPublishStream();
-        } else {
-          _tryStopPublishStream();
-        }
-        resolve();
-      } else {
-        // TODO
-        zlogwarning("Can not turn on other's camera device on this version");
-        reject();
-      }
-    });
+    return _turnCameraDeviceOn(userID, on);
   },
   onMicDeviceOn(callbackID, callback) {
     if (typeof callback !== 'function') {
@@ -1092,9 +1241,37 @@ export default {
     ZegoExpressEngine.instance().muteAllPlayStreamAudio(true);
     ZegoExpressEngine.instance().muteAllPlayStreamVideo(true);
   },
+  onTurnOnYourCameraRequest(callbackID, callback) {
+    if (typeof callback !== 'function') {
+      if (callbackID in _onTurnOnYourCameraRequestCallbackMap) {
+        zloginfo(
+          '[onTurnOnYourCameraRequest] Remove callback for: [',
+          callbackID,
+          '] because callback is not a valid function!'
+        );
+        delete _onTurnOnYourCameraRequestCallbackMap[callbackID];
+      }
+    } else {
+      _onTurnOnYourCameraRequestCallbackMap[callbackID] = callback;
+    }
+  },
+  onTurnOnYourMicrophoneRequest(callbackID, callback) {
+    if (typeof callback !== 'function') {
+      if (callbackID in _onTurnOnYourMicrophoneRequestCallbackMap) {
+        zloginfo(
+          '[onTurnOnYourMicrophoneRequest] Remove callback for: [',
+          callbackID,
+          '] because callback is not a valid function!'
+        );
+        delete _onTurnOnYourMicrophoneRequestCallbackMap[callbackID];
+      }
+    } else {
+      _onTurnOnYourMicrophoneRequestCallbackMap[callbackID] = callback;
+    }
+  },
 
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Room <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-  joinRoom(roomID, token) {
+  joinRoom(roomID, token, markAsLargeRoom = false) {
     // Solve the problem of repeated join
     if (_isRoomConnected && _currentRoomID === roomID) {
       zloginfo('Join room success already');
@@ -1112,6 +1289,8 @@ export default {
         .loginRoom(roomID, user, config)
         .then(() => {
           zloginfo('Join room success.', user);
+          _roomMemberCount = 1
+          _markAsLargeRoom = markAsLargeRoom;
           ZegoExpressEngine.instance().startSoundLevelMonitor();
 
           _localCoreUser.streamID = _getPublishStreamID();
@@ -1130,29 +1309,7 @@ export default {
     });
   },
   leaveRoom() {
-    return new Promise((resolve, reject) => {
-      if (_currentRoomID == '') {
-        zlogwarning('You are not join in any room, no need to leave room.');
-        resolve();
-      } else {
-        zloginfo('leaveRoom: ', _currentRoomID);
-        ZegoExpressEngine.instance()
-          .logoutRoom(_currentRoomID)
-          .then(() => {
-            zloginfo('Leave room succeed.');
-            ZegoExpressEngine.instance().stopSoundLevelMonitor();
-            _notifyUserCountOrPropertyChanged(
-              ZegoChangedCountOrProperty.userDelete
-            );
-            _resetDataForLeavingRoom();
-            resolve();
-          })
-          .catch((error) => {
-            zlogerror('Leave room failed: ', error);
-            reject(error);
-          });
-      }
-    });
+    return _leaveRoom();
   },
   onRoomStateChanged(callbackID, callback) {
     if (typeof callback !== 'function') {
@@ -1288,7 +1445,46 @@ export default {
     } else {
       _onRoomPropertiesFullUpdatedCallbackMap[callbackID] = callback;
     }
-  },   
+  },
+  sendInRoomCommand(command, toUserIDs = []) {
+    const toUserList = toUserIDs.map((userID) => {
+      const userInfo = _coreUserMap[userID];
+      const userName = userInfo ? (userInfo.userName || '') : '';
+      return {
+        userID,
+        userName,
+      };
+    });
+    return _sendInRoomCommand(command, toUserList);
+  },
+  onInRoomCommandReceived(callbackID, callback) {
+    if (typeof callback !== 'function') {
+      if (callbackID in _onInRoomCommandReceivedCallbackMap) {
+        zloginfo(
+          '[onInRoomCommandReceived] Remove callback for: [',
+          callbackID,
+          '] because callback is not a valid function!'
+        );
+        delete _onInRoomCommandReceivedCallbackMap[callbackID];
+      }
+    } else {
+      _onInRoomCommandReceivedCallbackMap[callbackID] = callback;
+    }
+  },
+  onMeRemovedFromRoom(callbackID, callback) {
+    if (typeof callback !== 'function') {
+      if (callbackID in _onMeRemovedFromRoomCallbackMap) {
+        zloginfo(
+          '[onMeRemovedFromRoom] Remove callback for: [',
+          callbackID,
+          '] because callback is not a valid function!'
+        );
+        delete _onMeRemovedFromRoomCallbackMap[callbackID];
+      }
+    } else {
+      _onMeRemovedFromRoomCallbackMap[callbackID] = callback;
+    }
+  },
 
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> User <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
   connectUser(userID, userName) {
@@ -1372,6 +1568,18 @@ export default {
     } else {
       _onUserCountOrPropertyChangedCallbackMap[callbackID] = callback;
     }
+  },
+  removeUserFromRoom(userIDs = []) {
+    const command = JSON.stringify({ zego_remove_user: userIDs });
+    const toUserList = (_isLargeRoom || _markAsLargeRoom) ? [] : userIDs.map((userID) => {
+      const userInfo = _coreUserMap[userID];
+      const userName = userInfo ? (userInfo.userName || '') : '';
+      return {
+        userID,
+        userName,
+      };
+    });
+    return _sendInRoomCommand(command, toUserList);
   },
 
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Message <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<

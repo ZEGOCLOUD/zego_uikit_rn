@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import ZegoUIKitInternal from "../../internal/ZegoUIKitInternal";
 import ZegoAudioVideoView from "../../audio_video/ZegoAudioVideoView";
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, View, PanResponder, TouchableWithoutFeedback } from 'react-native'
 import { ZegoViewPostion } from './defines'
 
 export default function PictureInPictureLayout(props) {
@@ -24,6 +24,11 @@ export default function PictureInPictureLayout(props) {
     } = audioVideoConfig;
     const realTimeData = useRef();
     const [globalAudioVideoUserList, setGlobalAudioVideoUserList] = useState([]);
+    const panResponder = useRef(PanResponder.create({
+        onStartShouldSetPanResponderCapture: () => {
+            console.log('Switch the big screen');
+        }
+    })).current;
 
     useEffect(() => {
         realTimeData.current = [];
@@ -94,10 +99,8 @@ export default function PictureInPictureLayout(props) {
     return (<View style={styles.container}>
         <View style={[styles.smallViewContainer, getSmallViewPostStyle()]} onLayout={layoutHandle}>
             {
-                globalAudioVideoUserList.slice(1, 4).map((user, index) => <View
+                globalAudioVideoUserList.slice(1, 4).map((user, index) => <TouchableWithoutFeedback {...panResponder.panHandlers} onPress={switchLargeOrSmallView.bind(this, index, user)}><View
                     key={user.userID}
-                    pointerEvents='auto'
-                    onTouchStart={switchLargeOrSmallView.bind(this, index, user)}
                     style={[
                         styles.smallView,
                         styles.smallViewBorder,
@@ -113,7 +116,7 @@ export default function PictureInPictureLayout(props) {
                             useVideoViewAspectFill={useVideoViewAspectFill}
                             foregroundBuilder={foregroundBuilder}
                         />
-                </View>)
+                </View></TouchableWithoutFeedback>)
             }
         </View>
         <View style={styles.bigView}>

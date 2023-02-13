@@ -647,6 +647,35 @@ const ZegoUIKitSignalingPluginImpl = {
       _onRoomPropertiesFullUpdatedCallbackMap[callbackID] = callback;
     }
   },
+  onInRoomTextMessageReceived(callbackID, callback) {
+    if (!ZegoUIKitSignalingPlugin) {
+      zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
+      return;
+    }
+    if (typeof callback !== 'function') {
+      ZegoUIKitSignalingPlugin.getInstance().registerPluginEventHandler(
+        'inRoomTextMessageReceived',
+        callbackID,
+        callback
+      );
+    } else {
+      ZegoUIKitSignalingPlugin.getInstance().registerPluginEventHandler(
+        'inRoomTextMessageReceived',
+        callbackID,
+        ({ messageList, fromConversationID }) => {
+          callback(messageList.map((message) => {
+            return {
+              messageID: message.messageID,
+              timestamp: message.timestamp,
+              orderKey: message.orderKey,
+              senderUserID: message.senderUserID,
+              text: message.message,
+            }
+          }));
+        }
+      );
+    }
+  }
 };
 
 export default ZegoUIKitSignalingPluginImpl;
