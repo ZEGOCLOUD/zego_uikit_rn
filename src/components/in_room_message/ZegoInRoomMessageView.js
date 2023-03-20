@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { FlatList, Text, StyleSheet, View } from 'react-native';
 import ZegoUIKitInternal from '../internal/ZegoUIKitInternal';
+import Delegate from 'react-delegate-component';
 
 export default function ZegoInRoomMessageView(props) {
   const { itemBuilder } = props;
@@ -8,7 +9,6 @@ export default function ZegoInRoomMessageView(props) {
   const [messageList, setMessageList] = useState([]);
 
   const refreshMessage = () => {
-    // setTimeOut(()=>null)
     // Update list like this will cause rerender
     setMessageList((arr) => [...ZegoUIKitInternal.getInRoomMessages()]);
   };
