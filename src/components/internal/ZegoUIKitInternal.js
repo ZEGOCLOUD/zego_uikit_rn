@@ -94,6 +94,7 @@ function _createPublicUser(coreUser) {
     isCameraOn: coreUser.isCameraDeviceOn,
     soundLevel: coreUser.soundLevel,
     inRoomAttributes: coreUser.inRoomAttributes,
+    avatar: coreUser.avatar,
   };
 }
 function _createCoreUser(userID, userName, profileUrl, extendInfo) {
@@ -111,6 +112,7 @@ function _createCoreUser(userID, userName, profileUrl, extendInfo) {
     soundLevel: 0,
     joinTime: 0,
     inRoomAttributes: {},
+    avatar: '',
   };
 }
 function _isLocalUser(userID) {
@@ -1661,6 +1663,10 @@ export default {
     _notifyUserCountOrPropertyChanged(type);
   },
   notifyUserInfoUpdate(userID) {
+    // Update avatar properties
+    if ( _coreUserMap[userID] && _coreUserMap[userID].inRoomAttributes) {
+      _coreUserMap[userID].avatar = _coreUserMap[userID].inRoomAttributes.avatar;
+    }
     _notifyUserInfoUpdate(_coreUserMap[userID]);
   },
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Force update component <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<

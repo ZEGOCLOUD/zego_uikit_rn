@@ -15,7 +15,7 @@ const ZegoUIKitCorePlugin = {
           : null;
         if (Object.values(ZegoUIKitPluginType).includes(type)) {
           if (_plugins.get(type)) {
-            zlogwarning(
+            zloginfo(
               '[installPlugins]Plugin already exists, will update plugin instance'
             );
           } else {
