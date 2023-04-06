@@ -47,7 +47,11 @@ export default function ZegoInRoomMessageView(props) {
       ref={listRef}
       data={messageList}
       // https://stackoverflow.com/questions/46304677/scrolltoend-after-update-data-for-flatlist
-      onContentSizeChange={() => listRef.current.scrollToEnd()}
+      onContentSizeChange={() => {
+        if (messageList.length) {
+          listRef.current.scrollToEnd();
+        }
+      }}
       renderItem={renderItem}
     />
   );
