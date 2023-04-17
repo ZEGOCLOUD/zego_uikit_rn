@@ -3,7 +3,7 @@ import { Image, TouchableOpacity, View } from "react-native";
 import ZegoUIKitInternal from "../internal/ZegoUIKitInternal";
 import { zloginfo } from "../../utils/logger";
 
-export default function ZegoToggleCameraButton(props) {
+export default function ZegoToggleCameraButton(props: any) {
     const { userID, iconCameraOn, iconCameraOff, isOn, onPress, width = 48, height = 48 } = props;
     const [isCurrentOn, setIsCurrentOn] = useState(true);// Default on
     const getImageSourceByPath = () => {
@@ -23,7 +23,7 @@ export default function ZegoToggleCameraButton(props) {
     });
     useEffect(() => {
         const callbackID = 'ZegoToggleCameraButton' + String(Math.floor(Math.random() * 10000));
-        ZegoUIKitInternal.onCameraDeviceOn(callbackID, (id, on) => {
+        ZegoUIKitInternal.onCameraDeviceOn(callbackID, (id: string, on: boolean) => {
             if (userID === undefined || userID === '') { // local user
                 if (id == ZegoUIKitInternal.getLocalUserInfo().userID) {
                     setIsCurrentOn(on);

@@ -1,7 +1,7 @@
 import { View, StyleSheet, Text, ImageBackground } from "react-native";
 import React from 'react'
 
-export default function MoreFrame(props) {
+export default function MoreFrame(props: any) {
     const {
         roomID,
         userList,
@@ -10,7 +10,7 @@ export default function MoreFrame(props) {
         useVideoViewAspectFill = false,
     } = props;
 
-    const getShotName = (name) => {
+    const getShotName = (name: string) => {
         if (!name) {
             return '';
         }
@@ -48,7 +48,7 @@ export default function MoreFrame(props) {
 }
 
 
-const cstyle = (bgColor) => StyleSheet.create({
+const cstyle = (bgColor: string) => StyleSheet.create({
     container: {
         width: '100%',
         height: '100%',

@@ -3,7 +3,7 @@ import { FlatList, Text, StyleSheet, View } from 'react-native';
 import ZegoUIKitInternal from '../internal/ZegoUIKitInternal';
 import Delegate from 'react-delegate-component';
 
-export default function ZegoInRoomMessageView(props) {
+export default function ZegoInRoomMessageView(props: any) {
   const { itemBuilder } = props;
   const listRef = useRef(null);
   const [messageList, setMessageList] = useState([]);
@@ -12,7 +12,7 @@ export default function ZegoInRoomMessageView(props) {
     // Update list like this will cause rerender
     setMessageList((arr) => [...ZegoUIKitInternal.getInRoomMessages()]);
   };
-  const renderItem = ({ item }) => {
+  const renderItem = ({ item }: any) => {
     return (
       !itemBuilder ? <View style={styles.messageContainer}>
         <Text style={styles.nameLabel}>
@@ -29,10 +29,10 @@ export default function ZegoInRoomMessageView(props) {
   useEffect(() => {
     const callbackID =
       'ZegoInRoomMessageView' + String(Math.floor(Math.random() * 10000));
-    ZegoUIKitInternal.onInRoomMessageReceived(callbackID, (messageList) => {
+    ZegoUIKitInternal.onInRoomMessageReceived(callbackID, () => {
       refreshMessage();
     });
-    ZegoUIKitInternal.onInRoomMessageSent(callbackID, (error, messageID) => {
+    ZegoUIKitInternal.onInRoomMessageSent(callbackID, () => {
       refreshMessage();
     });
 

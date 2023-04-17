@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Image, TouchableOpacity, View } from "react-native";
 import ZegoUIKitInternal from "../internal/ZegoUIKitInternal";
 
-export default function ZegoSwitchCameraButton(props) {
+export default function ZegoSwitchCameraButton(props: any) {
     // TODO useFrontFacingCamera may cause problems when create a lot of times during connected
     const { iconFrontFacingCamera, iconBackFacingCamera, useFrontFacingCamera = true, onPress, width = 48, height = 48 } = props;
     const [isFront, setIsFront] = useState(ZegoUIKitInternal.isUsingFrontFacingCamera());

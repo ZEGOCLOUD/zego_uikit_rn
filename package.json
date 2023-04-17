@@ -6,6 +6,7 @@
   "module": "lib/module/index",
   "react-native": "src/index",
   "source": "src/index",
+  "types": "lib/typescript/index.d.ts",
   "files": [
     "src",
     "lib",
@@ -138,9 +139,13 @@
       [
         "typescript",
         {
-          "project": "tsconfig.build.json"
+          "project": "tsconfig.json"
         }
       ]
     ]
+  },
+  "dependencies": {
+    "react-delegate-component": "^1.0.0",
+    "zego-express-engine-reactnative": "^3.2.0"
   }
 }

@@ -4,7 +4,7 @@ import ZegoUIKitInvitationService from '../services';
 import ZegoInvitationType from './ZegoInvitationType';
 import { zloginfo, zlogerror } from '../../../utils/logger';
 
-export default function ZegoSendInvitationButton(props) {
+export default function ZegoSendInvitationButton(props: any) {
   const {
     icon,
     text,
@@ -56,13 +56,13 @@ export default function ZegoSendInvitationButton(props) {
     }
     return renderView;
   };
-  const getCustomTextStyle = (fontSize, color) => StyleSheet.create({
+  const getCustomTextStyle = (fontSize: number, color: string) => StyleSheet.create({
     text: {
       fontSize,
       color,
     },
   });
-  const getCustomContainerStyle = (width, height, borderRadius, backgroundColor, verticalLayout) => StyleSheet.create({
+  const getCustomContainerStyle = (width: number, height: number, borderRadius: number, backgroundColor: string, verticalLayout: boolean) => StyleSheet.create({
     customContainer: {
       flexDirection: verticalLayout ? 'column' : 'row',
       width,
@@ -104,16 +104,16 @@ export default function ZegoSendInvitationButton(props) {
       `[Components]Send invitation start, invitees: ${invitees}, timeout: ${timeout}, type: ${type}, data: ${data}`
     );
     ZegoUIKitInvitationService.sendInvitation(invitees, timeout, type, data, { resourceID, title: notificationTitle, message: notificationMessage })
-      .then(({ code, message, callID, errorInvitees }) => {
+      .then(({ code, message, callID, errorInvitees }: any) => {
         zloginfo(
           `[Components]Send invitation success, code: ${code}, message: ${message}, errorInvitees: ${errorInvitees}`
         );
         if (invitees.length > errorInvitees.length) {
           if (typeof onPressed === 'function') {
             const inviteesBackup = JSON.parse(JSON.stringify(invitees));
-            errorInvitees.forEach((errorInviteeID) => {
+            errorInvitees.forEach((errorInviteeID: string) => {
               const index = inviteesBackup.findIndex(
-                (inviteeID) => errorInviteeID === inviteeID
+                (inviteeID: string) => errorInviteeID === inviteeID
               );
               index !== -1 && inviteesBackup.splice(index, 1);
             });
@@ -127,7 +127,7 @@ export default function ZegoSendInvitationButton(props) {
           }
         }
       })
-      .catch(({ code, message }) => {
+      .catch(({ code, message }: any) => {
         zlogerror(
           `[Components]Send invitation error, code: ${code}, message: ${message}`
         );

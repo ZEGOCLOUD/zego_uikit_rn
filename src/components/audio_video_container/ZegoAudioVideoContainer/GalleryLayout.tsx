@@ -3,8 +3,9 @@ import { StyleSheet, View, Text } from 'react-native'
 import ZegoUIKitInternal from "../../internal/ZegoUIKitInternal";
 import ZegoAudioVideoView from "../../audio_video/ZegoAudioVideoView";
 import ZegoAudioVideoViewMore from "./MoreFrame";
+import { ZegoRoomStateChangedReason } from "zego-express-engine-reactnative";
 
-export default function GalleryLayout(props) {
+export default function GalleryLayout(props: any) {
     const { config = {}, foregroundBuilder, audioVideoConfig = {} } = props;
     const {
         addBorderRadiusAndSpacingBetweenView = true, // Whether to display rounded corners and spacing between Views
@@ -27,7 +28,7 @@ export default function GalleryLayout(props) {
         ZegoUIKitInternal.onSDKConnected(callbackID, () => {
             setLocalUserID(ZegoUIKitInternal.getLocalUserInfo().userID);
         });
-        ZegoUIKitInternal.onRoomStateChanged(callbackID, (reason, errorCode, extendedData) => {
+        ZegoUIKitInternal.onRoomStateChanged(callbackID, (reason: ZegoRoomStateChangedReason) => {
             if (reason == 1 || reason == 4) {
                 setLocalUserID(ZegoUIKitInternal.getLocalUserInfo().userID);
             } else if (reason == 2 || reason == 5 || reason == 6 || reason == 7) {
@@ -39,7 +40,7 @@ export default function GalleryLayout(props) {
                 setLocalUserID('');
             }
         })
-        ZegoUIKitInternal.onUserCountOrPropertyChanged(callbackID, (userList) => {
+        ZegoUIKitInternal.onUserCountOrPropertyChanged(callbackID, (userList: any[]) => {
             // console.warn('>>>>>>>>>>> onUserCountOrPropertyChanged', userList)
             // Put yourself first
             const index = userList.findIndex((user => user.userID == ZegoUIKitInternal.getLocalUserInfo().userID));

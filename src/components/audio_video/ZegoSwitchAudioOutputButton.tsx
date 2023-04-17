@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Image, TouchableOpacity, View } from "react-native";
 import ZegoUIKitInternal from "../internal/ZegoUIKitInternal";
 
-export default function ZegoSwitchAudioOutputButton(props) {
+export default function ZegoSwitchAudioOutputButton(props: any) {
     // ZegoAudioRouteSpeaker=(0) ZegoAudioRouteHeadphone=(1) ZegoAudioRouteBluetooth=(2) ZegoAudioRouteReceiver=(3) ZegoAudioRouteExternalUSB=(4) ZegoAudioRouteAirPlay=(5)
     const { iconSpeaker, iconEarpiece, iconBluetooth, useSpeaker = false, width = 48, height = 48 } = props;
     const [currentDevice, setCurrentDevice] = useState(0);// Default to speaker
@@ -24,7 +24,7 @@ export default function ZegoSwitchAudioOutputButton(props) {
             ZegoUIKitInternal.setAudioOutputToSpeaker(!usingSpeaker);
         }
     }
-    const updateDeviceType = (type) => {
+    const updateDeviceType = (type: number) => {
         setCurrentDevice(type);
         setEnable(type == 0 || type == 3);
     }
@@ -33,7 +33,7 @@ export default function ZegoSwitchAudioOutputButton(props) {
     });
     useEffect(() => {
         const callbackID = 'ZegoSwitchAudioOutputButton' + String(Math.floor(Math.random() * 10000));
-        ZegoUIKitInternal.onAudioOutputDeviceTypeChange(callbackID, (type) => {
+        ZegoUIKitInternal.onAudioOutputDeviceTypeChange(callbackID, (type: number) => {
             updateDeviceType(type);
         });
         ZegoUIKitInternal.onSDKConnected(callbackID, () => {
@@ -50,6 +50,7 @@ export default function ZegoSwitchAudioOutputButton(props) {
         style={{ width: width, height: height }}
         disabled={!enable} // Only speaker can toggle enable
         onPress={onPress}>
+        {/* @ts-ignore */}
         <Image resizeMode='contain' source={getImageSourceByPath()} style={{ width: "100%", height: "100%" }} />
     </TouchableOpacity>)
 }

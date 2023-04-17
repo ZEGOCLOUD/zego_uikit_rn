@@ -11,8 +11,9 @@ import ZegoUIKitInternal from '../internal/ZegoUIKitInternal';
 import ZegoMicrophoneStateIcon from '../audio_video/ZegoMicrophoneStateIcon';
 import ZegoCameraStateIcon from '../audio_video/ZegoCameraStateIcon';
 import Delegate from 'react-delegate-component';
+import { ZegoRoomStateChangedReason } from 'zego-express-engine-reactnative';
 
-export default function ZegoMemberList(props) {
+export default function ZegoMemberList(props: any) {
   const { showMicrophoneState, showCameraState, itemBuilder, sortUserList } =
     props;
   // let mockList = [
@@ -71,7 +72,7 @@ export default function ZegoMemberList(props) {
     refreshMemberList();
   }, []);
 
-  const getShotName = (name) => {
+  const getShotName = (name: string) => {
     if (!name) {
       return '';
     }
@@ -85,7 +86,7 @@ export default function ZegoMemberList(props) {
     return shotName;
   };
 
-  const iconMicView = (item) =>
+  const iconMicView = (item: any) =>
     showMicrophoneState ? (
       <ZegoMicrophoneStateIcon
         iconMicrophoneOn={require('../internal/resources/gray_icon_video_mic_on.png')}
@@ -96,7 +97,7 @@ export default function ZegoMemberList(props) {
     ) : (
       <View />
     );
-  const iconCameraView = (item) =>
+  const iconCameraView = (item: any) =>
     showCameraState ? (
       <ZegoCameraStateIcon
         iconCameraOn={require('../internal/resources/gray_icon_video_camera_on.png')}
@@ -107,7 +108,7 @@ export default function ZegoMemberList(props) {
       <View />
     );
 
-  const roleDescription = (item) => {
+  const roleDescription = (item: any) => {
     console.warn('===============roleDescription==============', item);
     const localUserID = ZegoUIKitInternal.getLocalUserInfo().userID;
     const showMe = item.userID == localUserID ? 'You' : '';
@@ -118,7 +119,7 @@ export default function ZegoMemberList(props) {
     }
   };
 
-  const renderItem = ({ item }) =>
+  const renderItem = ({ item }: any) =>
     !itemBuilder ? (
       <View style={styles.item}>
         <View style={styles.itemLeft}>
@@ -146,7 +147,7 @@ export default function ZegoMemberList(props) {
     });
     ZegoUIKitInternal.onRoomStateChanged(
       callbackID,
-      (reason, errorCode, extendedData) => {
+      (reason: ZegoRoomStateChangedReason) => {
         if (reason == 1 || reason == 4) {
           setLocalUserID(ZegoUIKitInternal.getLocalUserInfo().userID);
         } else if (reason == 2 || reason == 5 || reason == 6 || reason == 7) {
@@ -159,7 +160,7 @@ export default function ZegoMemberList(props) {
         }
       }
     );
-    ZegoUIKitInternal.onUserCountOrPropertyChanged(callbackID, (userList) => {
+    ZegoUIKitInternal.onUserCountOrPropertyChanged(callbackID, (userList: any[]) => {
       console.warn(
         '===============onUserCountOrPropertyChanged==============',
         userList
@@ -176,7 +177,7 @@ export default function ZegoMemberList(props) {
         setMemberList((arr) => [...userList]);
       }
     });
-    ZegoUIKitInternal.onMemberListForceSort(callbackID, (userList) => {
+    ZegoUIKitInternal.onMemberListForceSort(callbackID, (userList: any[]) => {
       console.log('===============onMemberListForceSort==============', userList)
       if (typeof sortUserList === 'function') {
         const temp = sortUserList(userList) || userList;

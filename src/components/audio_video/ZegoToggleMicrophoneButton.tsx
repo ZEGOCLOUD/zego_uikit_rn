@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Image, TouchableOpacity, View } from "react-native";
 import ZegoUIKitInternal from "../internal/ZegoUIKitInternal";
 
-export default function ZegoToggleMicrophoneButton(props) {
+export default function ZegoToggleMicrophoneButton(props: any) {
     const { userID, iconMicOn, iconMicOff, isOn, onPress, width = 48, height = 48 } = props;
     const [isCurrentOn, setIsCurrentOn] = useState(true);// Default on
     const getImageSourceByPath = () => {
@@ -27,7 +27,7 @@ export default function ZegoToggleMicrophoneButton(props) {
             ZegoUIKitInternal.turnMicDeviceOn(userID, isOn);
             setIsCurrentOn(ZegoUIKitInternal.isMicDeviceOn(userID))
         });
-        ZegoUIKitInternal.onMicDeviceOn(callbackID, (id, on) => {
+        ZegoUIKitInternal.onMicDeviceOn(callbackID, (id: string, on: boolean) => {
             if (userID === undefined || userID === '') { // local user
                 if (id == ZegoUIKitInternal.getLocalUserInfo().userID) {
                     setIsCurrentOn(on);

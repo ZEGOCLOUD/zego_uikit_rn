@@ -5,7 +5,7 @@ import ZegoUIKitInternal from '../../internal/ZegoUIKitInternal';
 const defaultAvatarSizeRatio = 129 / 375;
 const flexStyle = ['center', 'flex-start', 'flex-end'];
 
-export default function AudioFrame(props) {
+export default function AudioFrame(props: any) {
   const {
     userInfo,
     showSoundWave,
@@ -21,7 +21,7 @@ export default function AudioFrame(props) {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [isLoadError, setIsLoadError] = useState(false);
 
-  const getShotName = (name) => {
+  const getShotName = (name: string) => {
     if (!name) {
       return '';
     }
@@ -38,7 +38,7 @@ export default function AudioFrame(props) {
   useEffect(() => {
     ZegoUIKitInternal.onSoundLevelUpdate(
       'AudioFrame' + userInfo.userID,
-      (userID, soundLevel) => {
+      (userID: string, soundLevel: number) => {
         if (userInfo.userID == userID) {
           setSoundLevel(soundLevel);
         }
@@ -70,6 +70,7 @@ export default function AudioFrame(props) {
         resizeMode="cover"
         style={[
           styles.imgBackground,
+          // @ts-ignore
           { justifyContent: flexStyle[avatarAlignment] },
         ]}
       >
@@ -147,7 +148,7 @@ export default function AudioFrame(props) {
   );
 }
 
-const cstyle = (bgColor) =>
+const cstyle = (bgColor: string) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -158,7 +159,7 @@ const cstyle = (bgColor) =>
       backgroundColor: bgColor,
     },
   });
-const waveStyle = (w, color, opacity) =>
+const waveStyle = (w: number, color: string, opacity: number) =>
   StyleSheet.create({
     circleWave: {
       flex: 1,

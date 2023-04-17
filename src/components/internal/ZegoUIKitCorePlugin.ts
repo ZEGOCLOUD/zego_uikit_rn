@@ -3,8 +3,8 @@ import { ZegoUIKitPluginType } from './defines';
 
 const _plugins = new Map(); // type -> plugin
 const ZegoUIKitCorePlugin = {
-  installPlugins: (plugins) => {
-    if (!plugins || !plugins instanceof Array) {
+  installPlugins: (plugins: any[]) => {
+    if (!plugins || !(plugins instanceof Array)) {
       zlogerror('[installPlugins]The parameter passed in was incorrect');
       return;
     }
@@ -29,7 +29,7 @@ const ZegoUIKitCorePlugin = {
       }
     });
   },
-  getPlugin: (type) => {
+  getPlugin: (type: number) => {
     return _plugins.get(type);
   },
 };

@@ -4,7 +4,7 @@ import PictureInPictureWindow from './PictureInPictureLayout'
 import GalleryLayout from './GalleryLayout'
 import { ZegoLayoutMode } from "./defines";
 
-export default function ZegoAudioVideoContainer(props) {
+export default function ZegoAudioVideoContainer(props: any) {
   const { foregroundBuilder, layout, audioVideoConfig = {}, sortAudioVideo } = props;
   const { mode = ZegoLayoutMode.pictureInPicture } = layout;
 

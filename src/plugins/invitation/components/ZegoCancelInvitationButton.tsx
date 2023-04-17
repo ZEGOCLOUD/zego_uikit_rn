@@ -1,26 +1,26 @@
-import React, { Fragment }from 'react';
+import React, { Fragment } from 'react';
 import { Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import ZegoUIKitInvitationService from '../services';
 import { zloginfo, zlogerror } from '../../../utils/logger';
 
-export default function ZegoAcceptInvitationButton(props) {
+export default function ZegoCancelInvitationButton(props: any) {
   const {
     icon,
-    text, 
-    inviterID,
+    text,
+    invitees = [],
     data,
     onPressed,
     onWillPressed,
-    backgroundColor = '#30D059',
+    backgroundColor = '#FF4A50',
     fontSize = 16,
     color = '#FFFFFF',
-    width, // The default size was not given in the first release, so I can't add it here
-    height, // The default size was not given in the first release, so I can't add it here
+    width = 60,
+    height = 60,
     borderRadius = 1000,
     verticalLayout, // Default row layout, no layout parameters default to precedence icon
   } = props;
   const getImageSourceByPath = () => {
-    return require('../resources/button_call_audio_accept.png');
+    return require('../resources/button_call_cancel.png');
   };
   const getRenderView = () => {
     let renderView;
@@ -46,13 +46,13 @@ export default function ZegoAcceptInvitationButton(props) {
     }
     return renderView;
   };
-  const getCustomTextStyle = (fontSize, color) => StyleSheet.create({
+  const getCustomTextStyle = (fontSize: number, color: string) => StyleSheet.create({
     text: {
       fontSize,
       color,
     },
   });
-  const getCustomContainerStyle = (width, height, borderRadius, backgroundColor, verticalLayout) => StyleSheet.create({
+  const getCustomContainerStyle = (width: number, height: number, borderRadius: number, backgroundColor: string, verticalLayout: boolean) => StyleSheet.create({
     customContainer: {
       flexDirection: verticalLayout ? 'column' : 'row',
       width,
@@ -61,22 +61,36 @@ export default function ZegoAcceptInvitationButton(props) {
       borderRadius,
     },
   });
+
   const onButtonPress = () => {
-    const canAcceptInvitation = typeof onWillPressed === 'function' ? onWillPressed() : true;
-    if (!canAcceptInvitation) return;
+    const canCancelInvitation = typeof onWillPressed === 'function' ? onWillPressed() : true;
+    if (!canCancelInvitation) return;
     zloginfo(
-      `[Components]Accept invitation start, inviterID: ${inviterID}, data: ${data}`
+      `[Components]Cancel invitation start, invitees: ${invitees}, data: ${data}`
     );
-    ZegoUIKitInvitationService.acceptInvitation(inviterID, data)
-      .then(() => {
-        zloginfo(`[Components]Accept invitation success`);
-        if (typeof onPressed === 'function') {
-          onPressed();
+    ZegoUIKitInvitationService.cancelInvitation(invitees, data)
+      .then(({ code, message, errorInvitees }: any) => {
+        zloginfo(
+          `[Components]Cancel invitation success, errorInvitees: ${errorInvitees}`
+        );
+        if (invitees.length > errorInvitees.length) {
+          if (typeof onPressed === 'function') {
+            const inviteesBackup = JSON.parse(JSON.stringify(invitees));
+            errorInvitees.forEach((errorInviteeID: string) => {
+              const index = inviteesBackup.findIndex(
+                (inviteeID: string) => errorInviteeID === inviteeID
+              );
+              index !== -1 && inviteesBackup.splice(index, 1);
+            });
+            onPressed({
+              invitees: inviteesBackup,
+            });
+          }
         }
       })
-      .catch(({ code, message }) => {
+      .catch(({ code, message }: any) => {
         zlogerror(
-          `[Components]Accept invitation error, code: ${code}, message: ${message}`
+          `[Components]Cancel invitation error, code: ${code}, message: ${message}`
         );
       });
   };
@@ -92,6 +106,7 @@ export default function ZegoAcceptInvitationButton(props) {
     </TouchableOpacity>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',

@@ -4,12 +4,12 @@ import ZegoUIKitCorePlugin from '../../../components/internal/ZegoUIKitCorePlugi
 import { zlogerror, zloginfo } from '../../../utils/logger';
 import { ZegoInvitationImplResult } from './defines';
 
-var ZegoUIKitSignalingPlugin;
-const _localUser = {};
+var ZegoUIKitSignalingPlugin: any;
+const _localUser: any = {};
 const _queryCount = 20;
-const _onRoomPropertiesFullUpdatedCallbackMap = {};
+const _onRoomPropertiesFullUpdatedCallbackMap: any = {};
 const _usersInRoomAttributes = new Map(); // <userID, attributes> attributes={ string, string }
-let _roomAttributes = {};
+let _roomAttributes: any = {};
 
 
 // ------- live audio room ------
@@ -25,11 +25,11 @@ const _queryUsersInRoomAttributesIteration = (
     }
   );
 };
-const _queryUsersInRoomAttributesFully = (nextFlag, count) => {
-  const fullAttributes = [];
+const _queryUsersInRoomAttributesFully = (nextFlag: string, count: number) => {
+  const fullAttributes: any[] = [];
   return new Promise((resolve, reject) => {
     _queryUsersInRoomAttributesIteration(nextFlag, count)
-      .then(({ nextFlag: resNextFlag, infos }) => {
+      .then(({ nextFlag: resNextFlag, infos }: any) => {
         fullAttributes.push(...infos);
         if (resNextFlag) {
           _queryUsersInRoomAttributesIteration(resNextFlag);
@@ -37,14 +37,14 @@ const _queryUsersInRoomAttributesFully = (nextFlag, count) => {
           resolve(fullAttributes);
         }
       })
-      .catch((error) => {
+      .catch((error: any) => {
         reject(error);
       });
   });
 };
-const _updateCoreUserAndNofityChanges = (infos, editor) => {
+const _updateCoreUserAndNofityChanges = (infos: any[]) => {
   let shouldNotifyChange = false;
-  infos.forEach((info) => {
+  infos.forEach((info: any) => {
     const coreUser = ZegoUIKitInternal.getUser(info.userID);
     if (coreUser) {
       if (
@@ -67,10 +67,10 @@ const _updateCoreUserAndNofityChanges = (infos, editor) => {
     );
   }
 };
-const _notifyRoomPropertiesFullUpdated = (...notifyData) => {
+const _notifyRoomPropertiesFullUpdated = (...notifyData: any[]) => {
   Object.keys(_onRoomPropertiesFullUpdatedCallbackMap).forEach((callbackID) => {
-    if (_onRoomPropertiesFullUpdatedCallbackMap[callbackID]) {
-      _onRoomPropertiesFullUpdatedCallbackMap[callbackID](...notifyData);
+    if ((_onRoomPropertiesFullUpdatedCallbackMap as any)[callbackID]) {
+      ((_onRoomPropertiesFullUpdatedCallbackMap as any)[callbackID])(...notifyData);
     }
   });
 };
@@ -83,7 +83,7 @@ const ZegoUIKitSignalingPluginImpl = {
     }
     ZegoUIKitSignalingPlugin.getVersion();
   },
-  init: (appID, appSign) => {
+  init: (appID: number, appSign: string) => {
     ZegoUIKitSignalingPlugin = ZegoUIKitCorePlugin.getPlugin(
       ZegoUIKitPluginType.signaling
     );
@@ -100,7 +100,7 @@ const ZegoUIKitSignalingPluginImpl = {
     }
     ZegoUIKitSignalingPlugin.getInstance().invoke('uninit');
   },
-  login: (userID, userName) => {
+  login: (userID: string, userName: string) => {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return Promise.reject();
@@ -119,7 +119,7 @@ const ZegoUIKitSignalingPluginImpl = {
     }
     return ZegoUIKitSignalingPlugin.getInstance().invoke('logout');
   },
-  enableNotifyWhenAppRunningInBackgroundOrQuit: (enable, isIOSDevelopmentEnvironment, appName) => {
+  enableNotifyWhenAppRunningInBackgroundOrQuit: (enable: boolean, isIOSDevelopmentEnvironment: boolean, appName: string) => {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return Promise.reject();
@@ -130,7 +130,7 @@ const ZegoUIKitSignalingPluginImpl = {
       appName,
     });
   },
-  sendInvitation: (invitees, timeout, type, data, notificationConfig) => {
+  sendInvitation: (invitees: any[], timeout: number, type: number, data?: string, notificationConfig?: any) => {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return Promise.reject();
@@ -144,7 +144,7 @@ const ZegoUIKitSignalingPluginImpl = {
       notificationConfig
     });
   },
-  cancelInvitation: (invitees, data) => {
+  cancelInvitation: (invitees: any[], data?: string) => {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return Promise.reject();
@@ -154,7 +154,7 @@ const ZegoUIKitSignalingPluginImpl = {
       data,
     });
   },
-  refuseInvitation: (inviterID, data) => {
+  refuseInvitation: (inviterID: string, data?: string) => {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return Promise.reject();
@@ -164,7 +164,7 @@ const ZegoUIKitSignalingPluginImpl = {
       data,
     });
   },
-  acceptInvitation: (inviterID, data) => {
+  acceptInvitation: (inviterID: string, data?: string) => {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return Promise.reject();
@@ -174,7 +174,7 @@ const ZegoUIKitSignalingPluginImpl = {
       data,
     });
   },
-  onConnectionStateChanged: (callbackID, callback) => {
+  onConnectionStateChanged: (callbackID: string, callback?: Function) => {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return;
@@ -185,7 +185,7 @@ const ZegoUIKitSignalingPluginImpl = {
       callback
     );
   },
-  onInvitationReceived: (callbackID, callback) => {
+  onInvitationReceived: (callbackID: string, callback?: Function) => {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return;
@@ -196,7 +196,7 @@ const ZegoUIKitSignalingPluginImpl = {
       callback
     );
   },
-  onInvitationTimeout: (callbackID, callback) => {
+  onInvitationTimeout: (callbackID: string, callback?: Function) => {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return;
@@ -207,7 +207,7 @@ const ZegoUIKitSignalingPluginImpl = {
       callback
     );
   },
-  onInvitationResponseTimeout: (callbackID, callback) => {
+  onInvitationResponseTimeout: (callbackID: string, callback?: Function) => {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return;
@@ -218,7 +218,7 @@ const ZegoUIKitSignalingPluginImpl = {
       callback
     );
   },
-  onInvitationAccepted: (callbackID, callback) => {
+  onInvitationAccepted: (callbackID: string, callback?: Function) => {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return;
@@ -229,7 +229,7 @@ const ZegoUIKitSignalingPluginImpl = {
       callback
     );
   },
-  onInvitationRefused: (callbackID, callback) => {
+  onInvitationRefused: (callbackID: string, callback?: Function) => {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return;
@@ -240,7 +240,7 @@ const ZegoUIKitSignalingPluginImpl = {
       callback
     );
   },
-  onInvitationCanceled: (callbackID, callback) => {
+  onInvitationCanceled: (callbackID: string, callback?: Function) => {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return;
@@ -252,7 +252,7 @@ const ZegoUIKitSignalingPluginImpl = {
     );
   },
   // ------- live audio room - user------
-  joinRoom(roomID) {
+  joinRoom(roomID: string) {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return;
@@ -289,7 +289,7 @@ const ZegoUIKitSignalingPluginImpl = {
             );
           }
         })
-        .catch((error) => {
+        .catch((error: any) => {
           zloginfo('[Plugins][invitation]Failed to join room.', roomID);
           reject(error);
         });
@@ -302,7 +302,7 @@ const ZegoUIKitSignalingPluginImpl = {
   //   }
   //   return _usersInRoomAttributes;
   // },
-  setUsersInRoomAttributes: (key, value, userIDs) => {
+  setUsersInRoomAttributes: (key: string, value: any, userIDs: string[]) => {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return;
@@ -315,7 +315,7 @@ const ZegoUIKitSignalingPluginImpl = {
           value,
           userIDs,
         })
-        .then(({ errorUserList, infos }) => {
+        .then(({ errorUserList }: any) => {
           // for the time being, consider setting only one property for one user at a time
           if (errorUserList.length) {
             zlogerror(
@@ -340,7 +340,7 @@ const ZegoUIKitSignalingPluginImpl = {
             resolve(new ZegoInvitationImplResult('', ''));
           }
         })
-        .catch((error) => {
+        .catch((error: any) => {
           zlogerror(
             '[Plugins][invitation]Failed to set attributes of users in room.',
             error
@@ -349,16 +349,16 @@ const ZegoUIKitSignalingPluginImpl = {
         });
     });
   },
-  queryUsersInRoomAttributes: (nextFlag, count = _queryCount) => {
+  queryUsersInRoomAttributes: (nextFlag: string, count = _queryCount) => {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return;
     }
     return new Promise((resolve, reject) => {
       _queryUsersInRoomAttributesFully(nextFlag, count)
-        .then((fullAttributes) => {
+        .then((fullAttributes: any[]) => {
           _usersInRoomAttributes.clear();
-          fullAttributes.forEach((element) => {
+          fullAttributes.forEach((element: any) => {
             _usersInRoomAttributes.set(element.userID, element.attributes);
           });
           zloginfo(
@@ -381,7 +381,7 @@ const ZegoUIKitSignalingPluginImpl = {
         });
     });
   },
-  onUsersInRoomAttributesUpdated: (callbackID, callback) => {
+  onUsersInRoomAttributesUpdated: (callbackID: string, callback?: Function) => {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return;
@@ -396,7 +396,7 @@ const ZegoUIKitSignalingPluginImpl = {
       ZegoUIKitSignalingPlugin.getInstance().registerPluginEventHandler(
         'usersInRoomAttributesUpdated',
         callbackID,
-        ({ infos, editor }) => {
+        ({ infos, editor }: any) => {
           // incremental information
           const oldAttributes = new Map();
           Array.from(_usersInRoomAttributes.keys()).forEach((key) => {
@@ -405,8 +405,8 @@ const ZegoUIKitSignalingPluginImpl = {
               JSON.parse(JSON.stringify(_usersInRoomAttributes.get(key)))
             );
           });
-          const updateKeys = [];
-          infos.forEach((info) => {
+          const updateKeys: string[] = [];
+          (infos as any[]).forEach((info) => {
             Object.keys(info.attributes).forEach((key) => {
               if (!updateKeys.includes(key)) {
                 updateKeys.push(key);
@@ -428,7 +428,7 @@ const ZegoUIKitSignalingPluginImpl = {
           callback(updateKeys, oldAttributes, _usersInRoomAttributes, editor);
 
           // update the user information of the core layer
-          _updateCoreUserAndNofityChanges(infos, editor);
+          _updateCoreUserAndNofityChanges(infos);
         }
       );
     }
@@ -442,11 +442,11 @@ const ZegoUIKitSignalingPluginImpl = {
   //   return _roomAttributes;
   // },
   updateRoomProperty(
-    key,
-    value,
-    isDeleteAfterOwnerLeft,
-    isForce,
-    isUpdateOwner
+    key: string,
+    value: any,
+    isDeleteAfterOwnerLeft: boolean,
+    isForce: boolean,
+    isUpdateOwner: boolean
   ) {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
@@ -461,7 +461,7 @@ const ZegoUIKitSignalingPluginImpl = {
           isForce,
           isUpdateOwner,
         })
-        .then(({ errorKeys }) => {
+        .then(({ errorKeys }: any) => {
           if (!errorKeys.includes(key)) {
             _roomAttributes[key] = value;
           }
@@ -471,7 +471,7 @@ const ZegoUIKitSignalingPluginImpl = {
           );
           resolve({ ...new ZegoInvitationImplResult('', ''), errorKeys });
         })
-        .catch((error) => {
+        .catch((error: any) => {
           zlogerror(
             '[Plugins][invitation]Failed to update room attributes.',
             error
@@ -480,7 +480,7 @@ const ZegoUIKitSignalingPluginImpl = {
         });
     });
   },
-  deleteRoomProperties(keys, isForce) {
+  deleteRoomProperties(keys: string[], isForce: boolean) {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return;
@@ -491,7 +491,7 @@ const ZegoUIKitSignalingPluginImpl = {
           keys,
           isForce,
         })
-        .then(({ errorKeys }) => {
+        .then(({ errorKeys }: any) => {
           keys.forEach((key) => {
             if (!errorKeys.includes(key)) {
               delete _roomAttributes[key];
@@ -503,7 +503,7 @@ const ZegoUIKitSignalingPluginImpl = {
           );
           resolve({ ...new ZegoInvitationImplResult('', ''), errorKeys });
         })
-        .catch((error) => {
+        .catch((error: any) => {
           zlogerror(
             '[Plugins][invitation]Failed to delete room attributes.',
             error
@@ -513,9 +513,9 @@ const ZegoUIKitSignalingPluginImpl = {
     });
   },
   beginRoomPropertiesBatchOperation(
-    isDeleteAfterOwnerLeft,
-    isForce,
-    isUpdateOwner
+    isDeleteAfterOwnerLeft: boolean,
+    isForce: boolean,
+    isUpdateOwner: boolean
   ) {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
@@ -560,7 +560,7 @@ const ZegoUIKitSignalingPluginImpl = {
             );
           }
         })
-        .catch((error) => {
+        .catch((error: any) => {
           zlogerror(
             '[Plugins][invitation]Failed to end room attributes batch operation.',
             error
@@ -577,7 +577,7 @@ const ZegoUIKitSignalingPluginImpl = {
     return new Promise((resolve, reject) => {
       ZegoUIKitSignalingPlugin.getInstance()
         .invoke('queryRoomProperties')
-        .then(({ roomID, roomAttributes }) => {
+        .then(({ roomID, roomAttributes }: any) => {
           zloginfo(
             '[Plugins][invitation]Query room attributes successfully.',
             roomAttributes
@@ -585,7 +585,7 @@ const ZegoUIKitSignalingPluginImpl = {
           _roomAttributes = roomAttributes;
           resolve({ ...new ZegoInvitationImplResult('', ''), _roomAttributes });
         })
-        .catch((error) => {
+        .catch((error: any) => {
           zlogerror(
             '[Plugins][invitation]Failed to query room attributes.',
             error
@@ -594,7 +594,7 @@ const ZegoUIKitSignalingPluginImpl = {
         });
     });
   },
-  onRoomPropertyUpdated(callbackID, callback) {
+  onRoomPropertyUpdated(callbackID: string, callback?: Function) {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return;
@@ -609,7 +609,7 @@ const ZegoUIKitSignalingPluginImpl = {
       ZegoUIKitSignalingPlugin.getInstance().registerPluginEventHandler(
         'roomPropertyUpdated',
         callbackID,
-        (info) => {
+        (info: any) => {
           const oldRoomAttributes = JSON.parse(JSON.stringify(_roomAttributes));
           const { action, roomAttributes } = info;
           const updateKeys = Object.keys(roomAttributes);
@@ -634,7 +634,7 @@ const ZegoUIKitSignalingPluginImpl = {
       );
     }
   },
-  onRoomPropertiesFullUpdated(callbackID, callback) {
+  onRoomPropertiesFullUpdated(callbackID: string, callback?: Function) {
     if (typeof callback !== 'function') {
       if (callbackID in _onRoomPropertiesFullUpdatedCallbackMap) {
         zloginfo(
@@ -648,7 +648,7 @@ const ZegoUIKitSignalingPluginImpl = {
       _onRoomPropertiesFullUpdatedCallbackMap[callbackID] = callback;
     }
   },
-  onInRoomTextMessageReceived(callbackID, callback) {
+  onInRoomTextMessageReceived(callbackID: string, callback?: Function) {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return;
@@ -663,8 +663,8 @@ const ZegoUIKitSignalingPluginImpl = {
       ZegoUIKitSignalingPlugin.getInstance().registerPluginEventHandler(
         'inRoomTextMessageReceived',
         callbackID,
-        ({ messageList, fromConversationID }) => {
-          callback(messageList.map((message) => {
+        ({ messageList }: any) => {
+          callback(messageList.map((message: any) => {
             return {
               messageID: message.messageID,
               timestamp: message.timestamp,

@@ -4,7 +4,7 @@ import ZegoAudioVideoView from "../../audio_video/ZegoAudioVideoView";
 import { StyleSheet, View, PanResponder, TouchableWithoutFeedback } from 'react-native'
 import { ZegoViewPostion } from './defines'
 
-export default function PictureInPictureLayout(props) {
+export default function PictureInPictureLayout(props: any) {
     const { config = {}, foregroundBuilder, audioVideoConfig = {}, sortAudioVideo } = props;
     const {
         isSmallViewDraggable = false, // TODO
@@ -22,9 +22,10 @@ export default function PictureInPictureLayout(props) {
         useVideoViewAspectFill = false,
         showSoundWavesInAudioMode = true,
     } = audioVideoConfig;
-    const realTimeData = useRef();
+    const realTimeData: any = useRef();
     const [globalAudioVideoUserList, setGlobalAudioVideoUserList] = useState([]);
     const panResponder = useRef(PanResponder.create({
+        // @ts-ignore
         onStartShouldSetPanResponderCapture: () => {
             console.log('Switch the big screen');
         }
@@ -33,19 +34,19 @@ export default function PictureInPictureLayout(props) {
     useEffect(() => {
         realTimeData.current = [];
         const callbackID = 'PictureInPictureLayout' + String(Math.floor(Math.random() * 10000));
-        ZegoUIKitInternal.onAudioVideoAvailable(callbackID, (userList) => {
+        ZegoUIKitInternal.onAudioVideoAvailable(callbackID, (userList: any[]) => {
             userList.forEach((user) => {
-                const result = realTimeData.current.find((item) => user.userID === item.userID);
+                const result = realTimeData.current.find((item: any) => user.userID === item.userID);
                 if (!result) {
                     realTimeData.current.push(user);
                     setGlobalAudioVideoUserList((arr) => [...(sortAudioVideo ? sortAudioVideo(realTimeData.current) : realTimeData.current)]);
                 }
             });
         });
-        ZegoUIKitInternal.onAudioVideoUnavailable(callbackID, (userList) => {
+        ZegoUIKitInternal.onAudioVideoUnavailable(callbackID, (userList: any[]) => {
             if (removeViewWhenAudioVideoUnavailable) {
                 userList.forEach((user) => {
-                    const result = realTimeData.current.findIndex((item) => user.userID === item.userID);
+                    const result = realTimeData.current.findIndex((item: any) => user.userID === item.userID);
                     if (result !== -1) {
                         realTimeData.current.splice(result, 1);
                         setGlobalAudioVideoUserList((arr) => [...(sortAudioVideo ? sortAudioVideo(realTimeData.current) : realTimeData.current)]);
@@ -56,10 +57,10 @@ export default function PictureInPictureLayout(props) {
         ZegoUIKitInternal.onAudioVideoListForceSort(callbackID, () => {
             setGlobalAudioVideoUserList((arr) => [...(sortAudioVideo ? sortAudioVideo(realTimeData.current) : realTimeData.current)]);
         });
-        ZegoUIKitInternal.onUserLeave(callbackID, (userList) => {
+        ZegoUIKitInternal.onUserLeave(callbackID, (userList: any[]) => {
             if (!removeViewWhenAudioVideoUnavailable) {
                 userList.forEach((user) => {
-                    const result = realTimeData.current.findIndex((item) => user.userID === item.userID);
+                    const result = realTimeData.current.findIndex((item: any) => user.userID === item.userID);
                     if (result !== -1) {
                         realTimeData.current.splice(result, 1);
                         setGlobalAudioVideoUserList((arr) => [...(sortAudioVideo ? sortAudioVideo(realTimeData.current) : realTimeData.current)]);
@@ -82,14 +83,14 @@ export default function PictureInPictureLayout(props) {
             return styles.smallViewPostTopLeft;
         }
     }
-    const switchLargeOrSmallView = (index, user) => {
+    const switchLargeOrSmallView = (index: number) => {
         if (switchLargeOrSmallViewByClick) {
             globalAudioVideoUserList[0] = globalAudioVideoUserList.splice(index + 1, 1, globalAudioVideoUserList[0])[0];
             setGlobalAudioVideoUserList((arr) => [...globalAudioVideoUserList]);
             realTimeData.current = globalAudioVideoUserList;
         }
     }
-    const layoutHandle = (event) => {
+    const layoutHandle = (event: any) => {
         const { nativeEvent } = event;
         const { layout } = nativeEvent;
         const { width, height, x, y } = layout;
@@ -136,13 +137,13 @@ export default function PictureInPictureLayout(props) {
     </View>)
 }
 
-const getSmallViewSize = (width, height) => StyleSheet.create({
+const getSmallViewSize = (width: number, height: number) => StyleSheet.create({
     smallViewSize: {
         width,
         height,
     },
 });
-const getSmallViewSpacing = (margin) => StyleSheet.create({
+const getSmallViewSpacing = (margin: number) => StyleSheet.create({
     smallViewSpacing: {
         marginBottom: margin,
     },

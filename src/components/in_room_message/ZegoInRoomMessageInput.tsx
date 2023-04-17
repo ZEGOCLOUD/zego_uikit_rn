@@ -4,7 +4,10 @@ import ZegoUIKitInternal from '../internal/ZegoUIKitInternal';
 
 // https://github.com/react-native-community/hooks#usekeyboard
 class ZegoInRoomMessageInput extends React.Component {
-    constructor(props) {
+    textInput: any;
+    iconPath: any;
+    state: any;
+    constructor(props: any) {
         super(props);
         this.textInput = React.createRef();
         this.state = {
@@ -13,7 +16,9 @@ class ZegoInRoomMessageInput extends React.Component {
             currentText: ""
         };
         this.iconPath = {
+            // @ts-ignore
             enable: this.props.iconSend ? this.props.iconSend : require('../internal/resources/white_button_send_in_room_message_enable.png'),
+            // @ts-ignore
             disable: this.props.iconSendDisable ? this.props.iconSendDisable : (this.props.iconSend ? this.props.iconSend : require('../internal/resources/white_button_send_in_room_message_disable.png'))
         }
     }
@@ -27,7 +32,9 @@ class ZegoInRoomMessageInput extends React.Component {
     clear() {
         this.textInput.current.clear();
         this.setState({ textInputHeight: 45, contentWidth: 0, currentText: "" })
+        // @ts-ignore
         if (typeof this.props.onContentSizeChange == 'function') {
+            // @ts-ignore
             this.props.onContentSizeChange(0, 45);
         }
     }
@@ -36,7 +43,9 @@ class ZegoInRoomMessageInput extends React.Component {
             ZegoUIKitInternal.sendInRoomMessage(this.state.currentText);
             this.clear();
             this.blur();
+            // @ts-ignore
             if (typeof this.props.onSumit == 'function') {
+                // @ts-ignore
                 this.props.onSumit();
             }
         }
@@ -44,16 +53,19 @@ class ZegoInRoomMessageInput extends React.Component {
 
     render() {
         return (
+            // @ts-ignore
             <View style={[styles.container, { height: this.state.textInputHeight, backgroundColor: this.props.backgroundColor ? this.props.backgroundColor : 'rgba(0, 0, 0, 0.7500)' }]} >
                 <View style={styles.textInputContainer}>
                     <TextInput
                         ref={this.textInput}
-                        style={[styles.fillParent, styles.textInput]}
+                        style={[styles.textInput]}
                         blurOnSubmit={true}
                         multiline={true}
                         autoFocus={true}
+                        // @ts-ignore
                         editable={this.props.enable ? this.props.enable : true}
                         selectionColor={'#A653FF'}
+                        // @ts-ignore
                         placeholder={this.props.placeholder ? this.props.placeholder : ''}
                         placeholderTextColor={'rgba(255, 255, 255, 0.2)'}
                         onContentSizeChange={({ nativeEvent: { contentSize: { width, height } } }) => {
@@ -63,7 +75,9 @@ class ZegoInRoomMessageInput extends React.Component {
                                 h = height + 25;
                             }
                             this.setState({ textInputHeight: h, contentWidth: width })
+                            // @ts-ignore
                             if (typeof this.props.onContentSizeChange == 'function') {
+                                // @ts-ignore
                                 this.props.onContentSizeChange(width, h);
                             }
                         }}

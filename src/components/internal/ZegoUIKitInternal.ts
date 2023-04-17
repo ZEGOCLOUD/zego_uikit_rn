@@ -1,4 +1,10 @@
-import ZegoExpressEngine from 'zego-express-engine-reactnative';
+import ZegoExpressEngine, {
+  ZegoRoomStateChangedReason,
+  ZegoAudioRoute,
+  ZegoUser,
+  ZegoEngineProfile,
+  ZegoRoomConfig,
+} from 'zego-express-engine-reactnative';
 import { zlogerror, zloginfo, zlogwarning } from '../../utils/logger';
 import { ZegoAudioVideoResourceMode, ZegoChangedCountOrProperty, ZegoRoomPropertyUpdateType } from './defines'
 
@@ -12,41 +18,41 @@ var _currentRoomID = '';
 var _audioOutputType = 0;
 var _usingFrontFacingCamera = true;
 
-var _onMicDeviceOnCallbackMap = {};
-var _onCameraDeviceOnCallbackMap = {};
-var _onRoomStateChangedCallbackMap = {};
-var _onRequireNewTokenCallbackMap = {};
-var _onUserJoinCallbackMap = {};
-var _onUserLeaveCallbackMap = {};
-var _onUserInfoUpdateCallbackMap = {};
-var _onSoundLevelUpdateCallbackMap = {};
-var _onSDKConnectedCallbackMap = {};
-var _onAudioOutputDeviceTypeChangeCallbackMap = {};
-var _onOnlySelfInRoomCallbackMap = {};
-var _onUserCountOrPropertyChangedCallbackMap = {};
-var _onAudioVideoAvailableCallbackMap = {};
-var _onAudioVideoUnavailableCallbackMap = {};
-var _onInRoomMessageReceivedCallbackMap = {};
-var _onInRoomMessageSentCallbackMap = {};
-var _onRoomPropertyUpdatedCallbackMap = {};
-var _onRoomPropertiesFullUpdatedCallbackMap = {};
-var _onInRoomCommandReceivedCallbackMap = {};
-var _onMeRemovedFromRoomCallbackMap = {};
-var _onTurnOnYourCameraRequestCallbackMap = {};
-var _onTurnOnYourMicrophoneRequestCallbackMap = {};
+var _onMicDeviceOnCallbackMap: any = {};
+var _onCameraDeviceOnCallbackMap: any = {};
+var _onRoomStateChangedCallbackMap: any = {};
+var _onRequireNewTokenCallbackMap: any = {};
+var _onUserJoinCallbackMap: any = {};
+var _onUserLeaveCallbackMap: any = {};
+var _onUserInfoUpdateCallbackMap: any = {};
+var _onSoundLevelUpdateCallbackMap: any = {};
+var _onSDKConnectedCallbackMap: any = {};
+var _onAudioOutputDeviceTypeChangeCallbackMap: any = {};
+var _onOnlySelfInRoomCallbackMap: any = {};
+var _onUserCountOrPropertyChangedCallbackMap: any = {};
+var _onAudioVideoAvailableCallbackMap: any = {};
+var _onAudioVideoUnavailableCallbackMap: any = {};
+var _onInRoomMessageReceivedCallbackMap: any = {};
+var _onInRoomMessageSentCallbackMap: any = {};
+var _onRoomPropertyUpdatedCallbackMap: any = {};
+var _onRoomPropertiesFullUpdatedCallbackMap: any = {};
+var _onInRoomCommandReceivedCallbackMap: any = {};
+var _onMeRemovedFromRoomCallbackMap: any = {};
+var _onTurnOnYourCameraRequestCallbackMap: any = {};
+var _onTurnOnYourMicrophoneRequestCallbackMap: any = {};
 
 // Force update component callback
-var _onMemberListForceSortCallbackMap = {};
-var _onAudioVideoListForceSortCallbackMap = {};
+var _onMemberListForceSortCallbackMap: any = {};
+var _onAudioVideoListForceSortCallbackMap: any = {};
 
-var _localCoreUser = _createCoreUser('', '', '', {});
-var _streamCoreUserMap = {}; // <streamID, CoreUser>
-var _coreUserMap = {}; // <userID, CoreUser>
+var _localCoreUser: any = _createCoreUser('', '', '', {});
+var _streamCoreUserMap: any = {}; // <streamID, CoreUser>
+var _coreUserMap: any = {}; // <userID, CoreUser>
 var _qualityUpdateLogCounter = 0;
 
-var _inRoomMessageList = [];
+var _inRoomMessageList: any[] = [];
 var _audioVideoResourceMode = ZegoAudioVideoResourceMode.Default;
-var _roomProperties = {};
+var _roomProperties: any = {};
 var _isLargeRoom = false;
 var _roomMemberCount = 0;
 var _markAsLargeRoom = false;
@@ -85,7 +91,7 @@ function _resetDataForLeavingRoom() {
   _markAsLargeRoom = false;
 }
 
-function _createPublicUser(coreUser) {
+function _createPublicUser(coreUser: any) {
   return {
     userID: coreUser.userID,
     userName: coreUser.userName,
@@ -97,7 +103,7 @@ function _createPublicUser(coreUser) {
     avatar: coreUser.avatar,
   };
 }
-function _createCoreUser(userID, userName, profileUrl, extendInfo) {
+function _createCoreUser(userID: string, userName: string, profileUrl?: string, extendInfo?: any) {
   return {
     userID: userID,
     userName: userName,
@@ -115,12 +121,12 @@ function _createCoreUser(userID, userName, profileUrl, extendInfo) {
     avatar: '',
   };
 }
-function _isLocalUser(userID) {
+function _isLocalUser(userID: string) {
   return (
     userID === undefined || userID === '' || _localCoreUser.userID === userID
   );
 }
-function _setLocalUserInfo(userInfo) {
+function _setLocalUserInfo(userInfo: any) {
   _localCoreUser = _createCoreUser(
     userInfo.userID,
     userInfo.userName,
@@ -130,9 +136,9 @@ function _setLocalUserInfo(userInfo) {
   _coreUserMap[userInfo.userID] = _localCoreUser;
 }
 
-function _onRoomUserUpdate(roomID, updateType, userList) {
+function _onRoomUserUpdate(roomID: string, updateType: number, userList: any[]) {
   // No need for roomID, does not support multi-room right now.
-  const userInfoList = [];
+  const userInfoList: any[] = [];
   if (updateType == 0) {
     _roomMemberCount += userList.length;
     if (_roomMemberCount >= 500) {
@@ -197,9 +203,9 @@ function _onRoomUserUpdate(roomID, updateType, userList) {
     }
   }
 }
-function _onRoomStreamUpdate(roomID, updateType, streamList) {
+function _onRoomStreamUpdate(roomID: string, updateType: number, streamList: any[]) {
   zloginfo('_onRoomStreamUpdate: ', roomID, updateType, streamList);
-  var users = [];
+  var users: any[] = [];
   if (updateType == 0) {
     // Add
     streamList.forEach((stream) => {
@@ -260,7 +266,7 @@ function _onRoomStreamUpdate(roomID, updateType, streamList) {
     });
   }
 }
-function _onRemoteCameraStateUpdate(userID, isOn) {
+function _onRemoteCameraStateUpdate(userID: string, isOn: boolean) {
   console.warn('>>>>>>>>>>>>> _onRemoteCameraStateUpdate', userID, isOn);
   if (userID in _coreUserMap) {
     _coreUserMap[userID].isCameraDeviceOn = isOn;
@@ -282,7 +288,7 @@ function _onRemoteCameraStateUpdate(userID, isOn) {
     }
   }
 }
-function _onAudioRouteChange(type) {
+function _onAudioRouteChange(type: ZegoAudioRoute) {
   Object.keys(_onAudioOutputDeviceTypeChangeCallbackMap).forEach(
     (callbackID) => {
       if (_onAudioOutputDeviceTypeChangeCallbackMap[callbackID]) {
@@ -292,7 +298,7 @@ function _onAudioRouteChange(type) {
   );
   _audioOutputType = type;
 }
-function _onRemoteMicStateUpdate(userID, isOn) {
+function _onRemoteMicStateUpdate(userID: string, isOn: boolean) {
   console.warn('>>>>>>>>>>>>> _onRemoteMicStateUpdate', userID, isOn);
   if (userID in _coreUserMap) {
     _coreUserMap[userID].isMicDeviceOn = isOn;
@@ -314,7 +320,7 @@ function _onRemoteMicStateUpdate(userID, isOn) {
     }
   }
 }
-function _onRoomStateChanged(roomID, reason, errorCode, extendedData) {
+function _onRoomStateChanged(roomID: string, reason: ZegoRoomStateChangedReason, errorCode: number, extendedData: string) {
   zloginfo('Room state chaged: ', roomID, reason, errorCode, extendedData);
   // Not support multi-room right now
   if (reason == 1 || reason == 4) {
@@ -343,9 +349,9 @@ function _onRoomStateChanged(roomID, reason, errorCode, extendedData) {
     }
   });
 }
-function _onInRoomMessageReceived(roomID, messageList) {
+function _onInRoomMessageReceived(roomID: string, messageList: any[]) {
   zloginfo('Received in room message: ', roomID, messageList.length);
-  var messages = [];
+  var messages: any[] = [];
   messageList.forEach((msg) => {
     const message = {
       message: msg.message,
@@ -387,9 +393,9 @@ function _onRequireNewToken() {
     }
   });
 }
-function _onRoomExtraInfoUpdate(roomID, roomExtraInfoList) {
+function _onRoomExtraInfoUpdate(roomID: string, roomExtraInfoList: any[]) {
   zloginfo('$$$$$$$$Room extra info update: ', roomID, roomExtraInfoList);
-  const updateKeys = [];
+  const updateKeys: string[]= [];
   const oldRoomProperties = JSON.parse(JSON.stringify(_roomProperties));
   roomExtraInfoList.forEach(({ key, updateTime, updateUser, value }) => {
     if (key === 'extra_info') {
@@ -407,7 +413,7 @@ function _onRoomExtraInfoUpdate(roomID, roomExtraInfoList) {
     _notifyRoomPropertiesFullUpdate(updateKeys, oldRoomProperties, JSON.parse(JSON.stringify(_roomProperties)), ZegoRoomPropertyUpdateType.remote);
   }
 }
-function _onIMCustomCommandReceived(roomID, fromUser, command) {
+function _onIMCustomCommandReceived(roomID: string, fromUser: ZegoUser, command: string) {
   try {
     const commandObj = JSON.parse(command);
     if (commandObj && typeof commandObj === 'object') {
@@ -417,7 +423,7 @@ function _onIMCustomCommandReceived(roomID, fromUser, command) {
       const turnCameraOffUserID = commandObj.zego_turn_camera_off;
       const turnMicrophoneOnUserID = commandObj.zego_turn_microphone_on;
       const turnMicrophoneOffUserID = commandObj.zego_turn_microphone_off;
-      if (removeUserIDList && removeUserIDList.find((removeUserID) => removeUserID === _localCoreUser.userID)) {
+      if (removeUserIDList && removeUserIDList.find((removeUserID: string) => removeUserID === _localCoreUser.userID)) {
         _notifyMeRemovedFromRoom();
         // Leave the room automatically
         _leaveRoom();
@@ -453,12 +459,12 @@ function _onIMCustomCommandReceived(roomID, fromUser, command) {
     }
   });
 }
-function _sendInRoomCommand(command, toUserList) {
+function _sendInRoomCommand(command: string, toUserList: any[]) {
   if (!_isRoomConnected) {
     zlogerror('You need to join the room before using this interface!');
     return Promise.reject();
   }
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     ZegoExpressEngine.instance().sendCustomCommand(_currentRoomID, command, toUserList).then(({ errorCode }) => {
       if (errorCode === 0) {
         zloginfo('[sendInRoomCommand]Send successfully', toUserList);
@@ -474,7 +480,7 @@ function _sendInRoomCommand(command, toUserList) {
   });
 }
 function _leaveRoom() {
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     if (_currentRoomID == '') {
       zlogwarning('You are not join in any room, no need to leave room.');
       resolve();
@@ -498,8 +504,8 @@ function _leaveRoom() {
     }
   });
 }
-function _turnMicDeviceOn(userID, on) {
-  return new Promise((resolve, reject) => {
+function _turnMicDeviceOn(userID: string, on: boolean) {
+  return new Promise<void>((resolve, reject) => {
     if (_isLocalUser(userID)) {
       zloginfo('turnMicDeviceOn: ', _localCoreUser.userID, on);
       ZegoExpressEngine.instance().muteMicrophone(!on);
@@ -542,8 +548,8 @@ function _turnMicDeviceOn(userID, on) {
     }
   });
 }
-function _turnCameraDeviceOn(userID, on) {
-  return new Promise((resolve, reject) => {
+function _turnCameraDeviceOn(userID: string, on: boolean) {
+  return new Promise<void>((resolve, reject) => {
     if (_isLocalUser(userID)) {
       // Default to Main Channel
       zloginfo('turnCameraDeviceOn: ', _localCoreUser.userID, on);
@@ -661,7 +667,7 @@ function _registerEngineCallback() {
       );
     }
   );
-  ZegoExpressEngine.instance().on('remoteSoundLevelUpdate', (soundLevels) => {
+  ZegoExpressEngine.instance().on('remoteSoundLevelUpdate', (soundLevels: any) => {
     // {streamID, soundLavel} value from 0.0 to 100.0
     // zloginfo('[remoteSoundLevelUpdate callback]', soundLevels);
     Object.keys(soundLevels).forEach((streamID) => {
@@ -740,23 +746,23 @@ function _registerEngineCallback() {
 }
 function _unregisterEngineCallback() {
   zloginfo('Unregister callback from ZegoExpressEngine...');
-  ZegoExpressEngine.instance().off('roomUserUpdate');
-  ZegoExpressEngine.instance().off('roomStreamUpdate');
-  ZegoExpressEngine.instance().off('publisherQualityUpdate');
-  ZegoExpressEngine.instance().off('playerQualityUpdate');
-  ZegoExpressEngine.instance().off('remoteCameraStateUpdate');
-  ZegoExpressEngine.instance().off('remoteMicStateUpdate');
-  ZegoExpressEngine.instance().off('playerStateUpdate');
-  ZegoExpressEngine.instance().off('remoteSoundLevelUpdate');
-  ZegoExpressEngine.instance().off('capturedSoundLevelUpdate');
-  ZegoExpressEngine.instance().off('roomStateChanged');
-  ZegoExpressEngine.instance().off('audioRouteChange');
-  ZegoExpressEngine.instance().off('IMRecvBroadcastMessage');
-  ZegoExpressEngine.instance().off('roomExtraInfoUpdate');
-  ZegoExpressEngine.instance().off('roomStreamExtraInfoUpdate');
-  ZegoExpressEngine.instance().off('IMRecvCustomCommand');
+  ZegoExpressEngine.instance().off('roomUserUpdate', undefined);
+  ZegoExpressEngine.instance().off('roomStreamUpdate', undefined);
+  ZegoExpressEngine.instance().off('publisherQualityUpdate', undefined);
+  ZegoExpressEngine.instance().off('playerQualityUpdate', undefined);
+  ZegoExpressEngine.instance().off('remoteCameraStateUpdate', undefined);
+  ZegoExpressEngine.instance().off('remoteMicStateUpdate', undefined);
+  ZegoExpressEngine.instance().off('playerStateUpdate', undefined);
+  ZegoExpressEngine.instance().off('remoteSoundLevelUpdate', undefined);
+  ZegoExpressEngine.instance().off('capturedSoundLevelUpdate', undefined);
+  ZegoExpressEngine.instance().off('roomStateChanged', undefined);
+  ZegoExpressEngine.instance().off('audioRouteChange', undefined);
+  ZegoExpressEngine.instance().off('IMRecvBroadcastMessage', undefined);
+  ZegoExpressEngine.instance().off('roomExtraInfoUpdate', undefined);
+  ZegoExpressEngine.instance().off('roomStreamExtraInfoUpdate', undefined);
+  ZegoExpressEngine.instance().off('IMRecvCustomCommand', undefined);
 }
-function _notifyUserCountOrPropertyChanged(type) {
+function _notifyUserCountOrPropertyChanged(type: number) {
   const msg = [
     '',
     'user add',
@@ -766,7 +772,7 @@ function _notifyUserCountOrPropertyChanged(type) {
     'attributes update',
   ];
   const userList = Object.values(_coreUserMap)
-    .sort((user1, user2) => {
+    .sort((user1: any, user2: any) => {
       return user2.joinTime - user1.joinTime;
     })
     .map((user) => _createPublicUser(user));
@@ -783,7 +789,7 @@ function _notifyUserCountOrPropertyChanged(type) {
 }
 
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Stream Handling <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-function _getUserIDByStreamID(streamID) {
+function _getUserIDByStreamID(streamID: string) {
   // StreamID format: roomid_userid_main
   for (const userID in _coreUserMap) {
     if (_coreUserMap[userID].streamID == streamID) {
@@ -795,7 +801,7 @@ function _getUserIDByStreamID(streamID) {
 function _getPublishStreamID() {
   return _currentRoomID + '_' + _localCoreUser.userID + '_main';
 }
-function _getStreamIDByUserID(userID) {
+function _getStreamIDByUserID(userID: string) {
   return _currentRoomID + '_' + userID + '_main';
 }
 function _tryStartPublishStream() {
@@ -856,7 +862,7 @@ function _tryStopPublishStream(force = false) {
     }
   }
 }
-function _tryStartPlayStream(userID) {
+function _tryStartPlayStream(userID: string) {
   if (userID in _coreUserMap) {
     const user = _coreUserMap[userID];
     zloginfo(
@@ -882,7 +888,7 @@ function _tryStartPlayStream(userID) {
     }
   }
 }
-function _tryStopPlayStream(userID, force = false) {
+function _tryStopPlayStream(userID: string, force = false) {
   if (userID in _coreUserMap) {
     const user = _coreUserMap[userID];
     if (force || (!user.isMicDeviceOn && !user.isCameraDeviceOn)) {
@@ -890,28 +896,28 @@ function _tryStopPlayStream(userID, force = false) {
     }
   }
 }
-function _notifyUserInfoUpdate(userInfo) {
+function _notifyUserInfoUpdate(userInfo: any) {
   Object.keys(_onUserInfoUpdateCallbackMap).forEach((callbackID) => {
     if (_onUserInfoUpdateCallbackMap[callbackID]) {
       _onUserInfoUpdateCallbackMap[callbackID](userInfo);
     }
   });
 }
-function _notifySoundLevelUpdate(userID, soundLevel) {
+function _notifySoundLevelUpdate(userID: string, soundLevel: number) {
   Object.keys(_onSoundLevelUpdateCallbackMap).forEach((callbackID) => {
     if (_onSoundLevelUpdateCallbackMap[callbackID]) {
       _onSoundLevelUpdateCallbackMap[callbackID](userID, soundLevel);
     }
   });
 }
-function _notifyRoomPropertyUpdate(key, oldValue, value, type) {
+function _notifyRoomPropertyUpdate(key: string, oldValue: any, value: any, type: number) {
   Object.keys(_onRoomPropertyUpdatedCallbackMap).forEach((callbackID) => {
     if (_onRoomPropertyUpdatedCallbackMap[callbackID]) {
       _onRoomPropertyUpdatedCallbackMap[callbackID](key, oldValue, value, type);
     }
   });
 }
-function _notifyRoomPropertiesFullUpdate(keys, oldRoomProperties, roomProperties, type) {
+function _notifyRoomPropertiesFullUpdate(keys: string[], oldRoomProperties: any, roomProperties: any, type: number) {
   Object.keys(_onRoomPropertiesFullUpdatedCallbackMap).forEach((callbackID) => {
     if (_onRoomPropertiesFullUpdatedCallbackMap[callbackID]) {
       _onRoomPropertiesFullUpdatedCallbackMap[callbackID](keys, oldRoomProperties, roomProperties, type);
@@ -938,11 +944,11 @@ export default {
   isRoomConnected() {
     return _isRoomConnected;
   },
-  setAudioVideoResourceMode(audioVideoResourceMode) {
+  setAudioVideoResourceMode(audioVideoResourceMode: any) {
     zloginfo('setAudioVideoResourceMode', audioVideoResourceMode);
     _audioVideoResourceMode = audioVideoResourceMode || ZegoAudioVideoResourceMode.Default;
   },
-  updateRenderingProperty(userID, viewID, fillMode) {
+  updateRenderingProperty(userID: string, viewID: number, fillMode: string) {
     zloginfo(
       'updateRenderingProperty: ',
       userID,
@@ -980,7 +986,7 @@ export default {
       }
     }
   },
-  onUserInfoUpdate(callbackID, callback) {
+  onUserInfoUpdate(callbackID: string, callback?: Function) {
     if (typeof callback !== 'function') {
       if (callbackID in _onUserInfoUpdateCallbackMap) {
         zloginfo(
@@ -994,7 +1000,7 @@ export default {
       _onUserInfoUpdateCallbackMap[callbackID] = callback;
     }
   },
-  onSoundLevelUpdate(callbackID, callback) {
+  onSoundLevelUpdate(callbackID: string, callback?: Function) {
     if (typeof callback !== 'function') {
       if (callbackID in _onSoundLevelUpdateCallbackMap) {
         zloginfo(
@@ -1008,7 +1014,7 @@ export default {
       _onSoundLevelUpdateCallbackMap[callbackID] = callback;
     }
   },
-  onSDKConnected(callbackID, callback) {
+  onSDKConnected(callbackID: string, callback?: Function) {
     if (typeof callback !== 'function') {
       if (callbackID in _onSDKConnectedCallbackMap) {
         zloginfo(
@@ -1023,7 +1029,7 @@ export default {
     }
   },
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SDK <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-  connectSDK(appID, appSign, userInfo) {
+  connectSDK(appID: number, appSign: string, userInfo: any) {
     // Solve the problem of repeated initialization
     if (_isEngineCreated()) {
       zloginfo('Create ZegoExpressEngine succeed already!');
@@ -1041,15 +1047,16 @@ export default {
 
       return Promise.resolve();
     }
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       // set advancedConfig to monitor remote user's device changed
       ZegoExpressEngine.setEngineConfig({
         advancedConfig: {
+          // @ts-ignore
           notify_remote_device_unknown_status: 'true',
           notify_remote_device_init_status: 'true',
         },
       });
-      const engineProfile = {
+      const engineProfile: ZegoEngineProfile = {
         appID: appID,
         appSign: appSign,
         scenario: 0,
@@ -1079,7 +1086,7 @@ export default {
     });
   },
   disconnectSDK() {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       if (ZegoExpressEngine.instance()) {
         ZegoExpressEngine.destroyEngine()
           .then(() => {
@@ -1100,7 +1107,7 @@ export default {
   },
 
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Audio Video <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-  useFrontFacingCamera(isFrontFacing) {
+  useFrontFacingCamera(isFrontFacing: boolean) {
     zloginfo('Use front facing camera: ', isFrontFacing);
     _usingFrontFacingCamera = isFrontFacing;
     return ZegoExpressEngine.instance().useFrontCamera(isFrontFacing, 0);
@@ -1108,7 +1115,7 @@ export default {
   isUsingFrontFacingCamera() {
     return _usingFrontFacingCamera;
   },
-  isMicDeviceOn(userID) {
+  isMicDeviceOn(userID: string) {
     if (!userID) {
       return _localCoreUser.isMicDeviceOn;
     } else if (userID in _coreUserMap) {
@@ -1122,7 +1129,7 @@ export default {
       return true;
     }
   },
-  isCameraDeviceOn(userID) {
+  isCameraDeviceOn(userID: string) {
     if (!userID) {
       return _localCoreUser.isCameraDeviceOn;
     } else if (userID in _coreUserMap) {
@@ -1136,9 +1143,9 @@ export default {
       return true;
     }
   },
-  enableSpeaker(enable) {
+  enableSpeaker(enable: boolean) {
     // TODO
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       if (!_isRoomConnected) {
         zlogerror('You are not connect to any room.');
         reject();
@@ -1151,13 +1158,13 @@ export default {
   audioOutputDeviceType() {
     return _audioOutputType;
   },
-  turnMicDeviceOn(userID, on) {
+  turnMicDeviceOn(userID: string, on: boolean) {
     return _turnMicDeviceOn(userID, on);
   },
-  turnCameraDeviceOn(userID, on) {
+  turnCameraDeviceOn(userID: string, on: boolean) {
     return _turnCameraDeviceOn(userID, on);
   },
-  onMicDeviceOn(callbackID, callback) {
+  onMicDeviceOn(callbackID: string, callback?: Function) {
     if (typeof callback !== 'function') {
       if (callbackID in _onMicDeviceOnCallbackMap) {
         zloginfo(
@@ -1171,7 +1178,7 @@ export default {
       _onMicDeviceOnCallbackMap[callbackID] = callback;
     }
   },
-  onCameraDeviceOn(callbackID, callback) {
+  onCameraDeviceOn(callbackID: string, callback?: Function) {
     if (typeof callback !== 'function') {
       if (callbackID in _onCameraDeviceOnCallbackMap) {
         zloginfo(
@@ -1185,10 +1192,10 @@ export default {
       _onCameraDeviceOnCallbackMap[callbackID] = callback;
     }
   },
-  setAudioOutputToSpeaker(isSpeaker) {
+  setAudioOutputToSpeaker(isSpeaker: boolean) {
     ZegoExpressEngine.instance().setAudioRouteToSpeaker(isSpeaker);
   },
-  onAudioOutputDeviceTypeChange(callbackID, callback) {
+  onAudioOutputDeviceTypeChange(callbackID: string, callback?: Function) {
     if (typeof callback !== 'function') {
       if (callbackID in _onAudioOutputDeviceTypeChangeCallbackMap) {
         zloginfo(
@@ -1202,13 +1209,13 @@ export default {
       _onAudioOutputDeviceTypeChangeCallbackMap[callbackID] = callback;
     }
   },
-  setAudioConfig(config) {
+  setAudioConfig(config: any) {
     // TODO
   },
-  setVideoConfig(config) {
+  setVideoConfig(config: any) {
     // TODO
   },
-  onAudioVideoAvailable(callbackID, callback) {
+  onAudioVideoAvailable(callbackID: string, callback?: Function) {
     if (typeof callback !== 'function') {
       if (callbackID in _onAudioVideoAvailableCallbackMap) {
         zloginfo(
@@ -1222,7 +1229,7 @@ export default {
       _onAudioVideoAvailableCallbackMap[callbackID] = callback;
     }
   },
-  onAudioVideoUnavailable(callbackID, callback) {
+  onAudioVideoUnavailable(callbackID: string, callback?: Function) {
     if (typeof callback !== 'function') {
       if (callbackID in _onAudioVideoUnavailableCallbackMap) {
         zloginfo(
@@ -1244,7 +1251,7 @@ export default {
     ZegoExpressEngine.instance().muteAllPlayStreamAudio(true);
     ZegoExpressEngine.instance().muteAllPlayStreamVideo(true);
   },
-  onTurnOnYourCameraRequest(callbackID, callback) {
+  onTurnOnYourCameraRequest(callbackID: string, callback?: Function) {
     if (typeof callback !== 'function') {
       if (callbackID in _onTurnOnYourCameraRequestCallbackMap) {
         zloginfo(
@@ -1258,7 +1265,7 @@ export default {
       _onTurnOnYourCameraRequestCallbackMap[callbackID] = callback;
     }
   },
-  onTurnOnYourMicrophoneRequest(callbackID, callback) {
+  onTurnOnYourMicrophoneRequest(callbackID: string, callback?: Function) {
     if (typeof callback !== 'function') {
       if (callbackID in _onTurnOnYourMicrophoneRequestCallbackMap) {
         zloginfo(
@@ -1274,18 +1281,18 @@ export default {
   },
 
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Room <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-  joinRoom(roomID, token, markAsLargeRoom = false) {
+  joinRoom(roomID: string, token: string, markAsLargeRoom = false) {
     // Solve the problem of repeated join
     if (_isRoomConnected && _currentRoomID === roomID) {
       zloginfo('Join room success already');
       return Promise.resolve();
     }
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       const user = {
         userID: _localCoreUser.userID,
         userName: _localCoreUser.userName,
       };
-      const config = { isUserStatusNotify: true };
+      const config = { isUserStatusNotify: true } as ZegoRoomConfig;
       token && (config.token = token);
       _currentRoomID = roomID;
       ZegoExpressEngine.instance()
@@ -1314,7 +1321,7 @@ export default {
   leaveRoom() {
     return _leaveRoom();
   },
-  onRoomStateChanged(callbackID, callback) {
+  onRoomStateChanged(callbackID: string, callback?: Function) {
     if (typeof callback !== 'function') {
       if (callbackID in _onRoomStateChangedCallbackMap) {
         zloginfo(
@@ -1328,7 +1335,7 @@ export default {
       _onRoomStateChangedCallbackMap[callbackID] = callback;
     }
   },
-  onRequireNewToken(callbackID, callback) {
+  onRequireNewToken(callbackID: string, callback?: Function) {
     if (typeof callback !== 'function') {
       if (callbackID in _onRequireNewTokenCallbackMap) {
         zloginfo(
@@ -1342,7 +1349,7 @@ export default {
       _onRequireNewTokenCallbackMap[callbackID] = callback;
     }
   },
-  setRoomProperty(key, value) {
+  setRoomProperty(key: string, value: any) {
     if (!_isRoomConnected) {
       zlogerror('You need to join the room before using this interface!');
       return;
@@ -1355,7 +1362,7 @@ export default {
     _roomProperties[key] = value;
     const extraInfo = JSON.stringify(_roomProperties);
     zloginfo('[updateRoomProperties]Set start', extraInfo);
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       ZegoExpressEngine.instance().setRoomExtraInfo(_currentRoomID, 'extra_info', extraInfo).then(({ errorCode }) => {
         if (errorCode === 0) {
           zloginfo('[updateRoomProperties]Set success');
@@ -1377,12 +1384,12 @@ export default {
       });
     });
   },
-  updateRoomProperties(newRoomProperties) {
+  updateRoomProperties(newRoomProperties: any) {
     if (!_isRoomConnected) {
       zlogerror('You need to join the room before using this interface!');
       return Promise.reject();
     }
-    const updateKeys = [];
+    const updateKeys: string[] = [];
     const oldRoomProperties = JSON.parse(JSON.stringify(_roomProperties));
     Object.keys(newRoomProperties).forEach((key) => {
       if (oldRoomProperties[key] !== newRoomProperties[key]) {
@@ -1392,7 +1399,7 @@ export default {
     })
     const extraInfo = JSON.stringify(_roomProperties);
     zloginfo('[updateRoomProperties]Update start', extraInfo);
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       ZegoExpressEngine.instance().setRoomExtraInfo(_currentRoomID, 'extra_info', extraInfo).then(({ errorCode }) => {
         if (errorCode === 0) {
           zloginfo('[updateRoomProperties]Update success');
@@ -1421,7 +1428,7 @@ export default {
   getRoomProperties() {
     return _roomProperties;
   },
-  onRoomPropertyUpdated(callbackID, callback) {
+  onRoomPropertyUpdated(callbackID: string, callback?: Function) {
     if (typeof callback !== 'function') {
       if (callbackID in _onRoomPropertyUpdatedCallbackMap) {
         zloginfo(
@@ -1435,7 +1442,7 @@ export default {
       _onRoomPropertyUpdatedCallbackMap[callbackID] = callback;
     }
   },
-  onRoomPropertiesFullUpdated(callbackID, callback) {
+  onRoomPropertiesFullUpdated(callbackID: string, callback?: Function) {
     if (typeof callback !== 'function') {
       if (callbackID in _onRoomPropertiesFullUpdatedCallbackMap) {
         zloginfo(
@@ -1449,7 +1456,7 @@ export default {
       _onRoomPropertiesFullUpdatedCallbackMap[callbackID] = callback;
     }
   },
-  sendInRoomCommand(command, toUserIDs = []) {
+  sendInRoomCommand(command: string, toUserIDs: string[] = []) {
     const toUserList = toUserIDs.map((userID) => {
       const userInfo = _coreUserMap[userID];
       const userName = userInfo ? (userInfo.userName || '') : '';
@@ -1460,7 +1467,7 @@ export default {
     });
     return _sendInRoomCommand(command, toUserList);
   },
-  onInRoomCommandReceived(callbackID, callback) {
+  onInRoomCommandReceived(callbackID: string, callback?: Function) {
     if (typeof callback !== 'function') {
       if (callbackID in _onInRoomCommandReceivedCallbackMap) {
         zloginfo(
@@ -1474,7 +1481,7 @@ export default {
       _onInRoomCommandReceivedCallbackMap[callbackID] = callback;
     }
   },
-  onMeRemovedFromRoom(callbackID, callback) {
+  onMeRemovedFromRoom(callbackID: string, callback?: Function) {
     if (typeof callback !== 'function') {
       if (callbackID in _onMeRemovedFromRoomCallbackMap) {
         zloginfo(
@@ -1490,7 +1497,7 @@ export default {
   },
 
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> User <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-  connectUser(userID, userName) {
+  connectUser(userID: string, userName: string) {
     _setLocalUserInfo({ userID: userID, userName: userName });
     // TODO ZIM login
   },
@@ -1502,21 +1509,21 @@ export default {
   getLocalUserInfo() {
     return _localCoreUser;
   },
-  getUser(userID) {
+  getUser(userID: string) {
     return _coreUserMap[userID];
   },
   getAllUsers() {
     const users = Object.values(_coreUserMap);
-    users.sort((a, b) => {
-      return a.joinTime > b.joinTime;
+    users.sort((a: any, b: any) => {
+      return a.joinTime - b.joinTime;
     });
-    var publicUsers = [];
+    var publicUsers: any[] = [];
     users.forEach((user) => {
       publicUsers.push(_createPublicUser(user));
     });
     return publicUsers;
   },
-  onUserJoin(callbackID, callback) {
+  onUserJoin(callbackID: string, callback?: Function) {
     if (typeof callback !== 'function') {
       if (callbackID in _onUserJoinCallbackMap) {
         zloginfo(
@@ -1530,7 +1537,7 @@ export default {
       _onUserJoinCallbackMap[callbackID] = callback;
     }
   },
-  onUserLeave(callbackID, callback) {
+  onUserLeave(callbackID: string, callback?: Function) {
     if (typeof callback !== 'function') {
       if (callbackID in _onUserLeaveCallbackMap) {
         zloginfo(
@@ -1544,7 +1551,7 @@ export default {
       _onUserLeaveCallbackMap[callbackID] = callback;
     }
   },
-  onOnlySelfInRoom(callbackID, callback) {
+  onOnlySelfInRoom(callbackID: string, callback?: Function) {
     if (typeof callback !== 'function') {
       if (callbackID in _onOnlySelfInRoomCallbackMap) {
         zloginfo(
@@ -1558,7 +1565,7 @@ export default {
       _onOnlySelfInRoomCallbackMap[callbackID] = callback;
     }
   },
-  onUserCountOrPropertyChanged(callbackID, callback) {
+  onUserCountOrPropertyChanged(callbackID: string, callback?: Function) {
     if (typeof callback !== 'function') {
       if (callbackID in _onUserCountOrPropertyChangedCallbackMap) {
         zloginfo(
@@ -1572,7 +1579,7 @@ export default {
       _onUserCountOrPropertyChangedCallbackMap[callbackID] = callback;
     }
   },
-  removeUserFromRoom(userIDs = []) {
+  removeUserFromRoom(userIDs: string[] = []) {
     const command = JSON.stringify({ zego_remove_user: userIDs });
     const toUserList = (_isLargeRoom || _markAsLargeRoom) ? [] : userIDs.map((userID) => {
       const userInfo = _coreUserMap[userID];
@@ -1589,7 +1596,7 @@ export default {
   getInRoomMessages() {
     return _inRoomMessageList;
   },
-  sendInRoomMessage(message) {
+  sendInRoomMessage(message: string) {
     return new Promise((resolve, reject) => {
       ZegoExpressEngine.instance()
         .sendBroadcastMessage(_currentRoomID, message)
@@ -1630,7 +1637,7 @@ export default {
         });
     });
   },
-  onInRoomMessageReceived(callbackID, callback) {
+  onInRoomMessageReceived(callbackID: string, callback?: Function) {
     if (typeof callback !== 'function') {
       if (callbackID in _onInRoomMessageReceivedCallbackMap) {
         zloginfo(
@@ -1644,7 +1651,7 @@ export default {
       _onInRoomMessageReceivedCallbackMap[callbackID] = callback;
     }
   },
-  onInRoomMessageSent(callbackID, callback) {
+  onInRoomMessageSent(callbackID: string, callback?: Function) {
     if (typeof callback !== 'function') {
       if (callbackID in _onInRoomMessageSentCallbackMap) {
         zloginfo(
@@ -1659,10 +1666,10 @@ export default {
     }
   },
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Live audio room <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-  notifyUserCountOrPropertyChanged(type) {
+  notifyUserCountOrPropertyChanged(type: number) {
     _notifyUserCountOrPropertyChanged(type);
   },
-  notifyUserInfoUpdate(userID) {
+  notifyUserInfoUpdate(userID: string) {
     // Update avatar properties
     if ( _coreUserMap[userID] && _coreUserMap[userID].inRoomAttributes) {
       _coreUserMap[userID].avatar = _coreUserMap[userID].inRoomAttributes.avatar;
@@ -1673,7 +1680,7 @@ export default {
   forceSortMemberList() {
     zloginfo('[forceSortMemberList callback]');
     const userList = Object.values(_coreUserMap)
-      .sort((user1, user2) => {
+      .sort((user1: any, user2: any) => {
         return user2.joinTime - user1.joinTime;
       })
       .map((user) => _createPublicUser(user));
@@ -1683,7 +1690,7 @@ export default {
       }
     });
   },
-  onMemberListForceSort(callbackID, callback) {
+  onMemberListForceSort(callbackID: string, callback?: Function) {
     if (typeof callback !== 'function') {
       if (callbackID in _onMemberListForceSortCallbackMap) {
         zloginfo(
@@ -1705,7 +1712,7 @@ export default {
       }
     });
   },
-  onAudioVideoListForceSort(callbackID, callback) {
+  onAudioVideoListForceSort(callbackID: string, callback?: Function) {
     if (typeof callback !== 'function') {
       if (callbackID in _onAudioVideoListForceSortCallbackMap) {
         zloginfo(

@@ -1,26 +1,26 @@
-import React, { Fragment } from 'react';
+import React, { Fragment }from 'react';
 import { Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import ZegoUIKitInvitationService from '../services';
 import { zloginfo, zlogerror } from '../../../utils/logger';
 
-export default function ZegoCancelInvitationButton(props) {
+export default function ZegoAcceptInvitationButton(props: any) {
   const {
     icon,
-    text,
-    invitees = [],
+    text, 
+    inviterID,
     data,
     onPressed,
     onWillPressed,
-    backgroundColor = '#FF4A50',
+    backgroundColor = '#30D059',
     fontSize = 16,
     color = '#FFFFFF',
-    width = 60,
-    height = 60,
+    width, // The default size was not given in the first release, so I can't add it here
+    height, // The default size was not given in the first release, so I can't add it here
     borderRadius = 1000,
     verticalLayout, // Default row layout, no layout parameters default to precedence icon
   } = props;
   const getImageSourceByPath = () => {
-    return require('../resources/button_call_cancel.png');
+    return require('../resources/button_call_audio_accept.png');
   };
   const getRenderView = () => {
     let renderView;
@@ -46,13 +46,13 @@ export default function ZegoCancelInvitationButton(props) {
     }
     return renderView;
   };
-  const getCustomTextStyle = (fontSize, color) => StyleSheet.create({
+  const getCustomTextStyle = (fontSize: number, color: string) => StyleSheet.create({
     text: {
       fontSize,
       color,
     },
   });
-  const getCustomContainerStyle = (width, height, borderRadius, backgroundColor, verticalLayout) => StyleSheet.create({
+  const getCustomContainerStyle = (width: number, height: number, borderRadius: number, backgroundColor: string, verticalLayout: boolean) => StyleSheet.create({
     customContainer: {
       flexDirection: verticalLayout ? 'column' : 'row',
       width,
@@ -61,36 +61,22 @@ export default function ZegoCancelInvitationButton(props) {
       borderRadius,
     },
   });
-
   const onButtonPress = () => {
-    const canCancelInvitation = typeof onWillPressed === 'function' ? onWillPressed() : true;
-    if (!canCancelInvitation) return;
+    const canAcceptInvitation = typeof onWillPressed === 'function' ? onWillPressed() : true;
+    if (!canAcceptInvitation) return;
     zloginfo(
-      `[Components]Cancel invitation start, invitees: ${invitees}, data: ${data}`
+      `[Components]Accept invitation start, inviterID: ${inviterID}, data: ${data}`
     );
-    ZegoUIKitInvitationService.cancelInvitation(invitees, data)
-      .then(({ code, message, errorInvitees }) => {
-        zloginfo(
-          `[Components]Cancel invitation success, errorInvitees: ${errorInvitees}`
-        );
-        if (invitees.length > errorInvitees.length) {
-          if (typeof onPressed === 'function') {
-            const inviteesBackup = JSON.parse(JSON.stringify(invitees));
-            errorInvitees.forEach((errorInviteeID) => {
-              const index = inviteesBackup.findIndex(
-                (inviteeID) => errorInviteeID === inviteeID
-              );
-              index !== -1 && inviteesBackup.splice(index, 1);
-            });
-            onPressed({
-              invitees: inviteesBackup,
-            });
-          }
+    ZegoUIKitInvitationService.acceptInvitation(inviterID, data)
+      .then(() => {
+        zloginfo(`[Components]Accept invitation success`);
+        if (typeof onPressed === 'function') {
+          onPressed();
         }
       })
-      .catch(({ code, message }) => {
+      .catch(({ code, message }: any) => {
         zlogerror(
-          `[Components]Cancel invitation error, code: ${code}, message: ${message}`
+          `[Components]Accept invitation error, code: ${code}, message: ${message}`
         );
       });
   };
@@ -106,7 +92,6 @@ export default function ZegoCancelInvitationButton(props) {
     </TouchableOpacity>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',

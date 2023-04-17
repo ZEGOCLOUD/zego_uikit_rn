@@ -5,7 +5,7 @@ import AudioFrame from './AudioFrame';
 import VideoFrame from './VideoFrame';
 import ZegoUIKitInternal from '../../internal/ZegoUIKitInternal';
 
-function MaskViewDefault(props) {
+function MaskViewDefault(props: any) {
   const { userInfo } = props;
   const { userName = '' } = userInfo;
   return (
@@ -17,7 +17,7 @@ function MaskViewDefault(props) {
   );
 }
 
-export default function ZegoVideoView(props) {
+export default function ZegoVideoView(props: any) {
   const {
     userID,
     roomID,
@@ -58,7 +58,7 @@ export default function ZegoVideoView(props) {
         setIsCameraOn(user.isCameraDeviceOn);
       }
     });
-    ZegoUIKitInternal.onUserInfoUpdate(callbackID, (info) => {
+    ZegoUIKitInternal.onUserInfoUpdate(callbackID, (info: any) => {
       if (info.userID == userID) {
         setIsCameraOn(info.isCameraDeviceOn);
         setUserInfo(info);
@@ -67,7 +67,7 @@ export default function ZegoVideoView(props) {
     });
     ZegoUIKitInternal.onRoomStateChanged(
       callbackID,
-      (reason, errorCode, extendedData) => {
+      () => {
         if (ZegoUIKitInternal.isRoomConnected()) {
           const user = ZegoUIKitInternal.getUser(userID);
           if (user) {
@@ -76,7 +76,7 @@ export default function ZegoVideoView(props) {
         }
       }
     );
-    ZegoUIKitInternal.onUserCountOrPropertyChanged(callbackID, (userList) => {
+    ZegoUIKitInternal.onUserCountOrPropertyChanged(callbackID, (userList: any[]) => {
       console.log('=========[ZegoVideoView]onUserCountOrPropertyChanged=========', userID, userList);
       userList.forEach((user) => {
         const temp = user.inRoomAttributes ? user.inRoomAttributes.avatar : '';

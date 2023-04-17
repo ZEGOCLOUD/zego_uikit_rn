@@ -3,7 +3,7 @@ import { findNodeHandle, View, StyleSheet } from "react-native";
 import { ZegoTextureView } from 'zego-express-engine-reactnative';
 import ZegoUIKitInternal from "../../internal/ZegoUIKitInternal";
 
-export default function VideoFrame(props) {
+export default function VideoFrame(props: any) {
     const { userID, roomID, fillMode } = props;
     const viewRef = useRef(null);
 
@@ -17,7 +17,7 @@ export default function VideoFrame(props) {
         ZegoUIKitInternal.onSDKConnected('VideoFrame' + userID, () => {
             updateRenderingProperty();
         });
-        ZegoUIKitInternal.onUserJoin('VideoFrame' + userID, (userInfoList) => {
+        ZegoUIKitInternal.onUserJoin('VideoFrame' + userID, (userInfoList: any[]) => {
             userInfoList.forEach(user => {
                 if (user.userID == userID) {
                     updateRenderingProperty()
@@ -34,6 +34,7 @@ export default function VideoFrame(props) {
     return (
         <View style={styles.container}>
             <ZegoTextureView
+                // @ts-ignore
                 style={styles.videoContainer}
                 ref={viewRef}
                 collapsable={false}

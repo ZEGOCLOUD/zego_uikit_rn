@@ -3,7 +3,7 @@ import { Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import ZegoUIKitInvitationService from '../services';
 import { zloginfo, zlogerror } from '../../../utils/logger';
 
-export default function ZegoRefuseInvitationButton(props) {
+export default function ZegoRefuseInvitationButton(props: any) {
   const {
     icon,
     text,
@@ -46,13 +46,13 @@ export default function ZegoRefuseInvitationButton(props) {
     }
     return renderView;
   };
-  const getCustomTextStyle = (fontSize, color) => StyleSheet.create({
+  const getCustomTextStyle = (fontSize: number, color: string) => StyleSheet.create({
     text: {
       fontSize,
       color,
     },
   });
-  const getCustomContainerStyle = (width, height, borderRadius, backgroundColor, verticalLayout) => StyleSheet.create({
+  const getCustomContainerStyle = (width: number, height: number, borderRadius: number, backgroundColor: string, verticalLayout: string) => StyleSheet.create({
     customContainer: {
       flexDirection: verticalLayout ? 'column' : 'row',
       width,
@@ -74,7 +74,7 @@ export default function ZegoRefuseInvitationButton(props) {
           onPressed();
         }
       })
-      .catch(({ code, message }) => {
+      .catch(({ code, message }: any) => {
         zlogerror(
           `[Components]Refuse invitation error, code: ${code}, message: ${message}`
         );
