@@ -146,6 +146,8 @@
   },
   "dependencies": {
     "react-delegate-component": "^1.0.0",
-    "zego-express-engine-reactnative": "^3.2.0"
+    "zego-express-engine-reactnative": "^3.2.0",
+    "zego-zim-react-native": "^2.7.1",
+    "zego-zpns-react-native": "^2.3.5"
   }
 }

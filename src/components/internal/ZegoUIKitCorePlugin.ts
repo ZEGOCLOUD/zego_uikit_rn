@@ -1,5 +1,6 @@
 import { zloginfo, zlogwarning, zlogerror } from '../../utils/logger';
 import { ZegoUIKitPluginType } from './defines';
+import ZegoUIKitSignalingPlugin from "../../signal_plugin";
 
 const _plugins = new Map(); // type -> plugin
 const ZegoUIKitCorePlugin = {
@@ -33,5 +34,6 @@ const ZegoUIKitCorePlugin = {
     return _plugins.get(type);
   },
 };
+ZegoUIKitCorePlugin.installPlugins([ZegoUIKitSignalingPlugin]);
 export default ZegoUIKitCorePlugin;
 export { ZegoUIKitPluginType };

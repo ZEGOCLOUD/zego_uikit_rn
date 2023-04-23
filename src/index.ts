@@ -39,8 +39,6 @@ export default {
   onCameraOn: ZegoUIKitInternal.onCameraDeviceOn,
   onAudioOutputDeviceChanged: ZegoUIKitInternal.onAudioOutputDeviceTypeChange,
   onSoundLevelUpdated: ZegoUIKitInternal.onSoundLevelUpdate,
-  // onAudioVideoAvailable
-  // onAudioVideoUnavailable
   joinRoom: ZegoUIKitInternal.joinRoom,
   leaveRoom: ZegoUIKitInternal.leaveRoom,
   isRoomConnected: ZegoUIKitInternal.isRoomConnected,
