@@ -2,7 +2,7 @@ import ZegoPluginInvitationService from './services';
 import { ZegoUIKitPluginType } from './defines';
 import ZegoPluginRoomPropertiesService from './services/room_properties_service';
 import ZegoPluginUserInRoomAttributesService from './services/user_in_room_attributes_service';
-import { CXAction } from 'zego-zpns-react-native';
+import type { CXAction } from 'zego-zpns-react-native';
 
 export default class ZegoUIKitSignalingPlugin {
   static shared: ZegoUIKitSignalingPlugin;
@@ -47,7 +47,7 @@ export default class ZegoUIKitSignalingPlugin {
   reportCallKitCallEnded(uuid: string) {
     ZegoPluginInvitationService.getInstance().reportCallKitCallEnded(uuid);
   }
-  invoke(method: string, params: any) {
+  invoke(method: string, params?: any) {
     switch (method) {
       case 'init':
         return ZegoPluginInvitationService.getInstance().init(

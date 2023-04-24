@@ -1,6 +1,17 @@
-import ZIM, { ZIMRoomInfo, ZIMRoomMemberAttributesInfo, ZIMRoomMemberAttributesQueryConfig } from 'zego-zim-react-native';
-import { zlogerror, zloginfo, zlogwarning } from '../utils/logger';
+import type {
+  ZIMRoomInfo,
+  ZIMRoomMemberAttributesInfo,
+  ZIMRoomMemberAttributesQueryConfig,
+  ZIMEventOfRoomMembersAttributesUpdatedResult,
+  ZIMRoomEnteredResult,
+  ZIMError,
+  ZIMRoomMembersAttributesOperatedResult,
+  ZIMRoomMemberAttributesListQueriedResult,
+} from 'zego-zim-react-native';
+import { zlogerror, zloginfo } from '../utils/logger';
 import ZegoPluginResult from './defines';
+import ZegoUIKitCorePlugin from "../../components/internal/ZegoUIKitCorePlugin";
+
 export default class ZegoPluginUserInRoomAttributesCore {
   static shared: ZegoPluginUserInRoomAttributesCore;
   _roomBaseInfo = {} as ZIMRoomInfo; // { roomID: '', roomName: '' }
@@ -23,9 +34,9 @@ export default class ZegoPluginUserInRoomAttributesCore {
   }
   // ------- internal events register ------
   _registerEngineCallback() {
-    ZIM.getInstance().on(
+    ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().on(
       'roomMemberAttributesUpdated',
-      (zim, { roomID, infos, operatedInfo }) => {
+      (zim: any, { roomID, infos, operatedInfo }: ZIMEventOfRoomMembersAttributesUpdatedResult) => {
         zloginfo(
           `[ZegoPluginUserInRoomAttributesCore]NotifyUsersInRoomAttributesUpdated`,
           infos,
@@ -45,7 +56,7 @@ export default class ZegoPluginUserInRoomAttributesCore {
     zloginfo(
       '[ZegoPluginUserInRoomAttributesCore]Unregister callback from ZIM...'
     );
-    ZIM.getInstance().off('roomMemberAttributesUpdated');
+    ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().off('roomMemberAttributesUpdated');
   }
   // ------- internal utils ------
   _resetData() {
@@ -71,23 +82,23 @@ export default class ZegoPluginUserInRoomAttributesCore {
   }
   // ------- external method ------
   joinRoom(roomID: string) {
-    if (!ZIM.getInstance()) {
+    if (!ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()) {
       zlogerror(
         '[ZegoPluginUserInRoomAttributesCore]Please initialize it first.'
       );
       return Promise.reject();
     }
     return new Promise((resolve, reject) => {
-      ZIM.getInstance()
+      ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()
         .enterRoom({ roomID, roomName: roomID })
-        .then(({ roomInfo }) => {
+        .then(({ roomInfo }: ZIMRoomEnteredResult) => {
           zloginfo(
             `[ZegoPluginUserInRoomAttributesCore]Join the room successfully.`
           );
           this._roomBaseInfo = roomInfo.baseInfo;
           resolve(new ZegoPluginResult('', ''));
         })
-        .catch((error) => {
+        .catch((error: ZIMError) => {
           zlogerror(
             `[ZegoPluginUserInRoomAttributesCore]Failed to join the room, code: ${error.code}, message: ${error.message}`
           );
@@ -96,7 +107,7 @@ export default class ZegoPluginUserInRoomAttributesCore {
     });
   }
   leaveRoom() {
-    if (!ZIM.getInstance()) {
+    if (!ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()) {
       zlogerror(
         '[ZegoPluginUserInRoomAttributesCore]Please initialize it first.'
       );
@@ -109,7 +120,7 @@ export default class ZegoPluginUserInRoomAttributesCore {
       return Promise.reject();
     }
     return new Promise((resolve, reject) => {
-      ZIM.getInstance()
+      ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()
         .leaveRoom(this._roomBaseInfo.roomID)
         .then(() => {
           zloginfo(
@@ -118,7 +129,7 @@ export default class ZegoPluginUserInRoomAttributesCore {
           this._resetDataForLeaveRoom();
           resolve(new ZegoPluginResult('', ''));
         })
-        .catch((error) => {
+        .catch((error: ZIMError) => {
           zlogerror(
             `[ZegoPluginUserInRoomAttributesCore]Failed to leave the room, code: ${error.code}, message: ${error.message}`
           );
@@ -130,21 +141,21 @@ export default class ZegoPluginUserInRoomAttributesCore {
     return this._roomBaseInfo;
   }
   setUsersInRoomAttributes(attributes: Record<string, string>, userIDs: string[]) {
-    if (!ZIM.getInstance()) {
+    if (!ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()) {
       zlogerror(
         '[ZegoPluginUserInRoomAttributesCore]Please initialize it first.'
       );
       return Promise.reject();
     }
     return new Promise((resolve, reject) => {
-      ZIM.getInstance()
+      ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()
         .setRoomMembersAttributes(
           attributes,
           userIDs,
           this._roomBaseInfo.roomID,
           { isDeleteAfterOwnerLeft: true }
         )
-        .then(({ roomID, infos, errorUserList }) => {
+        .then(({ roomID, infos, errorUserList }: ZIMRoomMembersAttributesOperatedResult) => {
           zloginfo(
             `[ZegoPluginUserInRoomAttributesCore]Set attributes of users in room successfully.`
           );
@@ -154,7 +165,7 @@ export default class ZegoPluginUserInRoomAttributesCore {
             infos,
           });
         })
-        .catch((error) => {
+        .catch((error: ZIMError) => {
           zlogerror(
             `[ZegoPluginUserInRoomAttributesCore]Failed to set the user's attributes, code: ${error.code}, message: ${error.message}`
           );
@@ -163,16 +174,16 @@ export default class ZegoPluginUserInRoomAttributesCore {
     });
   }
   queryUsersInRoomAttributes(config: ZIMRoomMemberAttributesQueryConfig) {
-    if (!ZIM.getInstance()) {
+    if (!ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()) {
       zlogerror(
         '[ZegoPluginUserInRoomAttributesCore]Please initialize it first.'
       );
       return Promise.reject();
     }
     return new Promise((resolve, reject) => {
-      ZIM.getInstance()
+      ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()
         .queryRoomMemberAttributesList(this._roomBaseInfo.roomID, config)
-        .then(({ roomID, infos, nextFlag: resNextFlag }) => {
+        .then(({ roomID, infos, nextFlag: resNextFlag }: ZIMRoomMemberAttributesListQueriedResult) => {
           zloginfo(
             `[ZegoPluginUserInRoomAttributesCore]Query attributes of users in room successfully.`
           );
@@ -183,7 +194,7 @@ export default class ZegoPluginUserInRoomAttributesCore {
           };
           resolve(params);
         })
-        .catch((error) => {
+        .catch((error: ZIMError) => {
           zlogerror(
             `[ZegoPluginUserInRoomAttributesCore]Failed to query the user's attributes, code: ${error.code}, message: ${error.message}`
           );
@@ -196,7 +207,7 @@ export default class ZegoPluginUserInRoomAttributesCore {
     infos: ZIMRoomMemberAttributesInfo[];
     editor: string;
   }) => void) {
-    if (!ZIM.getInstance()) {
+    if (!ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()) {
       zlogerror(
         '[ZegoPluginUserInRoomAttributesCore]Please initialize it first.'
       );

@@ -1,4 +1,4 @@
-import { ZIMRoomMemberAttributesInfo } from 'zego-zim-react-native';
+import type { ZIMRoomMemberAttributesInfo } from 'zego-zim-react-native';
 import ZegoPluginUserInRoomAttributesCore from '../core/user_in_room_attributes_core';
 export default class ZegoPluginUserInRoomAttributesService {
   static shared: ZegoPluginUserInRoomAttributesService;

@@ -1,7 +1,20 @@
-import ZIM, { ZIMMessage, ZIMRoomAttributesBatchOperationConfig, ZIMRoomAttributesDeleteConfig, ZIMRoomAttributesSetConfig, ZIMRoomAttributesUpdateInfo } from 'zego-zim-react-native';
-import { zlogerror, zloginfo, zlogwarning } from '../utils/logger';
+import type {
+  ZIMMessage,
+  ZIMRoomAttributesBatchOperationConfig,
+  ZIMRoomAttributesDeleteConfig,
+  ZIMRoomAttributesSetConfig,
+  ZIMRoomAttributesUpdateInfo,
+  ZIMEventOfRoomAttributesUpdatedResult,
+  ZIMEventOfReceiveConversationMessageResult,
+  ZIMRoomAttributesOperatedResult,
+  ZIMRoomAttributesBatchOperatedResult,
+  ZIMRoomAttributesQueriedResult,
+  ZIMError,
+} from 'zego-zim-react-native';
+import { zlogerror, zloginfo } from '../utils/logger';
 import ZegoPluginResult from './defines';
 import ZegoPluginUserInRoomAttributesCore from './user_in_room_attributes_core';
+import ZegoUIKitCorePlugin from "../../components/internal/ZegoUIKitCorePlugin";
 
 export default class ZegoPluginRoomPropertiesCore {
   static shared: ZegoPluginRoomPropertiesCore;
@@ -21,7 +34,7 @@ export default class ZegoPluginRoomPropertiesCore {
   }
   // ------- internal events register ------
   _registerEngineCallback() {
-    ZIM.getInstance().on('roomAttributesUpdated', (zim, { roomID, infos }) => {
+    ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().on('roomAttributesUpdated', (zim: any, { roomID, infos }: ZIMEventOfRoomAttributesUpdatedResult) => {
       zloginfo(
         `[ZegoPluginRoomPropertiesCore]NotifyRoomPropertiesUpdated`,
         infos
@@ -30,9 +43,9 @@ export default class ZegoPluginRoomPropertiesCore {
         this._notifyRoomPropertiesUpdated(info);
       });
     });
-    ZIM.getInstance().on(
+    ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().on(
       'roomAttributesBatchUpdated',
-      (zim, { roomID, infos }) => {
+      (zim: any, { roomID, infos }: ZIMEventOfRoomAttributesUpdatedResult) => {
         zloginfo(
           `[ZegoPluginRoomPropertiesCore]NotifyRoomPropertiesUpdated`,
           infos
@@ -42,17 +55,17 @@ export default class ZegoPluginRoomPropertiesCore {
         });
       }
     );
-    ZIM.getInstance().on('receiveRoomMessage', (zim, { messageList, fromConversationID }) => {
+    ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().on('receiveRoomMessage', (zim: any, { messageList, fromConversationID }: ZIMEventOfReceiveConversationMessageResult) => {
       this._notifyInRoomTextMessageReceived({ messageList, fromConversationID });
     });
 
     zloginfo('[ZegoPluginRoomPropertiesCore]Register callback for ZIM...');
   }
   _unregisterEngineCallback() {
-    zloginfo('[ZegoPluginRoomPropertiesCore]Unregister callback from ZIM...', ZIM);
-    ZIM.getInstance().off('roomAttributesUpdated');
-    ZIM.getInstance().off('roomAttributesBatchUpdated');
-    ZIM.getInstance().off('receiveRoomMessage');
+    zloginfo('[ZegoPluginRoomPropertiesCore]Unregister callback from ZIM...');
+    ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().off('roomAttributesUpdated');
+    ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().off('roomAttributesBatchUpdated');
+    ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().off('receiveRoomMessage');
   }
   // ------- internal events exec ------
   _notifyRoomPropertiesUpdated(notifyData: ZIMRoomAttributesUpdateInfo) {
@@ -75,22 +88,22 @@ export default class ZegoPluginRoomPropertiesCore {
   }
   // ------- external method ------
   updateRoomProperty(attributes: Record<string, string>, config: ZIMRoomAttributesSetConfig) {
-    if (!ZIM.getInstance()) {
+    if (!ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()) {
       zlogerror('[ZegoPluginRoomPropertiesCore]Please initialize it first.');
       return Promise.reject();
     }
     const roomID =
       ZegoPluginUserInRoomAttributesCore.getInstance().getRoomBaseInfo().roomID;
     return new Promise((resolve, reject) => {
-      ZIM.getInstance()
+      ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()
         .setRoomAttributes(attributes, roomID, config)
-        .then(({ roomID: resRoomID, errorKeys }) => {
+        .then(({ roomID: resRoomID, errorKeys }: ZIMRoomAttributesOperatedResult) => {
           zloginfo(
             `[ZegoPluginRoomPropertiesCore]Update the room properties successfully.`
           );
           resolve({ ...new ZegoPluginResult('', ''), errorKeys });
         })
-        .catch((error) => {
+        .catch((error: ZIMError) => {
           zlogerror(
             `[ZegoPluginRoomPropertiesCore]Failed to update room properties, code: ${error.code}, message: ${error.message}`
           );
@@ -99,22 +112,22 @@ export default class ZegoPluginRoomPropertiesCore {
     });
   }
   deleteRoomProperties(keys: string[], config: ZIMRoomAttributesDeleteConfig) {
-    if (!ZIM.getInstance()) {
+    if (!ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()) {
       zlogerror('[ZegoPluginRoomPropertiesCore]Please initialize it first.');
       return Promise.reject();
     }
     const roomID =
       ZegoPluginUserInRoomAttributesCore.getInstance().getRoomBaseInfo().roomID;
     return new Promise((resolve, reject) => {
-      ZIM.getInstance()
+      ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()
         .deleteRoomAttributes(keys, roomID, config)
-        .then(({ roomID: resRoomID, errorKeys }) => {
+        .then(({ roomID: resRoomID, errorKeys }: ZIMRoomAttributesOperatedResult) => {
           zloginfo(
             `[ZegoPluginRoomPropertiesCore]Delete the room properties successfully.`
           );
           resolve({ ...new ZegoPluginResult('', ''), errorKeys });
         })
-        .catch((error) => {
+        .catch((error: ZIMError) => {
           zlogerror(
             `[ZegoPluginRoomPropertiesCore]Failed to delete room properties, code: ${error.code}, message: ${error.message}`
           );
@@ -123,34 +136,34 @@ export default class ZegoPluginRoomPropertiesCore {
     });
   }
   beginRoomPropertiesBatchOperation(config: ZIMRoomAttributesBatchOperationConfig) {
-    if (!ZIM.getInstance()) {
+    if (!ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()) {
       zlogerror('[ZegoPluginRoomPropertiesCore]Please initialize it first.');
       return Promise.reject();
     }
     const roomID =
       ZegoPluginUserInRoomAttributesCore.getInstance().getRoomBaseInfo().roomID;
-    ZIM.getInstance().beginRoomAttributesBatchOperation(roomID, config);
+    ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().beginRoomAttributesBatchOperation(roomID, config);
     zloginfo(
       `[ZegoPluginRoomPropertiesCore]Begin batch operate room properties successfully.`
     );
   }
   endRoomPropertiesBatchOperation() {
-    if (!ZIM.getInstance()) {
+    if (!ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()) {
       zlogerror('[ZegoPluginRoomPropertiesCore]Please initialize it first.');
       return Promise.reject();
     }
     const roomID =
       ZegoPluginUserInRoomAttributesCore.getInstance().getRoomBaseInfo().roomID;
     return new Promise((resolve, reject) => {
-      ZIM.getInstance()
+      ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()
         .endRoomAttributesBatchOperation(roomID)
-        .then(({ roomID: resRoomID }) => {
+        .then(({ roomID: resRoomID }: ZIMRoomAttributesBatchOperatedResult) => {
           zloginfo(
             `[ZegoPluginRoomPropertiesCore]End batch operate room properties successfully.`
           );
           resolve(new ZegoPluginResult('', ''));
         })
-        .catch((error) => {
+        .catch((error: ZIMError) => {
           zlogerror(
             `[ZegoPluginRoomPropertiesCore]Failed to end batch operate room properties, code: ${error.code}, message: ${error.message}`
           );
@@ -159,22 +172,22 @@ export default class ZegoPluginRoomPropertiesCore {
     });
   }
   queryRoomProperties() {
-    if (!ZIM.getInstance()) {
+    if (!ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()) {
       zlogerror('[ZegoPluginRoomPropertiesCore]Please initialize it first.');
       return Promise.reject();
     }
     const roomID =
       ZegoPluginUserInRoomAttributesCore.getInstance().getRoomBaseInfo().roomID;
     return new Promise((resolve, reject) => {
-      ZIM.getInstance()
+      ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()
         .queryRoomAllAttributes(roomID)
-        .then(({ roomID: resRoomID, roomAttributes }) => {
+        .then(({ roomID: resRoomID, roomAttributes }: ZIMRoomAttributesQueriedResult) => {
           zloginfo(
             `[ZegoPluginRoomPropertiesCore]Query room all attributes successfully.`
           );
           resolve({ roomAttributes, ...new ZegoPluginResult('', '') });
         })
-        .catch((error) => {
+        .catch((error: ZIMError) => {
           zlogerror(
             `[ZegoPluginRoomPropertiesCore]Failed to query room all properties, code: ${error.code}, message: ${error.message}`
           );
@@ -183,7 +196,7 @@ export default class ZegoPluginRoomPropertiesCore {
     });
   }
   onRoomPropertyUpdated(callbackID: string, callback: (notifyData: ZIMRoomAttributesUpdateInfo) => void) {
-    if (!ZIM.getInstance()) {
+    if (!ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()) {
       zlogerror('[ZegoPluginRoomPropertiesCore]Please initialize it first.');
     }
     if (typeof callback !== 'function') {
@@ -200,7 +213,7 @@ export default class ZegoPluginRoomPropertiesCore {
     }
   }
   onInRoomTextMessageReceived(callbackID: string, callback: (notifyData: { messageList: ZIMMessage[]; fromConversationID: string }) => void) {
-    if (!ZIM.getInstance()) {
+    if (!ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()) {
       zlogerror('[ZegoPluginRoomPropertiesCore]Please initialize it first.');
     }
     if (typeof callback !== 'function') {

@@ -3,6 +3,7 @@ import { ZegoChangedCountOrProperty, ZegoUIKitPluginType } from '../../../compon
 import ZegoUIKitCorePlugin from '../../../components/internal/ZegoUIKitCorePlugin';
 import { zlogerror, zloginfo } from '../../../utils/logger';
 import { ZegoInvitationImplResult } from './defines';
+import InnerZegoUIKitSignalingPlugin from "../../../signal_plugin";
 
 var ZegoUIKitSignalingPlugin: any;
 const _localUser: any = {};
@@ -84,9 +85,9 @@ const ZegoUIKitSignalingPluginImpl = {
     ZegoUIKitSignalingPlugin.getVersion();
   },
   init: (appID: number, appSign: string) => {
-    ZegoUIKitSignalingPlugin = ZegoUIKitCorePlugin.getPlugin(
-      ZegoUIKitPluginType.signaling
-    );
+    if (ZegoUIKitCorePlugin.getZIMPlugin()) {
+      ZegoUIKitSignalingPlugin = InnerZegoUIKitSignalingPlugin;
+    }
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return;

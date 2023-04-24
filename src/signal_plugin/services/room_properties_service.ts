@@ -1,4 +1,4 @@
-import { ZIMMessage, ZIMRoomAttributesUpdateInfo } from 'zego-zim-react-native';
+import type { ZIMMessage, ZIMRoomAttributesUpdateInfo } from 'zego-zim-react-native';
 import ZegoPluginRoomPropertiesCore from '../core/room_properties_core';
 
 export default class ZegoPluginRoomPropertiesService {

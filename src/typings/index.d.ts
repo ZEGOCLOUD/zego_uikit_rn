@@ -1,1 +1,1 @@
-declare module 'react-delegate-component'
+declare module 'react-delegate-component';
