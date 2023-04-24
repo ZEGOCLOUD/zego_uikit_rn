@@ -100,8 +100,7 @@ export default function PictureInPictureLayout(props: any) {
     return (<View style={styles.container}>
         <View style={[styles.smallViewContainer, getSmallViewPostStyle()]} onLayout={layoutHandle}>
             {
-                globalAudioVideoUserList.slice(1, 4).map((user, index) => <TouchableWithoutFeedback {...panResponder.panHandlers} onPress={switchLargeOrSmallView.bind(this, index, user)}><View
-                    key={user.userID}
+                globalAudioVideoUserList.slice(1, 4).map((user, index) => <TouchableWithoutFeedback key={user.userID} {...panResponder.panHandlers} onPress={switchLargeOrSmallView.bind(this, index, user)}><View
                     style={[
                         styles.smallView,
                         styles.smallViewBorder,
@@ -109,7 +108,6 @@ export default function PictureInPictureLayout(props: any) {
                         getSmallViewSpacing(spacingBetweenSmallViews).smallViewSpacing,
                     ]}>
                         <ZegoAudioVideoView
-                            key={user.userID}
                             userID={user.userID}
                             audioViewBackgroudColor={smallViewBackgroundColor}
                             audioViewBackgroudImage={smallViewBackgroundImage}
@@ -123,7 +121,6 @@ export default function PictureInPictureLayout(props: any) {
         <View style={styles.bigView}>
             {globalAudioVideoUserList[0] ?
                 <ZegoAudioVideoView
-                    key={globalAudioVideoUserList[0].userID}
                     userID={globalAudioVideoUserList[0].userID}
                     audioViewBackgroudColor={largeViewBackgroundColor}
                     audioViewBackgroudImage={largeViewBackgroundImage}

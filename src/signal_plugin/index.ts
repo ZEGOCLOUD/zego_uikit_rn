@@ -32,6 +32,9 @@ export default class ZegoUIKitSignalingPlugin {
   getPluginType() {
     return this._signaling;
   }
+  setBackgroundMessageHandler() {
+    ZegoPluginInvitationService.getInstance().setBackgroundMessageHandler();
+  }
   setAndroidOfflineDataHandler(handler: (data: any) => void) {
     ZegoPluginInvitationService.getInstance().setAndroidOfflineDataHandler(handler);
   }

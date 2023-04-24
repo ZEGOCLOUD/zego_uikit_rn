@@ -1,18 +1,11 @@
 import ZegoSignalingPluginCore from '../core';
 import ZegoPluginResult from '../core/defines';
 import { zlogerror, zloginfo } from '../utils/logger';
-import type { CXAction, ZPNsRegisterMessage } from 'zego-zpns-react-native';
+import type { CXAction, ZPNsRegisterMessage, ZPNsMessage } from 'zego-zpns-react-native';
 import type { ZIMCallInviteConfig, ZIMCallCancelConfig, ZIMConnectionState } from 'zego-zim-react-native';
 import { CXCallEndedReason } from '../defines';
 import ZegoUIKitCorePlugin from '../../components/internal/ZegoUIKitCorePlugin';
 import { Platform } from 'react-native';
-// import ZPNs from 'zego-zpns-react-native';
-
-// ZPNs.setBackgroundMessageHandler((message: any) => {
-//   zloginfo('ZPNs throughMessageReceived: ', message)
-//   const dataObj = JSON.parse(message.extras.payload);
-//   ZegoPluginInvitationService.getInstance().getAndroidOfflineDataHandler()(dataObj)
-// })
 
 export default class ZegoPluginInvitationService {
   static shared: ZegoPluginInvitationService;
@@ -34,6 +27,13 @@ export default class ZegoPluginInvitationService {
       ZegoPluginInvitationService.shared = new ZegoPluginInvitationService();
     }
     return ZegoPluginInvitationService.shared;
+  }
+  setBackgroundMessageHandler() {
+    ZegoUIKitCorePlugin.getZPNsPlugin().default.setBackgroundMessageHandler((message: ZPNsMessage) => {
+      zloginfo('ZPNs setBackgroundMessageHandler: ', message)
+      const dataObj = JSON.parse(message.extras.payload);
+      ZegoPluginInvitationService.getInstance().getAndroidOfflineDataHandler()(dataObj)
+    })
   }
   setAndroidOfflineDataHandler(handler: (data: any) => void) {
     this._androidOfflineDataHandler = handler;

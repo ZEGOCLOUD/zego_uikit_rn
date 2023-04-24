@@ -9,13 +9,24 @@ const ZegoUIKitCorePlugin = {
       return;
     }
     plugins.forEach((plugin) => {
-      zloginfo('[ZegoUIKitCorePlugin][installPlugins]Plugin install', plugin.default);
       if (plugin.ZIMConnectionState) {
-        _plugins.set('ZIM', plugin);
-        zloginfo('[ZegoUIKitCorePlugin][installPlugins]Plugin install success, plugins: ', 'ZIM');
+        if (_plugins.get('ZIM')) {
+          zloginfo(
+            '[ZegoUIKitCorePlugin][installPlugins]Plugin already exists, this install does not take effect, plugin: ZIM'
+          );
+        } else {
+          _plugins.set('ZIM', plugin);
+          zloginfo('[ZegoUIKitCorePlugin][installPlugins]Plugin install success, plugin: ZIM');
+        }
       } else if (plugin.ZPNsPushSourceType) {
-        _plugins.set('ZPNs', plugin);
-        zloginfo('[ZegoUIKitCorePlugin][installPlugins]Plugin install success, plugins: ', 'ZPNs');
+        if (_plugins.get('ZPNs')) {
+          zloginfo(
+            '[ZegoUIKitCorePlugin][installPlugins]Plugin already exists, this install does not take effect, plugin: ZPNs'
+          );
+        } else {
+          _plugins.set('ZPNs', plugin);
+          zloginfo('[ZegoUIKitCorePlugin][installPlugins]Plugin install success, plugin: ZPNs');
+        }
       } else if (typeof plugin.getInstance === 'function') {
         // Compatible with the original usage
         const type = plugin.getInstance().getPluginType
@@ -24,11 +35,11 @@ const ZegoUIKitCorePlugin = {
         if (Object.values(ZegoUIKitPluginType).includes(type)) {
           if (_plugins.get(type)) {
             zloginfo(
-              '[ZegoUIKitCorePlugin][installPlugins]Plugin already exists, will update plugin instance'
+              '[ZegoUIKitCorePlugin][installPlugins]Plugin already exists, this install does not take effect, plugins: ', type
             );
           } else {
             _plugins.set(type, plugin);
-            zloginfo('[ZegoUIKitCorePlugin][installPlugins]Plugin install success, plugins: ', type);
+            zloginfo('[ZegoUIKitCorePlugin][installPlugins]Plugin install success, plugin: ', type);
           }
         }
       }

@@ -77,6 +77,9 @@ const _notifyRoomPropertiesFullUpdated = (...notifyData: any[]) => {
 };
 
 const ZegoUIKitSignalingPluginImpl = {
+  getZegoUIKitSignalingPlugin: () => {
+    return InnerZegoUIKitSignalingPlugin;
+  },
   getVersion: () => {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
