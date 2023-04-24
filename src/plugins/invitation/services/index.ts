@@ -85,7 +85,7 @@ const ZegoUIKitSignalingPluginImpl = {
     ZegoUIKitSignalingPlugin.getVersion();
   },
   init: (appID: number, appSign: string) => {
-    if (ZegoUIKitCorePlugin.getZIMPlugin()) {
+    if (ZegoUIKitCorePlugin.getPlugin(ZegoUIKitPluginType.signaling)) {
       ZegoUIKitSignalingPlugin = InnerZegoUIKitSignalingPlugin;
     }
     if (!ZegoUIKitSignalingPlugin) {
