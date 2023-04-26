@@ -326,6 +326,15 @@ export default class ZegoSignalingPluginCore {
   _getInviterIDByCallID(callID: string) {
     return this._callIDUsers.get(callID);
   }
+  _createHandle() {
+    this._unregisterEngineCallback();
+    this._registerEngineCallback();
+    // live audio room
+    ZegoPluginUserInRoomAttributesCore.getInstance()._unregisterEngineCallback();
+    ZegoPluginUserInRoomAttributesCore.getInstance()._registerEngineCallback();
+    ZegoPluginRoomPropertiesCore.getInstance()._unregisterEngineCallback();
+    ZegoPluginRoomPropertiesCore.getInstance()._registerEngineCallback();
+  }
   // ------- external utils ------
   getLocalUser() {
     return this._loginUser;
@@ -355,31 +364,36 @@ export default class ZegoSignalingPluginCore {
         zlogerror('[Core]Create zim error.');
       } else {
         zloginfo('[Core]Create zim success.');
-        this._unregisterEngineCallback();
-        this._registerEngineCallback();
-        // live audio room
-        ZegoPluginUserInRoomAttributesCore.getInstance()._unregisterEngineCallback();
-        ZegoPluginUserInRoomAttributesCore.getInstance()._registerEngineCallback();
-        ZegoPluginRoomPropertiesCore.getInstance()._unregisterEngineCallback();
-        ZegoPluginRoomPropertiesCore.getInstance()._registerEngineCallback();
+        this._createHandle();
       }
     } else {
       zlogwarning('[Core]Zim has created.');
+      this._createHandle();
     }
   }
   login(userInfo: ZIMUserInfo, token = ''): Promise<void> {
-    if (!this._isLogin) {
-      return ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()
-        .login(userInfo, token)
-        .then(() => {
-          zloginfo('[Core]Login success.');
-          this._loginUser = userInfo;
-          this._isLogin = true;
-        });
-    } else {
-      zloginfo('[Core]Login already success.');
-      return Promise.resolve();
-    }
+    return new Promise((resolve, reject) => {
+      if (!this._isLogin) {
+        ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()
+          .login(userInfo, token)
+          .then(() => {
+            zloginfo('[Core]Login success.');
+            this._loginUser = userInfo;
+            this._isLogin = true;
+            resolve();
+          }).catch((error: ZIMError) => {
+            if (error.code == 6000111) {
+              zloginfo('[Core]Login already success.', error);
+              resolve();
+            } else {
+              reject(error);
+            }
+          });
+      } else {
+        zloginfo('[Core]Login already success.');
+        resolve();
+      }
+    });
   }
   logout(): Promise<void> {
     return ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()

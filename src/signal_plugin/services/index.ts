@@ -178,11 +178,13 @@ export default class ZegoPluginInvitationService {
         action.fulfill();
       });
     } else {
-      // ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().unregisterPush();
-      ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().off("registered")
-      // ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().off("notificationArrived")
-      // ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().off("notificationClicked")
-      // ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().off("throughMessageReceived")
+      if (ZegoUIKitCorePlugin.getZPNsPlugin()) {
+        // ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().unregisterPush();
+        ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().off("registered")
+        // ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().off("notificationArrived")
+        // ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().off("notificationClicked")
+        // ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().off("throughMessageReceived")
+      }
     }
 
   }
