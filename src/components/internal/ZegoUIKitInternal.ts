@@ -267,7 +267,6 @@ function _onRoomStreamUpdate(roomID: string, updateType: number, streamList: any
   }
 }
 function _onRemoteCameraStateUpdate(userID: string, isOn: boolean) {
-  console.warn('>>>>>>>>>>>>> _onRemoteCameraStateUpdate', userID, isOn);
   if (userID in _coreUserMap) {
     _coreUserMap[userID].isCameraDeviceOn = isOn;
     _notifyUserInfoUpdate(_coreUserMap[userID]);
@@ -299,7 +298,6 @@ function _onAudioRouteChange(type: ZegoAudioRoute) {
   _audioOutputType = type;
 }
 function _onRemoteMicStateUpdate(userID: string, isOn: boolean) {
-  console.warn('>>>>>>>>>>>>> _onRemoteMicStateUpdate', userID, isOn);
   if (userID in _coreUserMap) {
     _coreUserMap[userID].isMicDeviceOn = isOn;
     _notifyUserInfoUpdate(_coreUserMap[userID]);
