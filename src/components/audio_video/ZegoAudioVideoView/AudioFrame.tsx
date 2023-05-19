@@ -11,6 +11,7 @@ export default function AudioFrame(props: any) {
     showSoundWave,
     audioViewBackgroudColor,
     audioViewBackgroudImage,
+    avatarBackgroundColor = '#DBDDE3',
     avatarSize,
     avatarAlignment,
     soundWaveColor = '#6B6A71',
@@ -36,8 +37,9 @@ export default function AudioFrame(props: any) {
   };
 
   useEffect(() => {
+    const callbackID = 'AudioFrame' + userInfo.userID + String(Math.floor(Math.random() * 10000));
     ZegoUIKitInternal.onSoundLevelUpdate(
-      'AudioFrame' + userInfo.userID,
+      callbackID,
       (userID: string, soundLevel: number) => {
         if (userInfo.userID == userID) {
           setSoundLevel(soundLevel);
@@ -46,7 +48,7 @@ export default function AudioFrame(props: any) {
     );
 
     return () => {
-      ZegoUIKitInternal.onSoundLevelUpdate('AudioFrame' + userInfo.userID);
+      ZegoUIKitInternal.onSoundLevelUpdate(callbackID);
     };
   }, []);
 
@@ -123,6 +125,7 @@ export default function AudioFrame(props: any) {
           style={[
             styles.avatar,
             {
+              backgroundColor: avatarBackgroundColor,
               width: avatarSize
                 ? avatarSize.width
                 : defaultAvatarSizeRatio * dimensions.width,
@@ -200,7 +203,6 @@ const styles = StyleSheet.create({
     width: ((129 / 375) * 100).toString() + '%',
     aspectRatio: 1,
     borderRadius: 1000,
-    backgroundColor: '#DBDDE3',
     position: 'absolute',
     alignSelf: 'center',
     alignItems: 'center',

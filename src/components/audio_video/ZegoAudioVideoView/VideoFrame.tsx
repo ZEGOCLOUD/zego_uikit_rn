@@ -14,10 +14,11 @@ export default function VideoFrame(props: any) {
     useEffect(() => {
         updateRenderingProperty();
 
-        ZegoUIKitInternal.onSDKConnected('VideoFrame' + userID, () => {
+        const callbackID = 'VideoFrame' + userID + String(Math.floor(Math.random() * 10000));
+        ZegoUIKitInternal.onSDKConnected(callbackID, () => {
             updateRenderingProperty();
         });
-        ZegoUIKitInternal.onUserJoin('VideoFrame' + userID, (userInfoList: any[]) => {
+        ZegoUIKitInternal.onUserJoin(callbackID, (userInfoList: any[]) => {
             userInfoList.forEach(user => {
                 if (user.userID == userID) {
                     updateRenderingProperty()
@@ -25,8 +26,8 @@ export default function VideoFrame(props: any) {
             })
         });
         return () => {
-            ZegoUIKitInternal.onSDKConnected('VideoFrame' + userID);
-            ZegoUIKitInternal.onUserJoin('VideoFrame' + userID);
+            ZegoUIKitInternal.onSDKConnected(callbackID);
+            ZegoUIKitInternal.onUserJoin(callbackID);
             ZegoUIKitInternal.updateRenderingProperty(userID, -1, fillMode);
         }
     }, []);

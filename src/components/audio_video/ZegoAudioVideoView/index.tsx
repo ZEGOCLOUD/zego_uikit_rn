@@ -28,6 +28,7 @@ export default function ZegoVideoView(props: any) {
     foregroundBuilder,
     avatarSize,
     avatarAlignment = 0,
+    avatarBackgroundColor,
     soundWaveColor,
   } = props;
 
@@ -48,7 +49,7 @@ export default function ZegoVideoView(props: any) {
   }, []);
 
   useEffect(() => {
-    const callbackID = 'ZegoVideoView' + String(userID);
+    const callbackID = 'ZegoVideoView' + String(userID) + String(Math.floor(Math.random() * 10000));
 
     ZegoUIKitInternal.onSDKConnected(callbackID, () => {
       const user = ZegoUIKitInternal.getUser(userID);
@@ -107,9 +108,10 @@ export default function ZegoVideoView(props: any) {
             showSoundWave={showSoundWave}
             audioViewBackgroudColor={audioViewBackgroudColor}
             audioViewBackgroudImage={audioViewBackgroudImage}
+            avatar={avatar}
             avatarSize={avatarSize}
             avatarAlignment={avatarAlignment}
-            avatar={avatar}
+            avatarBackgroundColor={avatarBackgroundColor}
             soundWaveColor={soundWaveColor}
           />
         ) : null}
