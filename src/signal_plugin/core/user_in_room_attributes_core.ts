@@ -14,6 +14,7 @@ import ZegoUIKitCorePlugin from "../../components/internal/ZegoUIKitCorePlugin";
 
 export default class ZegoPluginUserInRoomAttributesCore {
   static shared: ZegoPluginUserInRoomAttributesCore;
+  _isJoinRoom = false;
   _roomBaseInfo = {} as ZIMRoomInfo; // { roomID: '', roomName: '' }
   _onUsersInRoomAttributesUpdatedCallbackMap: { [index: string]: (notifyData: {
     infos: ZIMRoomMemberAttributesInfo[];
@@ -64,6 +65,7 @@ export default class ZegoPluginUserInRoomAttributesCore {
   }
   _resetDataForLeaveRoom() {
     this._roomBaseInfo = {} as ZIMRoomInfo;
+    this._isJoinRoom = false;
   }
   // ------- internal events exec ------
   _notifyUsersInRoomAttributesUpdated(notifyData: {
@@ -89,21 +91,27 @@ export default class ZegoPluginUserInRoomAttributesCore {
       return Promise.reject();
     }
     return new Promise((resolve, reject) => {
-      ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()
-        .enterRoom({ roomID, roomName: roomID })
-        .then(({ roomInfo }: ZIMRoomEnteredResult) => {
-          zloginfo(
-            `[ZegoPluginUserInRoomAttributesCore]Join the room successfully.`
-          );
-          this._roomBaseInfo = roomInfo.baseInfo;
-          resolve(new ZegoPluginResult('', ''));
-        })
-        .catch((error: ZIMError) => {
-          zlogerror(
-            `[ZegoPluginUserInRoomAttributesCore]Failed to join the room, code: ${error.code}, message: ${error.message}`
-          );
-          reject(error);
-        });
+      if (!this._isJoinRoom) {
+        ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()
+          .enterRoom({ roomID, roomName: roomID })
+          .then(({ roomInfo }: ZIMRoomEnteredResult) => {
+            zloginfo(
+              `[ZegoPluginUserInRoomAttributesCore]Join the room successfully.`
+            );
+            this._roomBaseInfo = roomInfo.baseInfo;
+            this._isJoinRoom = true;
+            resolve(new ZegoPluginResult('', ''));
+          })
+          .catch((error: ZIMError) => {
+            zlogerror(
+              `[ZegoPluginUserInRoomAttributesCore]Failed to join the room, code: ${error.code}, message: ${error.message}`
+            );
+            reject(error);
+          });
+      } else {
+        zloginfo('[ZegoPluginUserInRoomAttributesCore]Join room already success.');
+        resolve(new ZegoPluginResult('', ''));
+      }
     });
   }
   leaveRoom() {
