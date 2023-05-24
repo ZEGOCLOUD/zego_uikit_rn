@@ -21,9 +21,12 @@ export default function PictureInPictureLayout(props: any) {
     const {
         useVideoViewAspectFill = false,
         showSoundWavesInAudioMode = true,
+        cacheAudioVideoUserList,
     } = audioVideoConfig;
-    const realTimeData: any = useRef();
-    const [globalAudioVideoUserList, setGlobalAudioVideoUserList] = useState([]);
+    const realTimeData: any = useRef(cacheAudioVideoUserList || []);
+    const [globalAudioVideoUserList, setGlobalAudioVideoUserList] = useState(cacheAudioVideoUserList || []);
+    console.log('########cacheAudioVideoUserList########', cacheAudioVideoUserList);
+
     const panResponder = useRef(PanResponder.create({
         // @ts-ignore
         onStartShouldSetPanResponderCapture: () => {
@@ -32,14 +35,13 @@ export default function PictureInPictureLayout(props: any) {
     })).current;
 
     useEffect(() => {
-        realTimeData.current = [];
         const callbackID = 'PictureInPictureLayout' + String(Math.floor(Math.random() * 10000));
         ZegoUIKitInternal.onAudioVideoAvailable(callbackID, (userList: any[]) => {
             userList.forEach((user) => {
                 const result = realTimeData.current.find((item: any) => user.userID === item.userID);
                 if (!result) {
                     realTimeData.current.push(user);
-                    setGlobalAudioVideoUserList((arr) => [...(sortAudioVideo ? sortAudioVideo(realTimeData.current) : realTimeData.current)]);
+                    setGlobalAudioVideoUserList(() => [...(sortAudioVideo ? sortAudioVideo(realTimeData.current) : realTimeData.current)]);
                 }
             });
         });
@@ -49,13 +51,13 @@ export default function PictureInPictureLayout(props: any) {
                     const result = realTimeData.current.findIndex((item: any) => user.userID === item.userID);
                     if (result !== -1) {
                         realTimeData.current.splice(result, 1);
-                        setGlobalAudioVideoUserList((arr) => [...(sortAudioVideo ? sortAudioVideo(realTimeData.current) : realTimeData.current)]);
+                        setGlobalAudioVideoUserList(() => [...(sortAudioVideo ? sortAudioVideo(realTimeData.current) : realTimeData.current)]);
                     }
                 });
             }
         });
         ZegoUIKitInternal.onAudioVideoListForceSort(callbackID, () => {
-            setGlobalAudioVideoUserList((arr) => [...(sortAudioVideo ? sortAudioVideo(realTimeData.current) : realTimeData.current)]);
+            setGlobalAudioVideoUserList(() => [...(sortAudioVideo ? sortAudioVideo(realTimeData.current) : realTimeData.current)]);
         });
         ZegoUIKitInternal.onUserLeave(callbackID, (userList: any[]) => {
             if (!removeViewWhenAudioVideoUnavailable) {
@@ -63,7 +65,7 @@ export default function PictureInPictureLayout(props: any) {
                     const result = realTimeData.current.findIndex((item: any) => user.userID === item.userID);
                     if (result !== -1) {
                         realTimeData.current.splice(result, 1);
-                        setGlobalAudioVideoUserList((arr) => [...(sortAudioVideo ? sortAudioVideo(realTimeData.current) : realTimeData.current)]);
+                        setGlobalAudioVideoUserList(() => [...(sortAudioVideo ? sortAudioVideo(realTimeData.current) : realTimeData.current)]);
                     }
                 });
             }
@@ -86,7 +88,7 @@ export default function PictureInPictureLayout(props: any) {
     const switchLargeOrSmallView = (index: number) => {
         if (switchLargeOrSmallViewByClick) {
             globalAudioVideoUserList[0] = globalAudioVideoUserList.splice(index + 1, 1, globalAudioVideoUserList[0])[0];
-            setGlobalAudioVideoUserList((arr) => [...globalAudioVideoUserList]);
+            setGlobalAudioVideoUserList(() => [...globalAudioVideoUserList]);
             realTimeData.current = globalAudioVideoUserList;
         }
     }
@@ -100,7 +102,7 @@ export default function PictureInPictureLayout(props: any) {
     return (<View style={styles.container}>
         <View style={[styles.smallViewContainer, getSmallViewPostStyle()]} onLayout={layoutHandle}>
             {
-                globalAudioVideoUserList.slice(1, 4).map((user, index) => <TouchableWithoutFeedback key={user.userID} {...panResponder.panHandlers} onPress={switchLargeOrSmallView.bind(this, index, user)}><View
+                globalAudioVideoUserList.slice(1, 4).map((user: any, index: number) => <TouchableWithoutFeedback key={user.userID} {...panResponder.panHandlers} onPress={switchLargeOrSmallView.bind(this, index, user)}><View
                     key={user.userID}
                     style={[
                         styles.smallView,
