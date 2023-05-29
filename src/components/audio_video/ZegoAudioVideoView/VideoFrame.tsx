@@ -6,8 +6,10 @@ import ZegoUIKitInternal from "../../internal/ZegoUIKitInternal";
 export default function VideoFrame(props: any) {
     const { userID, roomID, fillMode } = props;
     const viewRef = useRef(null);
+    console.log('VideoFrame', userID);
 
     const updateRenderingProperty = () => {
+        console.log('VideoFrame updateRenderingProperty');
         const viewID = findNodeHandle(viewRef.current);
         ZegoUIKitInternal.updateRenderingProperty(userID, viewID, fillMode);
     }
@@ -25,9 +27,13 @@ export default function VideoFrame(props: any) {
                 }
             })
         });
+        ZegoUIKitInternal.onVideoViewForceRender(callbackID, () => {
+            updateRenderingProperty();
+        });
         return () => {
             ZegoUIKitInternal.onSDKConnected(callbackID);
             ZegoUIKitInternal.onUserJoin(callbackID);
+            ZegoUIKitInternal.onVideoViewForceRender(callbackID);
             ZegoUIKitInternal.updateRenderingProperty(userID, -1, fillMode);
         }
     }, []);

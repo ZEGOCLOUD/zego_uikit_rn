@@ -44,6 +44,7 @@ var _onTurnOnYourMicrophoneRequestCallbackMap: any = {};
 // Force update component callback
 var _onMemberListForceSortCallbackMap: any = {};
 var _onAudioVideoListForceSortCallbackMap: any = {};
+var _onVideoViewForceRenderCallbackMap: any = {};
 
 var _localCoreUser: any = _createCoreUser('', '', '', {});
 var _streamCoreUserMap: any = {}; // <streamID, CoreUser>
@@ -1724,4 +1725,27 @@ export default {
       _onAudioVideoListForceSortCallbackMap[callbackID] = callback;
     }
   },
+  forceRenderVideoView() {
+    zloginfo('[forceRenderVideoView callback]');
+    Object.keys(_onVideoViewForceRenderCallbackMap).forEach((callbackID) => {
+      if (_onVideoViewForceRenderCallbackMap[callbackID]) {
+        _onVideoViewForceRenderCallbackMap[callbackID]();
+      }
+    });
+  },
+  onVideoViewForceRender(callbackID: string, callback?: Function) {
+    if (typeof callback !== 'function') {
+      if (callbackID in _onVideoViewForceRenderCallbackMap) {
+        zloginfo(
+          '[onVideoViewForceRender] Remove callback for: [',
+          callbackID,
+          '] because callback is not a valid function!'
+        );
+        delete _onVideoViewForceRenderCallbackMap[callbackID];
+      }
+    } else {
+      _onVideoViewForceRenderCallbackMap[callbackID] = callback;
+    }
+  },
+  
 };

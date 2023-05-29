@@ -68,6 +68,7 @@ export default {
   onRoomPropertiesFullUpdated: ZegoUIKitInternal.onRoomPropertiesFullUpdated,
   forceSortMemberList: ZegoUIKitInternal.forceSortMemberList,
   forceSortAudioVideoList: ZegoUIKitInternal.forceSortAudioVideoList,
+  forceRenderVideoView: ZegoUIKitInternal.forceRenderVideoView,
   startPlayingAllAudioVideo: ZegoUIKitInternal.startPlayingAllAudioVideo,
   stopPlayingAllAudioVideo: ZegoUIKitInternal.stopPlayingAllAudioVideo,
   removeUserFromRoom: ZegoUIKitInternal.removeUserFromRoom,
