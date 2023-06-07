@@ -1,6 +1,7 @@
 import { View, StyleSheet, Text, ImageBackground, Image } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import ZegoUIKitInternal from '../../internal/ZegoUIKitInternal';
+import Delegate from 'react-delegate-component';
 
 const defaultAvatarSizeRatio = 129 / 375;
 const flexStyle = ['center', 'flex-start', 'flex-end'];
@@ -14,6 +15,7 @@ export default function AudioFrame(props: any) {
     avatarBackgroundColor = '#DBDDE3',
     avatarSize,
     avatarAlignment,
+    avatarBuilder,
     soundWaveColor = '#6B6A71',
     avatar = '',
   } = props;
@@ -133,17 +135,25 @@ export default function AudioFrame(props: any) {
           ]}
         >
           {
-            (!avatar || isLoadError) ?
-              <Text style={styles.nameLabel}>{getShotName(userInfo.userName)}</Text> :
-              <Image 
-                style={{ width: '100%', height: '100%', resizeMode: 'contain' }}
-                resizeMode="contain"
-                source={{ uri: avatar }}
-                onLoadStart={() =>  console.log('avatar onLoadStart')}
-                onLoadEnd={() =>  console.log('avatar onLoadEnd')}
-                onError={() =>  { console.log('avatar onError'); setIsLoadError(true);}}
-                onLoad={() =>  { console.log('avatar onLoad'); setIsLoadError(false);}}
-              />
+            !avatarBuilder ?
+              (!avatar || isLoadError) ?
+                <Text style={styles.nameLabel}>{getShotName(userInfo.userName)}</Text> :
+                <Image 
+                  style={{ width: '100%', height: '100%', resizeMode: 'contain' }}
+                  resizeMode="contain"
+                  source={{ uri: avatar }}
+                  onLoadStart={() =>  console.log('avatar onLoadStart')}
+                  onLoadEnd={() =>  console.log('avatar onLoadEnd')}
+                  onError={() =>  { console.log('avatar onError'); setIsLoadError(true);}}
+                  onLoad={() =>  { console.log('avatar onLoad'); setIsLoadError(false);}}
+                />
+              : <View style={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center', }}>
+                <Text style={styles.nameLabel}>{getShotName(userInfo.userName)}</Text>
+                <Delegate
+                  to={avatarBuilder}
+                  props={{ userInfo: userInfo }}
+                />
+              </View>
           }
         </View>
       </ImageBackground>
@@ -208,6 +218,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 2,
+    overflow: 'hidden',
   },
   nameLabel: {
     flex: 1,

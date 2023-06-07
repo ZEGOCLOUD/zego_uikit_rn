@@ -28,6 +28,7 @@ export default function ZegoVideoView(props: any) {
     foregroundBuilder,
     avatarSize,
     avatarAlignment = 0,
+    avatarBuilder,
     avatarBackgroundColor,
     soundWaveColor,
   } = props;
@@ -111,6 +112,7 @@ export default function ZegoVideoView(props: any) {
             avatar={avatar}
             avatarSize={avatarSize}
             avatarAlignment={avatarAlignment}
+            avatarBuilder={avatarBuilder}
             avatarBackgroundColor={avatarBackgroundColor}
             soundWaveColor={soundWaveColor}
           />
