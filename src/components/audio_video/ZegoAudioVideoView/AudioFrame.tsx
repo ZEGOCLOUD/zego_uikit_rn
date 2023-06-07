@@ -148,7 +148,9 @@ export default function AudioFrame(props: any) {
                   onLoad={() =>  { console.log('avatar onLoad'); setIsLoadError(false);}}
                 />
               : <View style={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center', }}>
-                <Text style={styles.nameLabel}>{getShotName(userInfo.userName)}</Text>
+                {
+                  (!avatar || isLoadError) ? <Text style={styles.nameLabel}>{getShotName(userInfo.userName)}</Text> : null
+                }
                 <Delegate
                   to={avatarBuilder}
                   props={{ userInfo: userInfo }}
