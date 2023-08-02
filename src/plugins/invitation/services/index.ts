@@ -158,6 +158,15 @@ const ZegoUIKitSignalingPluginImpl = {
       data,
     });
   },
+  reportZPNsCallKitCallEnded: (uuid: string, reason: number) => {
+    if (!ZegoUIKitSignalingPlugin) {
+      zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
+      return Promise.reject();
+    }
+    return ZegoUIKitSignalingPlugin.getInstance().invoke('reportCallKitCallEnded', {
+      uuid, reason
+    });
+  },
   refuseInvitation: (inviterID: string, data?: string) => {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);

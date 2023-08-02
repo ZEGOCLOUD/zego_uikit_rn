@@ -73,6 +73,8 @@
     "react": "*",
     "react-delegate-component": "*",
     "react-native": "*",
+    "zego-zim-react-native": "^2.9.0",
+    "zego-zpns-react-native": "^2.4.0",
     "zego-express-engine-reactnative": "^3.2.0"
   },
   "jest": {
@@ -147,7 +149,7 @@
   "dependencies": {
     "react-delegate-component": "^1.0.0",
     "zego-express-engine-reactnative": "^3.2.0",
-    "zego-zim-react-native": "2.7.1",
-    "zego-zpns-react-native": "2.3.5"
+    "zego-zim-react-native": "2.9.0",
+    "zego-zpns-react-native": "2.4.0"
   }
 }

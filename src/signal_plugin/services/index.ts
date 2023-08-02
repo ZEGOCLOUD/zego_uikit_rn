@@ -59,8 +59,8 @@ export default class ZegoPluginInvitationService {
   getEndCallHandle() {
     return this._callKitEndCallHandler;
   }
-  reportCallKitCallEnded(uuid: string) {
-    return ZegoUIKitCorePlugin.getZPNsPlugin().CallKit.getInstance().reportCallEnded(CXCallEndedReason.AnsweredElsewhere, uuid);
+  reportCallKitCallEnded(uuid: string, reason: number) {
+    return ZegoUIKitCorePlugin.getZPNsPlugin().CallKit.getInstance().reportCallEnded(reason, uuid);
   }
   getZIMInstance() {
     return ZegoSignalingPluginCore.getInstance().getZIMInstance();
@@ -215,13 +215,21 @@ export default class ZegoPluginInvitationService {
     );
     return ZegoSignalingPluginCore.getInstance().invite(invitees, config);
   }
-  cancelInvitation(invitees: string[], data?: string) {
+  cancelInvitation(invitees: string[], data?: string, notificationConfig?: any) {
     invitees = invitees.map((invitee) => invitee);
     if (!invitees.length) {
       zlogerror('[Service]Cancel invitees is empty.');
       return Promise.reject(new ZegoPluginResult());
     }
     const config = { extendedData: data } as ZIMCallCancelConfig;
+    if (this._notifyWhenAppRunningInBackgroundOrQuit) {
+      config.pushConfig = {
+        title: notificationConfig && notificationConfig.title,
+        content: notificationConfig && notificationConfig.message,
+        resourcesID: notificationConfig && notificationConfig.resourceID,
+        payload: data
+      };
+    }
     const callID = ZegoSignalingPluginCore.getInstance().getCallIDByUserID(
       ZegoSignalingPluginCore.getInstance().getLocalUser().userID
     );

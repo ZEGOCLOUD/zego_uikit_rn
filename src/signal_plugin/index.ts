@@ -47,8 +47,8 @@ export default class ZegoUIKitSignalingPlugin {
   onCallKitEndCall(handler: (action: CXAction) => void) {
     ZegoPluginInvitationService.getInstance().onCallKitEndCall(handler);
   }
-  reportCallKitCallEnded(uuid: string) {
-    ZegoPluginInvitationService.getInstance().reportCallKitCallEnded(uuid);
+  reportCallKitCallEnded(uuid: string, reason: number) {
+    ZegoPluginInvitationService.getInstance().reportCallKitCallEnded(uuid, reason);
   }
   invoke(method: string, params?: any) {
     switch (method) {
@@ -81,6 +81,11 @@ export default class ZegoUIKitSignalingPlugin {
         return ZegoPluginInvitationService.getInstance().cancelInvitation(
           params.invitees,
           params.data
+        );
+      case 'reportCallKitCallEnded':
+        return ZegoPluginInvitationService.getInstance().reportCallKitCallEnded(
+          params.uuid,
+          params.reason
         );
       case 'refuseInvitation':
         return ZegoPluginInvitationService.getInstance().refuseInvitation(
