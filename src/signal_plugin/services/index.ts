@@ -32,6 +32,7 @@ export default class ZegoPluginInvitationService {
     ZegoUIKitCorePlugin.getZPNsPlugin().default.setBackgroundMessageHandler((message: ZPNsMessage) => {
       zloginfo('ZPNs setBackgroundMessageHandler: ', message)
       const dataObj = JSON.parse(message.extras.payload);
+      dataObj.zim_call_id = message.extras.call_id;
       ZegoPluginInvitationService.getInstance().getAndroidOfflineDataHandler()(dataObj)
     })
   }
