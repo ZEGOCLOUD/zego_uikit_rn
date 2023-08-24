@@ -131,7 +131,9 @@ export default class ZegoPluginInvitationService {
       ZegoUIKitCorePlugin.getZPNsPlugin().CallKit.getInstance().on("didReceiveIncomingPush", (extras: Record<string, any>, uuid: string) => {
         console.log('#########didReceiveIncomingPush', extras, uuid);
         let { payload } = extras;
+        let { call_id } = extras;
         const dataObj = payload ? JSON.parse(payload) : {};
+        dataObj.zim_call_id = call_id;
         ZegoPluginInvitationService.getInstance().getIOSOfflineDataHandler()(dataObj, uuid);
       });
       ZegoUIKitCorePlugin.getZPNsPlugin().CallKit.getInstance().on("providerDidReset", () => {
@@ -275,6 +277,11 @@ export default class ZegoPluginInvitationService {
       `[Service]Accept invitation: callID: ${callID}, inviter id: ${inviterID}, data: ${data}.`
     );
     return ZegoSignalingPluginCore.getInstance().accept(callID, config);
+  }
+
+  queryCallList(count: number, nextFlag?: number) {
+    const config = { count: count, nextFlag: nextFlag}
+    return ZegoSignalingPluginCore.getInstance().queryCallList(config);
   }
 
   onConnectionStateChanged(callbackID: string, callback: (notifyData: { state: ZIMConnectionState }) => void) {

@@ -50,6 +50,9 @@ export default class ZegoUIKitSignalingPlugin {
   reportCallKitCallEnded(uuid: string, reason: number) {
     ZegoPluginInvitationService.getInstance().reportCallKitCallEnded(uuid, reason);
   }
+  queryCallList(count: number, nextFlag?: number) {
+    return ZegoPluginInvitationService.getInstance().queryCallList(count, nextFlag);
+  }
   invoke(method: string, params?: any) {
     switch (method) {
       case 'init':

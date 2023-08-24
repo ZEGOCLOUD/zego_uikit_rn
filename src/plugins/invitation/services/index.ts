@@ -187,6 +187,13 @@ const ZegoUIKitSignalingPluginImpl = {
       data,
     });
   },
+  queryCallList: (count: number, nextFlag?: number) => {
+    if (!ZegoUIKitSignalingPlugin) {
+      zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
+      return Promise.reject();
+    }
+    return ZegoUIKitSignalingPlugin.getInstance().queryCallList(count, nextFlag);
+  },
   onConnectionStateChanged: (callbackID: string, callback?: Function) => {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);

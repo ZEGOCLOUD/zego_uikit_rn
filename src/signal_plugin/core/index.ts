@@ -17,6 +17,9 @@ import type {
   ZIMCallCancelSentResult,
   ZIMCallAcceptanceSentResult,
   ZIMCallRejectionSentResult,
+  ZIMCallInvitationQueryConfig,
+  ZIMCallInvitationListQueriedResult,
+  ZIMCallInfo,
 } from 'zego-zim-react-native';
 import { ZIMConnectionState, ZIMCallUserState } from "../defines";
 import ZegoPluginResult from './defines';
@@ -499,6 +502,20 @@ export default class ZegoSignalingPluginCore {
         .catch((error: ZIMError) => {
           reject(error);
         });
+    });
+  }
+  queryCallList(config: ZIMCallInvitationQueryConfig): Promise<{ callList: ZIMCallInfo[], nextFlag: number; }> {
+    return new Promise((resolve, reject) => {
+        ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()
+        .queryCallInvitationList(config)
+        .then(({callList, nextFlag: newFlag} : ZIMCallInvitationListQueriedResult) => {
+            zloginfo(`[Core]Query invitation list done, nextFlag: ${newFlag}, calllist: ${callList.length}`);
+            const data = {callList: callList, nextFlag: newFlag};
+            resolve(data);
+        })
+        .catch((error: ZIMError) => {
+            reject(error);
+        })
     });
   }
   // ------- external events register ------
