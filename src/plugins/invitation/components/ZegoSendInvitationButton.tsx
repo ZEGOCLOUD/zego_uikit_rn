@@ -13,6 +13,7 @@ export default function ZegoSendInvitationButton(props: any) {
     data,
     timeout = 60,
     onPressed,
+    onFailure,
     onWillPressed,
     backgroundColor = '#F3F4F7',
     fontSize = 16,
@@ -128,6 +129,9 @@ export default function ZegoSendInvitationButton(props: any) {
         }
       })
       .catch(({ code, message }: any) => {
+        if (typeof onFailure === 'function') {
+          onFailure({ code: code, message: message });
+        }
         zlogerror(
           `[Components]Send invitation error, code: ${code}, message: ${message}`
         );

@@ -10,6 +10,7 @@ export default function ZegoCancelInvitationButton(props: any) {
     invitees = [],
     data,
     onPressed,
+    onFailure,
     onWillPressed,
     backgroundColor = '#FF4A50',
     fontSize = 16,
@@ -89,6 +90,9 @@ export default function ZegoCancelInvitationButton(props: any) {
         }
       })
       .catch(({ code, message }: any) => {
+        if (typeof onFailure === 'function') {
+          onFailure({ code: code, message: message });
+        }
         zlogerror(
           `[Components]Cancel invitation error, code: ${code}, message: ${message}`
         );

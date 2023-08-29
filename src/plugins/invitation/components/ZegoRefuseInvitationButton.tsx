@@ -10,6 +10,7 @@ export default function ZegoRefuseInvitationButton(props: any) {
     inviterID,
     data,
     onPressed,
+    onFailure,
     onWillPressed,
     backgroundColor = '#FF4A50',
     fontSize = 16,
@@ -75,6 +76,9 @@ export default function ZegoRefuseInvitationButton(props: any) {
         }
       })
       .catch(({ code, message }: any) => {
+        if (typeof onFailure === 'function') {
+          onFailure({ code: code, message: message });
+        }
         zlogerror(
           `[Components]Refuse invitation error, code: ${code}, message: ${message}`
         );
