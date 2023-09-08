@@ -2,6 +2,7 @@ import React, { Fragment }from 'react';
 import { Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import ZegoUIKitInvitationService from '../services';
 import { zloginfo, zlogerror } from '../../../utils/logger';
+import ZegoUIKitInternal from '../../../components/internal/ZegoUIKitInternal';
 
 export default function ZegoAcceptInvitationButton(props: any) {
   const {
@@ -76,6 +77,7 @@ export default function ZegoAcceptInvitationButton(props: any) {
         }
       })
       .catch(({ code, message }: any) => {
+        ZegoUIKitInternal.notifyErrorUpdate('AcceptInvitation', code, message);
         if (typeof onFailure === 'function') {
           onFailure({ code: code, message: message });
         }

@@ -3,6 +3,7 @@ import { Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import ZegoUIKitInvitationService from '../services';
 import ZegoInvitationType from './ZegoInvitationType';
 import { zloginfo, zlogerror } from '../../../utils/logger';
+import ZegoUIKitInternal from '../../../components/internal/ZegoUIKitInternal';
 
 export default function ZegoSendInvitationButton(props: any) {
   const {
@@ -129,6 +130,7 @@ export default function ZegoSendInvitationButton(props: any) {
         }
       })
       .catch(({ code, message }: any) => {
+        ZegoUIKitInternal.notifyErrorUpdate('SendInvitation', code, message);
         if (typeof onFailure === 'function') {
           onFailure({ code: code, message: message });
         }

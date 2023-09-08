@@ -58,6 +58,8 @@ var _isLargeRoom = false;
 var _roomMemberCount = 0;
 var _markAsLargeRoom = false;
 
+var _onErrorCallbackMap: any = {};
+
 function _resetData() {
   zloginfo('Reset all data.');
   _appInfo = { appID: 0, appSign: '' };
@@ -1748,4 +1750,26 @@ export default {
     }
   },
   
+  onError(callbackID: string, callback?: Function) {
+    if (typeof callback !== 'function') {
+        if (callbackID in _onErrorCallbackMap) {
+            zloginfo(
+                '[onError] Remove callback for: [',
+                callbackID,
+                '] because callback is not a valid function!'
+              );
+            delete _onErrorCallbackMap[callbackID];
+        }
+    } else {
+        _onErrorCallbackMap[callbackID] = callback;
+    }
+  },
+
+  notifyErrorUpdate(method: string, error: number, message: string) {
+    Object.keys(_onErrorCallbackMap).forEach((callbackID) => {
+      if (_onErrorCallbackMap[callbackID]) {
+          _onErrorCallbackMap[callbackID](method, error, message);
+      }
+    });
+  }
 };
