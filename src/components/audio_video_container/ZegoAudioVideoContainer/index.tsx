@@ -12,12 +12,12 @@ export default function ZegoAudioVideoContainer(props: any) {
     {mode == 0 ?
       <PictureInPictureWindow
         audioVideoConfig={audioVideoConfig}
-        config={layout}
+        config={layout.config}
         sortAudioVideo={sortAudioVideo}
         foregroundBuilder={foregroundBuilder} /> :
       <GalleryLayout 
         audioVideoConfig={audioVideoConfig}
-        config={layout}
+        config={layout.config}
         sortAudioVideo={sortAudioVideo}
         foregroundBuilder={foregroundBuilder} />
     }

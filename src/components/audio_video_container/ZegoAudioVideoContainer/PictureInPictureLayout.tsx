@@ -17,6 +17,7 @@ export default function PictureInPictureLayout(props: any) {
         smallViewSize = { width: 85, height: 151 },
         spacingBetweenSmallViews = 8,
         removeViewWhenAudioVideoUnavailable = false,
+        smallViewBorderRadius = 10,
     } = config;
     const {
         useVideoViewAspectFill = false,
@@ -109,6 +110,7 @@ export default function PictureInPictureLayout(props: any) {
                         styles.smallViewBorder,
                         getSmallViewSize(smallViewSize.width, smallViewSize.height).smallViewSize,
                         getSmallViewSpacing(spacingBetweenSmallViews).smallViewSpacing,
+                        getSmallViewBorderRadius(smallViewBorderRadius).smallViewBorderRadius,
                     ]}>
                         <ZegoAudioVideoView
                             userID={user.userID}
@@ -149,6 +151,13 @@ const getSmallViewSpacing = (margin: number) => StyleSheet.create({
         marginBottom: margin,
     },
 });
+
+const getSmallViewBorderRadius = (radius: number) => StyleSheet.create({
+    smallViewBorderRadius: {
+        borderRadius: radius,
+    }
+});
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -170,7 +179,7 @@ const styles = StyleSheet.create({
         // height: '76%',
     },
     smallView: {
-        borderRadius: 10,
+        // borderRadius: 10,
         overflow: 'hidden',
         backgroundColor: '#4A4B4D',
     },
