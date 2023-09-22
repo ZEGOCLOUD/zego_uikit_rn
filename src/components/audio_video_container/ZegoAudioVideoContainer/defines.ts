@@ -2,11 +2,11 @@ const ZegoLayoutMode = {
     pictureInPicture: 0,
     gallery: 1
 }
-const ZegoViewPostion = {
+const ZegoViewPosition = {
     topLeft: 0,
     topRight: 1,
     bottomLeft: 2,
     bottomRight: 3
 }
 
-export { ZegoLayoutMode, ZegoViewPostion };
+export { ZegoLayoutMode, ZegoViewPosition };

@@ -13,7 +13,7 @@ import ZegoSwitchAudioOutputButton from './components/audio_video/ZegoSwitchAudi
 import ZegoAudioVideoContainer, {
   ZegoLayoutMode,
 } from './components/audio_video_container/ZegoAudioVideoContainer';
-import { ZegoViewPostion } from './components/audio_video_container/ZegoAudioVideoContainer/defines';
+import { ZegoViewPosition } from './components/audio_video_container/ZegoAudioVideoContainer/defines';
 import ZegoLeaveButton from './components/audio_video/ZegoLeaveButton';
 import ZegoInRoomMessageInput from './components/in_room_message/ZegoInRoomMessageInput';
 import ZegoInRoomMessageView from './components/in_room_message/ZegoInRoomMessageView';
@@ -94,7 +94,7 @@ export {
   ZegoSwitchAudioOutputButton,
   ZegoAudioVideoContainer,
   ZegoLayoutMode,
-  ZegoViewPostion,
+  ZegoViewPosition,
   ZegoLeaveButton,
   ZegoInRoomMessageInput,
   ZegoInRoomMessageView,

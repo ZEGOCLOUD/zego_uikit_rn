@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import ZegoUIKitInternal from "../../internal/ZegoUIKitInternal";
 import ZegoAudioVideoView from "../../audio_video/ZegoAudioVideoView";
 import { StyleSheet, View, PanResponder, TouchableWithoutFeedback } from 'react-native'
-import { ZegoViewPostion } from './defines'
+import { ZegoViewPosition } from './defines'
 
 export default function PictureInPictureLayout(props: any) {
     const { config = {}, foregroundBuilder, audioVideoConfig = {}, sortAudioVideo } = props;
@@ -12,7 +12,7 @@ export default function PictureInPictureLayout(props: any) {
         largeViewBackgroundColor = '',
         smallViewBackgroundImage = '',
         largeViewBackgroundImage = '',
-        smallViewPostion = ZegoViewPostion.bottomRight,
+        smallViewPostion = ZegoViewPosition.bottomRight,
         switchLargeOrSmallViewByClick = true,
         smallViewSize = { width: 85, height: 151 },
         spacingBetweenSmallViews = 8,
@@ -80,7 +80,7 @@ export default function PictureInPictureLayout(props: any) {
     }, [])
     const getSmallViewPostStyle = () => {
         const styleList = [styles.smallViewPostTopLeft, styles.smallViewPostTopRight, styles.smallViewPostBottomLeft, styles.smallViewPostBottomRight];
-        if (smallViewPostion >= ZegoViewPostion.topLeft && smallViewPostion <= ZegoViewPostion.bottomRight) {
+        if (smallViewPostion >= ZegoViewPosition.topLeft && smallViewPostion <= ZegoViewPosition.bottomRight) {
             return styleList[smallViewPostion];
         } else {
             return styles.smallViewPostTopLeft;
