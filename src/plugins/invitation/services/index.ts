@@ -123,7 +123,7 @@ const ZegoUIKitSignalingPluginImpl = {
     }
     return ZegoUIKitSignalingPlugin.getInstance().invoke('logout');
   },
-  enableNotifyWhenAppRunningInBackgroundOrQuit: (enable: boolean, isIOSDevelopmentEnvironment: boolean, appName: string) => {
+  enableNotifyWhenAppRunningInBackgroundOrQuit: (enable: boolean, isIOSDevelopmentEnvironment?: boolean, appName?: string) => {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return Promise.reject();

@@ -91,19 +91,24 @@ export default class ZegoPluginInvitationService {
     return ZegoSignalingPluginCore.getInstance().logout();
   }
 
-  enableNotifyWhenAppRunningInBackgroundOrQuit(enable: boolean, isIOSDevelopmentEnvironment: boolean, appName: string) {
+  enableNotifyWhenAppRunningInBackgroundOrQuit(enable: boolean, isIOSDevelopmentEnvironment?: boolean, appName?: string) {
     this._notifyWhenAppRunningInBackgroundOrQuit = enable;
 
     if (enable) {
       if (Platform.OS === 'ios') {
         const CXProviderConfiguration = {
-          localizedName: appName,
+          localizedName: appName ?? 'My app',
           iconTemplateImageName: "AppIcon",
         };
         ZegoUIKitCorePlugin.getZPNsPlugin().CallKit.setInitConfiguration(CXProviderConfiguration);
         ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().applyNotificationPermission();
-        ZegoUIKitCorePlugin.getZPNsPlugin().default.enableDebug(isIOSDevelopmentEnvironment);
-        ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().registerPush({ enableIOSVoIP: true });
+        
+        const iOSEnvironment = isIOSDevelopmentEnvironment == null ? 2 : (isIOSDevelopmentEnvironment ? 1 : 0);
+        console.log('#########registerPush, iOSEnvironment', iOSEnvironment);
+        ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().registerPush({ 
+          enableIOSVoIP: true,
+          iOSEnvironment: iOSEnvironment,
+        });
       } else {
         ZegoUIKitCorePlugin.getZPNsPlugin().default.setPushConfig({ "enableFCMPush": true, "enableHWPush": false, "enableMiPush": false, "enableOppoPush": false, "enableVivoPush": false });
 
