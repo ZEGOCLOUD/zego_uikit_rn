@@ -27,6 +27,7 @@ import { zlogerror, zloginfo, zlogwarning } from '../utils/logger';
 import ZegoPluginUserInRoomAttributesCore from './user_in_room_attributes_core';
 import ZegoPluginRoomPropertiesCore from './room_properties_core';
 import ZegoUIKitCorePlugin from "../../components/internal/ZegoUIKitCorePlugin";
+import ZegoPluginRoomMessageCore from './in_room_message_core';
 
 export default class ZegoSignalingPluginCore {
   static shared: ZegoSignalingPluginCore;
@@ -337,6 +338,8 @@ export default class ZegoSignalingPluginCore {
     ZegoPluginUserInRoomAttributesCore.getInstance()._registerEngineCallback();
     ZegoPluginRoomPropertiesCore.getInstance()._unregisterEngineCallback();
     ZegoPluginRoomPropertiesCore.getInstance()._registerEngineCallback();
+    ZegoPluginRoomMessageCore.getInstance()._unregisterEngineCallback();
+    ZegoPluginRoomMessageCore.getInstance()._registerEngineCallback();
   }
   // ------- external utils ------
   getLocalUser() {

@@ -1,4 +1,4 @@
-import type { ZIMMessage, ZIMRoomAttributesUpdateInfo } from 'zego-zim-react-native';
+import type { ZIMRoomAttributesUpdateInfo } from 'zego-zim-react-native';
 import ZegoPluginRoomPropertiesCore from '../core/room_properties_core';
 
 export default class ZegoPluginRoomPropertiesService {
@@ -65,12 +65,6 @@ export default class ZegoPluginRoomPropertiesService {
   }
   onRoomPropertyUpdated(callbackID: string, callback: (notifyData: ZIMRoomAttributesUpdateInfo) => void) {
     ZegoPluginRoomPropertiesCore.getInstance().onRoomPropertyUpdated(
-      callbackID,
-      callback
-    );
-  }
-  onInRoomTextMessageReceived(callbackID: string, callback: (notifyData: { messageList: ZIMMessage[]; fromConversationID: string }) => void) {
-    ZegoPluginRoomPropertiesCore.getInstance().onInRoomTextMessageReceived(
       callbackID,
       callback
     );

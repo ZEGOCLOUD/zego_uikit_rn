@@ -1,6 +1,7 @@
 import ZegoPluginInvitationService from './services';
 import { ZegoUIKitPluginType } from './defines';
 import ZegoPluginRoomPropertiesService from './services/room_properties_service';
+import ZegoPluginInRoomMessageService from './services/in_room_message_service';
 import ZegoPluginUserInRoomAttributesService from './services/user_in_room_attributes_service';
 import type { CXAction } from 'zego-zpns-react-native';
 
@@ -52,6 +53,12 @@ export default class ZegoUIKitSignalingPlugin {
   }
   queryCallList(count: number, nextFlag?: number) {
     return ZegoPluginInvitationService.getInstance().queryCallList(count, nextFlag);
+  }
+  sendInRoomTextMessage(roomID: string, message: string) {
+    return ZegoPluginInRoomMessageService.getInstance().sendInRoomTextMessage(roomID, message);
+  }
+  sendInRoomCommandMessage(roomID: string, message: string): Promise<void> {
+    return ZegoPluginInRoomMessageService.getInstance().sendInRoomCommandMessage(roomID, message);
   }
   invoke(method: string, params?: any) {
     switch (method) {
@@ -205,7 +212,13 @@ export default class ZegoUIKitSignalingPlugin {
         );
         break;
       case 'inRoomTextMessageReceived':
-        ZegoPluginRoomPropertiesService.getInstance().onInRoomTextMessageReceived(
+        ZegoPluginInRoomMessageService.getInstance().onInRoomTextMessageReceived(
+          callbackID,
+          callback
+        );
+        break;
+      case 'onInRoomCommandMessageReceived':
+        ZegoPluginInRoomMessageService.getInstance().onInRoomCommandMessageReceived(
           callbackID,
           callback
         );

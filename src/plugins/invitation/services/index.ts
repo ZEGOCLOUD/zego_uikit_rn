@@ -194,6 +194,12 @@ const ZegoUIKitSignalingPluginImpl = {
     }
     return ZegoUIKitSignalingPlugin.getInstance().queryCallList(count, nextFlag);
   },
+  sendInRoomTextMessage(roomID: string, message: string) {
+    return ZegoUIKitSignalingPlugin.getInstance().sendInRoomTextMessage(roomID, message);
+  },
+  sendInRoomCommandMessage(roomID: string, message: string) {
+    return ZegoUIKitSignalingPlugin.getInstance().sendInRoomCommandMessage(roomID, message);
+  },
   onConnectionStateChanged: (callbackID: string, callback?: Function) => {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
@@ -673,30 +679,23 @@ const ZegoUIKitSignalingPluginImpl = {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return;
     }
-    if (typeof callback !== 'function') {
-      ZegoUIKitSignalingPlugin.getInstance().registerPluginEventHandler(
-        'inRoomTextMessageReceived',
-        callbackID,
-        callback
-      );
-    } else {
-      ZegoUIKitSignalingPlugin.getInstance().registerPluginEventHandler(
-        'inRoomTextMessageReceived',
-        callbackID,
-        ({ messageList }: any) => {
-          callback(messageList.map((message: any) => {
-            return {
-              messageID: message.messageID,
-              timestamp: message.timestamp,
-              orderKey: message.orderKey,
-              senderUserID: message.senderUserID,
-              text: message.message,
-            }
-          }));
-        }
-      );
+    ZegoUIKitSignalingPlugin.getInstance().registerPluginEventHandler(
+      'inRoomTextMessageReceived',
+      callbackID,
+      callback
+    );
+  },
+  onInRoomCommandMessageReceived(callbackID: string, callback?: Function) {
+    if (!ZegoUIKitSignalingPlugin) {
+      zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
+      return;
     }
-  }
+    ZegoUIKitSignalingPlugin.getInstance().registerPluginEventHandler(
+      'onInRoomCommandMessageReceived',
+      callbackID,
+      callback
+    );
+  },
 };
 
 export default ZegoUIKitSignalingPluginImpl;

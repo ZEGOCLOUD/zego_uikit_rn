@@ -1,11 +1,9 @@
 import type {
-  ZIMMessage,
   ZIMRoomAttributesBatchOperationConfig,
   ZIMRoomAttributesDeleteConfig,
   ZIMRoomAttributesSetConfig,
   ZIMRoomAttributesUpdateInfo,
   ZIMEventOfRoomAttributesUpdatedResult,
-  ZIMEventOfReceiveConversationMessageResult,
   ZIMRoomAttributesOperatedResult,
   ZIMRoomAttributesBatchOperatedResult,
   ZIMRoomAttributesQueriedResult,
@@ -19,7 +17,7 @@ import ZegoUIKitCorePlugin from "../../components/internal/ZegoUIKitCorePlugin";
 export default class ZegoPluginRoomPropertiesCore {
   static shared: ZegoPluginRoomPropertiesCore;
   _onRoomPropertyUpdatedCallbackMap: { [index: string]: (notifyData: ZIMRoomAttributesUpdateInfo) => void } = {};
-  _onInRoomTextMessageReceivedCallbackMap: { [index: string]: (notifyData: { messageList: ZIMMessage[]; fromConversationID: string }) => void } = {};
+
   constructor() {
     if (!ZegoPluginRoomPropertiesCore.shared) {
       ZegoPluginRoomPropertiesCore.shared = this;
@@ -55,9 +53,6 @@ export default class ZegoPluginRoomPropertiesCore {
         });
       }
     );
-    ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().on('receiveRoomMessage', (zim: any, { messageList, fromConversationID }: ZIMEventOfReceiveConversationMessageResult) => {
-      this._notifyInRoomTextMessageReceived({ messageList, fromConversationID });
-    });
 
     zloginfo('[ZegoPluginRoomPropertiesCore]Register callback for ZIM...');
   }
@@ -65,7 +60,6 @@ export default class ZegoPluginRoomPropertiesCore {
     zloginfo('[ZegoPluginRoomPropertiesCore]Unregister callback from ZIM...');
     ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().off('roomAttributesUpdated');
     ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().off('roomAttributesBatchUpdated');
-    ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().off('receiveRoomMessage');
   }
   // ------- internal events exec ------
   _notifyRoomPropertiesUpdated(notifyData: ZIMRoomAttributesUpdateInfo) {
@@ -77,15 +71,7 @@ export default class ZegoPluginRoomPropertiesCore {
       }
     );
   }
-  _notifyInRoomTextMessageReceived(notifyData: { messageList: ZIMMessage[]; fromConversationID: string }) {
-    Object.keys(this._onInRoomTextMessageReceivedCallbackMap).forEach(
-      (callbackID) => {
-        if (this._onInRoomTextMessageReceivedCallbackMap[callbackID]) {
-          this._onInRoomTextMessageReceivedCallbackMap[callbackID](notifyData);
-        }
-      }
-    );
-  }
+
   // ------- external method ------
   updateRoomProperty(attributes: Record<string, string>, config: ZIMRoomAttributesSetConfig) {
     if (!ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()) {
@@ -210,23 +196,6 @@ export default class ZegoPluginRoomPropertiesCore {
       }
     } else {
       this._onRoomPropertyUpdatedCallbackMap[callbackID] = callback;
-    }
-  }
-  onInRoomTextMessageReceived(callbackID: string, callback: (notifyData: { messageList: ZIMMessage[]; fromConversationID: string }) => void) {
-    if (!ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()) {
-      zlogerror('[ZegoPluginRoomPropertiesCore]Please initialize it first.');
-    }
-    if (typeof callback !== 'function') {
-      if (callbackID in this._onInRoomTextMessageReceivedCallbackMap) {
-        zloginfo(
-          '[Core][onRoomPropertyUpdated] Remove callback for: [',
-          callbackID,
-          '] because callback is not a valid function!'
-        );
-        delete this._onInRoomTextMessageReceivedCallbackMap[callbackID];
-      }
-    } else {
-      this._onInRoomTextMessageReceivedCallbackMap[callbackID] = callback;
     }
   }
 }
