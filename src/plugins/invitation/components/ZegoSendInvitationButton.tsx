@@ -22,6 +22,9 @@ export default function ZegoSendInvitationButton(props: any) {
     width = 42,
     height = 42,
     borderRadius = 1000,
+    borderWidth,
+    borderColor,
+    borderStyle,
     verticalLayout, // Default row layout, no layout parameters default to precedence icon
     resourceID,
     notificationTitle,
@@ -64,13 +67,16 @@ export default function ZegoSendInvitationButton(props: any) {
       color,
     },
   });
-  const getCustomContainerStyle = (width: number, height: number, borderRadius: number, backgroundColor: string, verticalLayout: boolean) => StyleSheet.create({
+  const getCustomContainerStyle = () => StyleSheet.create({
     customContainer: {
       flexDirection: verticalLayout ? 'column' : 'row',
-      width,
-      height,
-      backgroundColor,
-      borderRadius,
+      width: width,
+      height: height,
+      backgroundColor: backgroundColor,
+      borderRadius: borderRadius,
+      borderWidth: borderWidth,
+      borderColor: borderColor,
+      borderStyle: borderStyle,
     },
   });
 
@@ -143,7 +149,7 @@ export default function ZegoSendInvitationButton(props: any) {
     <TouchableOpacity
       style={[
         styles.container,
-        getCustomContainerStyle(width, height, borderRadius, backgroundColor, verticalLayout).customContainer
+        getCustomContainerStyle().customContainer
       ]}
       onPress={onButtonPress}
     >
