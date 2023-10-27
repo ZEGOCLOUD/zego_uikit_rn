@@ -356,4 +356,7 @@ export default class ZegoPluginInvitationService {
       callback
     );
   }
+  onRequireNewToken(callbackID: string, callback: () => string) {
+    ZegoSignalingPluginCore.getInstance().onRequireNewToken(callbackID, callback);
+  }
 }

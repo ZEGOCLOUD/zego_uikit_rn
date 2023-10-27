@@ -59,6 +59,7 @@ var _roomMemberCount = 0;
 var _markAsLargeRoom = false;
 
 var _onErrorCallbackMap: any = {};
+var _onTokenProvideCallback: Function = undefined;
 
 function _resetData() {
   zloginfo('Reset all data.');
@@ -373,7 +374,7 @@ function _onInRoomMessageReceived(roomID: string, messageList: any[]) {
     }
   });
 }
-function _onRequireNewToken() {
+async function _onRequireNewToken() {
   Object.keys(_onRequireNewTokenCallbackMap).forEach((callbackID) => {
     if (callbackID in _onRequireNewTokenCallbackMap) {
       if (_onRequireNewTokenCallbackMap[callbackID]) {
@@ -393,6 +394,17 @@ function _onRequireNewToken() {
       }
     }
   });
+  const token = await ZegoUIKitInternal.getToken();
+  if (token) {
+    ZegoExpressEngine.instance()
+      .renewToken(_currentRoomID, token)
+      .then(() => {
+        zloginfo('Renew token success');
+      })
+      .catch((error) => {
+        zlogerror('Renew token failed: ', error);
+      });
+  }
 }
 function _onRoomExtraInfoUpdate(roomID: string, roomExtraInfoList: any[]) {
   zloginfo('$$$$$$$$Room extra info update: ', roomID, roomExtraInfoList);
@@ -718,6 +730,7 @@ function _registerEngineCallback() {
   ZegoExpressEngine.instance().on(
     'roomTokenWillExpire',
     (roomID, remainTimeInSecond) => {
+      zloginfo('express token will expire.');
       _onRequireNewToken();
     }
   );
@@ -833,8 +846,9 @@ function _tryStartPublishStream() {
           );
         // }
       });
-    zloginfo('ZegoExpressEngine startPreview:', _localCoreUser);
-    if (_localCoreUser.viewID > 0) {
+
+    if (_localCoreUser.viewID > 0 && _localCoreUser.isCameraDeviceOn) {
+      zloginfo('ZegoExpressEngine startPreview:', _localCoreUser);
       ZegoExpressEngine.instance()
         .startPreview({
           reactTag: _localCoreUser.viewID,
@@ -940,7 +954,7 @@ const _isEngineCreated = () => {
   }
 }
 
-export default {
+const ZegoUIKitInternal =  {
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Internal <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
   isRoomConnected() {
     return _isRoomConnected;
@@ -1282,12 +1296,16 @@ export default {
   },
 
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Room <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-  joinRoom(roomID: string, token: string, markAsLargeRoom = false) {
+  async joinRoom(roomID: string, token: string, markAsLargeRoom = false) {
     // Solve the problem of repeated join
     if (_isRoomConnected && _currentRoomID === roomID) {
       zloginfo('Join room success already');
       return Promise.resolve();
     }
+    if (_appInfo.appSign === '' && token === '') {
+      token = await ZegoUIKitInternal.getToken();
+    }
+    
     return new Promise<void>((resolve, reject) => {
       const user = {
         userID: _localCoreUser.userID,
@@ -1771,5 +1789,20 @@ export default {
           _onErrorCallbackMap[callbackID](method, error, message);
       }
     });
+  },
+
+  onTokenProvid(callback?: Function) {
+    _onTokenProvideCallback = callback;
+  },
+
+  async getToken() {
+    if (typeof _onTokenProvideCallback !== 'function') {
+      return '';
+    }
+    const token = await _onTokenProvideCallback();
+    zloginfo(`[Get Token]: ${token}`);
+    return token;
   }
 };
+
+export default ZegoUIKitInternal

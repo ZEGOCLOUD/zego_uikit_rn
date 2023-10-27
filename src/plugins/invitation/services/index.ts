@@ -11,7 +11,7 @@ const _queryCount = 20;
 const _onRoomPropertiesFullUpdatedCallbackMap: any = {};
 const _usersInRoomAttributes = new Map(); // <userID, attributes> attributes={ string, string }
 let _roomAttributes: any = {};
-
+var _appSign: string = '';
 
 // ------- live audio room ------
 const _queryUsersInRoomAttributesIteration = (
@@ -95,6 +95,7 @@ const ZegoUIKitSignalingPluginImpl = {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return;
     }
+    _appSign = appSign;
     ZegoUIKitSignalingPlugin.getInstance().invoke('init', { appID, appSign });
   },
   uninit: () => {
@@ -104,16 +105,28 @@ const ZegoUIKitSignalingPluginImpl = {
     }
     ZegoUIKitSignalingPlugin.getInstance().invoke('uninit');
   },
-  login: (userID: string, userName: string) => {
+  login: async (userID: string, userName: string) => {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return Promise.reject();
     }
     _localUser.userID = userID;
     _localUser.userName = userName;
+    var token = '';
+    if (_appSign === '') {
+      token = await ZegoUIKitInternal.getToken();
+      ZegoUIKitSignalingPlugin.getInstance().registerPluginEventHandler(
+        'onRequireNewToken',
+        'callbackID',
+        () => {
+          return ZegoUIKitInternal.getToken();
+        }
+      );
+    }
     return ZegoUIKitSignalingPlugin.getInstance().invoke('login', {
       userID,
       userName,
+      token,
     });
   },
   logout: () => {

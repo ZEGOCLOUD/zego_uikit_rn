@@ -81,6 +81,7 @@ export default {
   installPlugins: ZegoUIKitCorePlugin.installPlugins,
   getPlugin: ZegoUIKitCorePlugin.getPlugin,
   onError: ZegoUIKitInternal.onError,
+  onTokenProvid: ZegoUIKitInternal.onTokenProvid,
   getSignalingPlugin: () => ZegoUIKitSignalingPluginImpl,
 };
 

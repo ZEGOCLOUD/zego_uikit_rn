@@ -20,6 +20,7 @@ import type {
   ZIMCallInvitationQueryConfig,
   ZIMCallInvitationListQueriedResult,
   ZIMCallInfo,
+  ZIMEventOfTokenWillExpireResult,
 } from 'zego-zim-react-native';
 import { ZIMConnectionState, ZIMCallUserState } from "../defines";
 import ZegoPluginResult from './defines';
@@ -66,6 +67,8 @@ export default class ZegoSignalingPluginCore {
     data: string;
   }) => void } = {};
   _currentInvitationID = ''
+  _onRequireNewTokenCallbackMap: { [index: string]: () => string } = {};
+
   constructor() {
     if (!ZegoSignalingPluginCore.shared) {
       zloginfo('[Core]ZegoSignalingPluginCore successful instantiation.');
@@ -214,6 +217,29 @@ export default class ZegoSignalingPluginCore {
         this._notifyCallInviteesAnsweredTimeout(notifyData);
       }
     );
+
+    ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().on('tokenWillExpire', (zim: any, { second }: ZIMEventOfTokenWillExpireResult) => {
+      zloginfo('zim token will expire.');
+      Object.keys(this._onRequireNewTokenCallbackMap).forEach(
+        async (callbackID) => {
+          if (this._onRequireNewTokenCallbackMap[callbackID]) {
+            const token = await this._onRequireNewTokenCallbackMap[callbackID]();
+            if (token) {
+              ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()
+                .renewToken(token)
+                .then(() => {
+                  zloginfo(`Renew zim token success, token: ${token}`);
+                })
+                .catch (() => {
+                  zlogerror(`Renew zim token failed. token: ${token}`);
+                });
+            } else {
+              zlogerror('Renew token failed: the returned token is abnormal');
+            }
+          }
+        }
+      );
+    });
   }
   _unregisterEngineCallback() {
     zloginfo('[Core]Unregister callback from ZIM...');
@@ -225,6 +251,7 @@ export default class ZegoSignalingPluginCore {
     ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().off('callInvitationRejected');
     ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().off('callInvitationTimeout');
     ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().off('callInviteesAnsweredTimeout');
+    ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().off('tokenWillExpire');
   }
   // ------- internal events exec ------
   _notifyConnectionStateChanged(notifyData: { state: ZIMConnectionState }) {
@@ -641,6 +668,20 @@ export default class ZegoSignalingPluginCore {
       }
     } else {
       this._onCallInviteesAnsweredTimeoutCallbackMap[callbackID] = callback;
+    }
+  }
+  onRequireNewToken(callbackID: string, callback: () => string) {
+    if (typeof callback !== 'function') {
+      if (callbackID in this._onRequireNewTokenCallbackMap) {
+        zloginfo(
+          '[Core][onRequireNewToken] Remove callback for: [',
+          callbackID,
+          '] because callback is not a valid function!'
+        );
+        delete this._onRequireNewTokenCallbackMap[callbackID];
+      }
+    } else {
+      this._onRequireNewTokenCallbackMap[callbackID] = callback;
     }
   }
 }

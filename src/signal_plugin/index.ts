@@ -72,7 +72,8 @@ export default class ZegoUIKitSignalingPlugin {
       case 'login':
         return ZegoPluginInvitationService.getInstance().login(
           params.userID,
-          params.userName
+          params.userName,
+          params.token
         );
       case 'enableNotifyWhenAppRunningInBackgroundOrQuit':
         return ZegoPluginInvitationService.getInstance().enableNotifyWhenAppRunningInBackgroundOrQuit(params.enable, params.isIOSDevelopmentEnvironment, params.appName)
@@ -222,6 +223,9 @@ export default class ZegoUIKitSignalingPlugin {
           callbackID,
           callback
         );
+        break;
+      case 'onRequireNewToken':
+        ZegoPluginInvitationService.getInstance().onRequireNewToken(callbackID, callback);
         break;
       default:
         break;
