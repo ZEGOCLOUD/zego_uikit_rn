@@ -1792,7 +1792,7 @@ const ZegoUIKitInternal =  {
     });
   },
 
-  onTokenProvid(callback?: Function) {
+  onTokenProvide(callback?: Function) {
     _onTokenProvideCallback = callback;
   },
 
