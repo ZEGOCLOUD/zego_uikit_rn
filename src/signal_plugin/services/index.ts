@@ -289,6 +289,10 @@ export default class ZegoPluginInvitationService {
     return ZegoSignalingPluginCore.getInstance().queryCallList(config);
   }
 
+  renewToken(token: string) {
+    return ZegoSignalingPluginCore.getInstance().renewToken(token);
+  }
+
   onConnectionStateChanged(callbackID: string, callback: (notifyData: { state: ZIMConnectionState }) => void) {
     ZegoSignalingPluginCore.getInstance().onConnectionStateChanged(
       callbackID,

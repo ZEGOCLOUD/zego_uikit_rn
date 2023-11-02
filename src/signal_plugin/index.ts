@@ -60,6 +60,10 @@ export default class ZegoUIKitSignalingPlugin {
   sendInRoomCommandMessage(roomID: string, message: string): Promise<void> {
     return ZegoPluginInRoomMessageService.getInstance().sendInRoomCommandMessage(roomID, message);
   }
+  renewToken(token: string) {
+    return ZegoPluginInvitationService.getInstance().renewToken(token);
+  }
+
   invoke(method: string, params?: any) {
     switch (method) {
       case 'init':

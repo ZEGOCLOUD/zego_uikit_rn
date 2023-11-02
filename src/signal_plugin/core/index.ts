@@ -225,14 +225,7 @@ export default class ZegoSignalingPluginCore {
           if (this._onRequireNewTokenCallbackMap[callbackID]) {
             const token = await this._onRequireNewTokenCallbackMap[callbackID]();
             if (token) {
-              ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()
-                .renewToken(token)
-                .then(() => {
-                  zloginfo(`Renew zim token success, token: ${token}`);
-                })
-                .catch (() => {
-                  zlogerror(`Renew zim token failed. token: ${token}`);
-                });
+                this.renewToken(token);
             } else {
               zlogerror('Renew token failed: the returned token is abnormal');
             }
@@ -548,6 +541,22 @@ export default class ZegoSignalingPluginCore {
         })
     });
   }
+
+  renewToken(token: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()
+        .renewToken(token)
+        .then(() => {
+          zloginfo(`Renew zim token success, token: ${token}`);
+          resolve();
+        })
+        .catch ((error: ZIMError) => {
+          zlogerror(`Renew zim token failed. code: ${error.code}, message: ${error.message}`);
+          reject(error);
+        });
+    });
+  }
+
   // ------- external events register ------
   onConnectionStateChanged(callbackID: string, callback: (notifyData: { state: ZIMConnectionState }) => void) {
     if (typeof callback !== 'function') {

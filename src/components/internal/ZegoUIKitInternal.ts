@@ -5,6 +5,7 @@ import ZegoExpressEngine, {
   ZegoEngineProfile,
   ZegoRoomConfig,
 } from 'zego-express-engine-reactnative';
+import ZegoUIKitSignalingPluginImpl from '../../plugins/invitation';
 import { zlogerror, zloginfo, zlogwarning } from '../../utils/logger';
 import { ZegoAudioVideoResourceMode, ZegoChangedCountOrProperty, ZegoRoomPropertyUpdateType } from './defines'
 
@@ -1793,6 +1794,20 @@ const ZegoUIKitInternal =  {
 
   onTokenProvid(callback?: Function) {
     _onTokenProvideCallback = callback;
+  },
+
+  renewToken(token: string) {
+    if (_isEngineCreated() && _currentRoomID) {
+      ZegoExpressEngine.instance()
+      .renewToken(_currentRoomID, token)
+      .then(() => {
+        zloginfo(`Renew token success, roomID: ${_currentRoomID}`);
+      })
+      .catch((error) => {
+        zlogerror('Renew token failed: ', error);
+      });
+    }
+    return ZegoUIKitSignalingPluginImpl.renewToken(token);
   },
 
   async getToken() {

@@ -213,6 +213,11 @@ const ZegoUIKitSignalingPluginImpl = {
   sendInRoomCommandMessage(roomID: string, message: string) {
     return ZegoUIKitSignalingPlugin.getInstance().sendInRoomCommandMessage(roomID, message);
   },
+
+  renewToken(token: string) {
+    return ZegoUIKitSignalingPlugin.getInstance().renewToken(token);
+  },
+
   onConnectionStateChanged: (callbackID: string, callback?: Function) => {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
