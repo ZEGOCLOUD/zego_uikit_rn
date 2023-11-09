@@ -5,6 +5,8 @@ import ZegoInvitationType from './ZegoInvitationType';
 import { zloginfo, zlogerror } from '../../../utils/logger';
 import ZegoUIKitInternal from '../../../components/internal/ZegoUIKitInternal';
 
+let requesting = false;
+
 export default function ZegoSendInvitationButton(props: any) {
   const {
     icon,
@@ -81,6 +83,12 @@ export default function ZegoSendInvitationButton(props: any) {
   });
 
   const onButtonPress = async () => {
+    if (requesting) {
+      zloginfo('[Components]Send invitation requesting..... return.');
+      return;
+    }
+    requesting = true;
+    
     let canSendInvitation = true;
     if (onWillPressed) {
       console.log('#########onWillPressed judge', typeof onWillPressed === 'object', typeof (onWillPressed.then) === 'function', typeof (onWillPressed.catch) === 'function');
@@ -107,7 +115,10 @@ export default function ZegoSendInvitationButton(props: any) {
         }
       }
     }
-    if (!canSendInvitation) return;
+    if (!canSendInvitation) {
+      requesting = false;
+      return; 
+    }
     zloginfo(
       `[Components]Send invitation start, invitees: ${invitees}, timeout: ${timeout}, type: ${type}, data: ${data}`
     );
@@ -134,12 +145,18 @@ export default function ZegoSendInvitationButton(props: any) {
             });
           }
         }
+        setTimeout(() => {
+          requesting = false;
+        }, 1000);
       })
       .catch(({ code, message }: any) => {
         ZegoUIKitInternal.notifyErrorUpdate('SendInvitation', code, message);
         if (typeof onFailure === 'function') {
           onFailure({ code: code, message: message });
         }
+        setTimeout(() => {
+          requesting = false;
+        }, 1000);
         zlogerror(
           `[Components]Send invitation error, code: ${code}, message: ${message}`
         );
