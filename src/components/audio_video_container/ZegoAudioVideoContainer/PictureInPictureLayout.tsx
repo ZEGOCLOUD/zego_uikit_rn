@@ -5,7 +5,13 @@ import { StyleSheet, View, PanResponder, TouchableWithoutFeedback } from 'react-
 import { ZegoViewPosition } from './defines'
 
 export default function PictureInPictureLayout(props: any) {
-    const { config = {}, foregroundBuilder, audioVideoConfig = {}, sortAudioVideo } = props;
+    const { 
+      config = {}, 
+      foregroundBuilder, 
+      audioVideoConfig = {}, 
+      sortAudioVideo,
+      avatarBuilder
+    } = props;
     const {
         isSmallViewDraggable = false, // TODO
         smallViewBackgroundColor = '',
@@ -119,6 +125,7 @@ export default function PictureInPictureLayout(props: any) {
                             showSoundWave={showSoundWavesInAudioMode}
                             useVideoViewAspectFill={useVideoViewAspectFill}
                             foregroundBuilder={foregroundBuilder}
+                            avatarBuilder={avatarBuilder}
                         />
                 </View></TouchableWithoutFeedback>)
             }
@@ -133,6 +140,7 @@ export default function PictureInPictureLayout(props: any) {
                     showSoundWave={showSoundWavesInAudioMode}
                     useVideoViewAspectFill={useVideoViewAspectFill}
                     foregroundBuilder={foregroundBuilder}
+                    avatarBuilder={avatarBuilder}
                 /> :
                 <View />
             }

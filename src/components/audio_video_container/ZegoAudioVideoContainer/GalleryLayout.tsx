@@ -6,7 +6,12 @@ import ZegoAudioVideoViewMore from "./MoreFrame";
 import { ZegoRoomStateChangedReason } from "zego-express-engine-reactnative";
 
 export default function GalleryLayout(props: any) {
-    const { config = {}, foregroundBuilder, audioVideoConfig = {} } = props;
+    const { 
+      config = {}, 
+      foregroundBuilder, 
+      audioVideoConfig = {},
+      avatarBuilder
+    } = props;
     const {
         addBorderRadiusAndSpacingBetweenView = true, // Whether to display rounded corners and spacing between Views
         ownViewBackgroundColor = '',
@@ -102,6 +107,7 @@ export default function GalleryLayout(props: any) {
                         showSoundWave={showSoundWavesInAudioMode}
                         useVideoViewAspectFill={useVideoViewAspectFill}
                         foregroundBuilder={foregroundBuilder}
+                        avatarBuilder={avatarBuilder}
                     />
                 </View>
             </View>)
@@ -120,6 +126,7 @@ export default function GalleryLayout(props: any) {
                         showSoundWave={showSoundWavesInAudioMode}
                         useVideoViewAspectFill={useVideoViewAspectFill}
                         foregroundBuilder={foregroundBuilder}
+                        avatarBuilder={avatarBuilder}
                     />
                 </View>
             </View>) : <View style={[styles.audioVideoViewContainer, getAudioVideoViewStyle(), isAudioVideoViewPadding]}>

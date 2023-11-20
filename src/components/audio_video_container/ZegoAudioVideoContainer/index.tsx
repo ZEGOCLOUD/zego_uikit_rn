@@ -5,7 +5,13 @@ import GalleryLayout from './GalleryLayout'
 import { ZegoLayoutMode } from "./defines";
 
 export default function ZegoAudioVideoContainer(props: any) {
-  const { foregroundBuilder, layout, audioVideoConfig = {}, sortAudioVideo } = props;
+  const { 
+    foregroundBuilder, 
+    layout, 
+    audioVideoConfig = {}, 
+    sortAudioVideo, 
+    avatarBuilder 
+  } = props;
   const { mode = ZegoLayoutMode.pictureInPicture } = layout;
 
   return (<View style={styles.container}>
@@ -14,11 +20,13 @@ export default function ZegoAudioVideoContainer(props: any) {
         audioVideoConfig={audioVideoConfig}
         config={layout.config}
         sortAudioVideo={sortAudioVideo}
+        avatarBuilder={avatarBuilder}
         foregroundBuilder={foregroundBuilder} /> :
       <GalleryLayout 
         audioVideoConfig={audioVideoConfig}
         config={layout.config}
         sortAudioVideo={sortAudioVideo}
+        avatarBuilder={avatarBuilder}
         foregroundBuilder={foregroundBuilder} />
     }
   </View>)
