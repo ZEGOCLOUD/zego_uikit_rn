@@ -196,6 +196,10 @@ export default class ZegoPluginInvitationService {
     }
 
   }
+  setAdvancedConfig(key: string, value: string) {
+    ZegoSignalingPluginCore.getInstance().setAdvancedConfig(key, value);
+  }
+
   sendInvitation(inviterName: string, invitees: string[], timeout: number, type: number, data?: string, notificationConfig?: any) {
 
     // invitees = invitees.map((invitee) => invitee);
@@ -215,7 +219,12 @@ export default class ZegoPluginInvitationService {
         title: notificationConfig.title ?? "",
         content: notificationConfig.message ?? "",
         resourcesID: notificationConfig.resourceID ?? "",
-        payload: data
+        payload: data,
+        voIPConfig: {
+          iOSVoIPHandleType: 1,
+          iOSVoIPHandleValue: '',
+          iOSVoIPHasVideo: type === 1,
+        }
       };
     }
     zloginfo(

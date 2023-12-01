@@ -436,6 +436,10 @@ export default class ZegoSignalingPluginCore {
     zloginfo('[Core]Destroy success.');
     this._resetData();
   }
+  setAdvancedConfig(key: string, value: string) {
+    zloginfo(`[Core]setAdvancedConfig, key: ${key}, value: ${value}`);
+    ZegoUIKitCorePlugin.getZIMPlugin().default.setAdvancedConfig(key, value);
+  }
   invite(invitees: string[], config: ZIMCallInviteConfig): Promise<{ callID: string; errorInvitees: string[]; code: string, message: string; }> {
     return new Promise((resolve, reject) => {
       console.warn(invitees);
