@@ -136,12 +136,12 @@ const ZegoUIKitSignalingPluginImpl = {
     }
     return ZegoUIKitSignalingPlugin.getInstance().invoke('logout');
   },
-  enableNotifyWhenAppRunningInBackgroundOrQuit: (enable: boolean, isIOSDevelopmentEnvironment?: boolean, appName?: string) => {
+  enableNotifyWhenAppRunningInBackgroundOrQuit: (certificateIndex?: number, isIOSDevelopmentEnvironment?: boolean, appName?: string) => {
     if (!ZegoUIKitSignalingPlugin) {
       ZegoUIKitSignalingPlugin = InnerZegoUIKitSignalingPlugin;
     }
     return ZegoUIKitSignalingPlugin.getInstance().invoke('enableNotifyWhenAppRunningInBackgroundOrQuit', {
-      enable,
+      certificateIndex,
       isIOSDevelopmentEnvironment,
       appName,
     });

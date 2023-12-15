@@ -9,7 +9,6 @@ import { Platform } from 'react-native';
 
 export default class ZegoPluginInvitationService {
   static shared: ZegoPluginInvitationService;
-  _notifyWhenAppRunningInBackgroundOrQuit: boolean;
   _androidOfflineDataHandler: (data: any) => void;
   _iOSOfflineDataHandler: (data: any, uuid: string) => void;
   _callKitAnswerCallHandler: (action: CXAction) => void;
@@ -17,7 +16,6 @@ export default class ZegoPluginInvitationService {
 
   constructor() {
     if (!ZegoPluginInvitationService.shared) {
-      this._notifyWhenAppRunningInBackgroundOrQuit = true;
       ZegoPluginInvitationService.shared = this;
     }
     return ZegoPluginInvitationService.shared;
@@ -91,10 +89,12 @@ export default class ZegoPluginInvitationService {
     return ZegoSignalingPluginCore.getInstance().logout();
   }
 
-  enableNotifyWhenAppRunningInBackgroundOrQuit(enable: boolean, isIOSDevelopmentEnvironment?: boolean, appName?: string) {
-    this._notifyWhenAppRunningInBackgroundOrQuit = enable;
-
-    if (enable) {
+  enableNotifyWhenAppRunningInBackgroundOrQuit(certificateIndex?: number, isIOSDevelopmentEnvironment?: boolean, appName?: string) {
+    if (!certificateIndex) {
+      certificateIndex = 1;
+    }
+    zloginfo(`[Service] enableNotifyWhenAppRunningInBackgroundOrQuit, certificateIndex: ${certificateIndex}, isIOSDevelopmentEnvironment: ${isIOSDevelopmentEnvironment}, appName: ${appName}`);
+    if (ZegoUIKitCorePlugin.getZPNsPlugin()) {
       if (Platform.OS === 'ios') {
         const CXProviderConfiguration = {
           localizedName: appName ?? 'My app',
@@ -105,12 +105,13 @@ export default class ZegoPluginInvitationService {
         
         const iOSEnvironment = isIOSDevelopmentEnvironment == null ? 2 : (isIOSDevelopmentEnvironment ? 1 : 0);
         console.log('#########registerPush, iOSEnvironment', iOSEnvironment);
+        ZegoUIKitCorePlugin.getZPNsPlugin().default.setPushConfig({ 'appType': certificateIndex });
         ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().registerPush({ 
           enableIOSVoIP: true,
           iOSEnvironment: iOSEnvironment,
         });
       } else {
-        ZegoUIKitCorePlugin.getZPNsPlugin().default.setPushConfig({ "enableFCMPush": true, "enableHWPush": false, "enableMiPush": false, "enableOppoPush": false, "enableVivoPush": false });
+        ZegoUIKitCorePlugin.getZPNsPlugin().default.setPushConfig({ "enableFCMPush": true, "enableHWPush": false, "enableMiPush": false, "enableOppoPush": false, "enableVivoPush": false, "appType": certificateIndex });
 
         ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().registerPush({ enableIOSVoIP: true });
       }
@@ -185,16 +186,7 @@ export default class ZegoPluginInvitationService {
         console.log('#########performPlayDTMFCallAction', action);
         action.fulfill();
       });
-    } else {
-      if (ZegoUIKitCorePlugin.getZPNsPlugin()) {
-        // ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().unregisterPush();
-        ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().off("registered")
-        // ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().off("notificationArrived")
-        // ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().off("notificationClicked")
-        // ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().off("throughMessageReceived")
-      }
     }
-
   }
   setAdvancedConfig(key: string, value: string) {
     ZegoSignalingPluginCore.getInstance().setAdvancedConfig(key, value);
@@ -214,7 +206,7 @@ export default class ZegoPluginInvitationService {
       data,
     });
 
-    if (this._notifyWhenAppRunningInBackgroundOrQuit) {
+    if (ZegoUIKitCorePlugin.getZPNsPlugin()) {
       config.pushConfig = {
         title: notificationConfig.title ?? "",
         content: notificationConfig.message ?? "",
@@ -239,7 +231,7 @@ export default class ZegoPluginInvitationService {
       return Promise.reject(new ZegoPluginResult());
     }
     const config = { extendedData: data } as ZIMCallCancelConfig;
-    if (this._notifyWhenAppRunningInBackgroundOrQuit) {
+    if (ZegoUIKitCorePlugin.getZPNsPlugin()) {
       config.pushConfig = {
         title: notificationConfig && notificationConfig.title,
         content: notificationConfig && notificationConfig.message,
