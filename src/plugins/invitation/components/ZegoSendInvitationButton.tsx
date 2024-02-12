@@ -56,8 +56,9 @@ export default function ZegoSendInvitationButton(props: any) {
       }
     } else {
       // Both icon and text exist
+      var marigin = text ? 6 : 0;
       renderView = <Fragment>
-        <Image resizeMode="contain" source={icon || getImageSourceByPath()} style={{marginRight: 6}}/>
+        <Image resizeMode="contain" source={icon || getImageSourceByPath()} style={{marginRight: marigin}}/>
         <Text style={getCustomTextStyle(fontSize, color).text}>{text}</Text>
       </Fragment>
     }
