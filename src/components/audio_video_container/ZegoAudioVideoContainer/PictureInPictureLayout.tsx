@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import ZegoUIKitInternal from "../../internal/ZegoUIKitInternal";
 import ZegoAudioVideoView from "../../audio_video/ZegoAudioVideoView";
-import { StyleSheet, View, PanResponder, TouchableWithoutFeedback } from 'react-native'
+import { StyleSheet, View, PanResponder, TouchableWithoutFeedback, SafeAreaView } from 'react-native'
 import { ZegoViewPosition } from './defines'
 
 export default function PictureInPictureLayout(props: any) {
@@ -32,7 +32,6 @@ export default function PictureInPictureLayout(props: any) {
     } = audioVideoConfig;
     const realTimeData: any = useRef(cacheAudioVideoUserList || []);
     const [globalAudioVideoUserList, setGlobalAudioVideoUserList] = useState(cacheAudioVideoUserList || []);
-    console.log('########cacheAudioVideoUserList########', cacheAudioVideoUserList);
 
     const panResponder = useRef(PanResponder.create({
         // @ts-ignore
@@ -42,6 +41,7 @@ export default function PictureInPictureLayout(props: any) {
     })).current;
 
     useEffect(() => {
+        console.log('########cacheAudioVideoUserList########', cacheAudioVideoUserList);
         const callbackID = 'PictureInPictureLayout' + String(Math.floor(Math.random() * 10000));
         ZegoUIKitInternal.onAudioVideoAvailable(callbackID, (userList: any[]) => {
             userList.forEach((user) => {
@@ -65,6 +65,9 @@ export default function PictureInPictureLayout(props: any) {
         });
         ZegoUIKitInternal.onAudioVideoListForceSort(callbackID, () => {
             setGlobalAudioVideoUserList(() => [...(sortAudioVideo ? sortAudioVideo(realTimeData.current) : realTimeData.current)]);
+        });
+        ZegoUIKitInternal.onVideoViewForceRender(callbackID, () => {
+          setGlobalAudioVideoUserList([...realTimeData.current]);
         });
         ZegoUIKitInternal.onUserLeave(callbackID, (userList: any[]) => {
             if (!removeViewWhenAudioVideoUnavailable) {
@@ -109,15 +112,17 @@ export default function PictureInPictureLayout(props: any) {
     return (<View style={styles.container}>
         <View style={[styles.smallViewContainer, getSmallViewPostStyle()]} onLayout={layoutHandle}>
             {
-                globalAudioVideoUserList.slice(1, 4).map((user: any, index: number) => <TouchableWithoutFeedback key={user.userID} {...panResponder.panHandlers} onPress={switchLargeOrSmallView.bind(this, index, user)}><View
-                    key={user.userID}
-                    style={[
+                globalAudioVideoUserList.slice(1, 4).map((user: any, index: number) => <TouchableWithoutFeedback key={user.userID} {...panResponder.panHandlers} onPress={switchLargeOrSmallView.bind(this, index, user)}>
+                  <SafeAreaView >
+                    <View
+                      key={user.userID}
+                      style={[
                         styles.smallView,
                         styles.smallViewBorder,
-                        getSmallViewSize(smallViewSize.width, smallViewSize.height).smallViewSize,
+                        getSmallViewSize(user, smallViewSize.width, smallViewSize.height).smallViewSize,
                         getSmallViewSpacing(spacingBetweenSmallViews).smallViewSpacing,
                         getSmallViewBorderRadius(smallViewBorderRadius).smallViewBorderRadius,
-                    ]}>
+                      ]}>
                         <ZegoAudioVideoView
                             userID={user.userID}
                             audioViewBackgroudColor={smallViewBackgroundColor}
@@ -126,8 +131,11 @@ export default function PictureInPictureLayout(props: any) {
                             useVideoViewAspectFill={useVideoViewAspectFill}
                             foregroundBuilder={foregroundBuilder}
                             avatarBuilder={avatarBuilder}
+                            isPictureInPicture={true}
                         />
-                </View></TouchableWithoutFeedback>)
+                    </View>
+                  </SafeAreaView>
+                </TouchableWithoutFeedback>)
             }
         </View>
         <View style={styles.bigView}>
@@ -141,6 +149,7 @@ export default function PictureInPictureLayout(props: any) {
                     useVideoViewAspectFill={useVideoViewAspectFill}
                     foregroundBuilder={foregroundBuilder}
                     avatarBuilder={avatarBuilder}
+                    isPictureInPicture={true}
                 /> :
                 <View />
             }
@@ -148,12 +157,14 @@ export default function PictureInPictureLayout(props: any) {
     </View>)
 }
 
-const getSmallViewSize = (width: number, height: number) => StyleSheet.create({
+const getSmallViewSize = (user: any, width: number, height: number) => {
+  return StyleSheet.create({
     smallViewSize: {
-        width,
-        height,
+      width: user.isLandscape ? height : width,
+      height: user.isLandscape ? width : height,
     },
-});
+  });
+}
 const getSmallViewSpacing = (margin: number) => StyleSheet.create({
     smallViewSpacing: {
         marginBottom: margin,

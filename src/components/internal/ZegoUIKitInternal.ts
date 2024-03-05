@@ -7,7 +7,7 @@ import ZegoExpressEngine, {
 } from 'zego-express-engine-reactnative';
 import ZegoUIKitSignalingPluginImpl from '../../plugins/invitation';
 import { zlogerror, zloginfo, zlogwarning } from '../../utils/logger';
-import { ZegoAudioVideoResourceMode, ZegoChangedCountOrProperty, ZegoRoomPropertyUpdateType } from './defines'
+import { ZegoAudioVideoResourceMode, ZegoChangedCountOrProperty, ZegoRoomPropertyUpdateType, ZegoUIKitVideoConfig } from './defines'
 
 var _appInfo = {
   appID: 0,
@@ -62,10 +62,14 @@ var _markAsLargeRoom = false;
 var _onErrorCallbackMap: any = {};
 var _onTokenProvideCallback: Function = undefined;
 
+var _videoConfig = ZegoUIKitVideoConfig.preset360P();
+var _appOrientation = 0;
+
 function _resetData() {
   zloginfo('Reset all data.');
   _appInfo = { appID: 0, appSign: '' };
   _localCoreUser = _createCoreUser('', '', '', {});
+  _localCoreUser.isLandscape = _appOrientation !== 0;
   _streamCoreUserMap = {};
   _coreUserMap = {};
   _currentRoomID = '';
@@ -88,6 +92,7 @@ function _resetDataForLeavingRoom() {
   _isRoomConnected = false;
   const { userID, userName, profileUrl, extendInfo } = _localCoreUser;
   _localCoreUser = _createCoreUser(userID, userName, profileUrl, extendInfo);
+  _localCoreUser.isLandscape = _appOrientation !== 0;
   _coreUserMap[_localCoreUser.userID] = _localCoreUser;
   _inRoomMessageList = [];
   _roomProperties = {};
@@ -124,6 +129,7 @@ function _createCoreUser(userID: string, userName: string, profileUrl?: string, 
     joinTime: 0,
     inRoomAttributes: {},
     avatar: '',
+    isLandscape: false,
   };
 }
 function _isLocalUser(userID: string) {
@@ -758,6 +764,18 @@ function _registerEngineCallback() {
     zloginfo('IMRecvCustomCommand', roomID, fromUser, command);
     _onIMCustomCommandReceived(roomID, fromUser, command);
   });
+  ZegoExpressEngine.instance().on('playerVideoSizeChanged', (streamID, width, height) => {
+    zloginfo('playerVideoSizeChanged', streamID, width, height);
+    const userID =  _streamCoreUserMap[streamID].userID;
+    _coreUserMap[userID].isLandscape = width > height;
+    ZegoUIKitInternal.forceRenderVideoView();
+  });
+  ZegoExpressEngine.instance().on('publisherVideoSizeChanged', (width, height, channel) => {
+    zloginfo('publisherVideoSizeChanged', width, height, channel);
+    _localCoreUser.isLandscape = width > height;
+    _coreUserMap[_localCoreUser.userID].isLandscape = width > height;
+    ZegoUIKitInternal.forceRenderVideoView();
+  });
 }
 function _unregisterEngineCallback() {
   zloginfo('Unregister callback from ZegoExpressEngine...');
@@ -964,7 +982,7 @@ const ZegoUIKitInternal =  {
     zloginfo('setAudioVideoResourceMode', audioVideoResourceMode);
     _audioVideoResourceMode = audioVideoResourceMode || ZegoAudioVideoResourceMode.Default;
   },
-  updateRenderingProperty(userID: string, viewID: number, fillMode: string) {
+  updateRenderingProperty(userID: string, viewID: number, fillMode: number) {
     zloginfo(
       'updateRenderingProperty: ',
       userID,
@@ -1228,8 +1246,26 @@ const ZegoUIKitInternal =  {
   setAudioConfig(config: any) {
     // TODO
   },
-  setVideoConfig(config: any) {
-    // TODO
+  setVideoConfig(config: ZegoUIKitVideoConfig) {
+    _videoConfig = config;
+  },
+  setAppOrientation(orientation: number) {
+    _appOrientation = orientation;
+    if (_localCoreUser) {
+      _localCoreUser.isLandscape = orientation !== 0;
+    }
+    if (_coreUserMap[_localCoreUser.userID]) {
+      _coreUserMap[_localCoreUser.userID].isLandscape = orientation !== 0;
+    }
+    if (_isEngineCreated()) {
+      const config = _videoConfig.toSDK(orientation);
+      console.log('setAppOrientation, ', orientation, config);
+      ZegoExpressEngine.instance().setVideoConfig(config);
+      ZegoExpressEngine.instance().setAppOrientation(orientation);
+    }
+  },
+  appOrientation() {
+    return _appOrientation;
   },
   onAudioVideoAvailable(callbackID: string, callback?: Function) {
     if (typeof callback !== 'function') {

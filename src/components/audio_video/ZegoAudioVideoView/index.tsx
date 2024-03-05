@@ -31,6 +31,7 @@ export default function ZegoVideoView(props: any) {
     avatarBuilder,
     avatarBackgroundColor,
     soundWaveColor,
+    isPictureInPicture,
   } = props;
 
   const [userInfo, setUserInfo] = useState({});
@@ -101,6 +102,7 @@ export default function ZegoVideoView(props: any) {
         style={styles.videoContainer}
         userID={userID}
         roomID={roomID}
+        isPictureInPicture={isPictureInPicture}
         fillMode={useVideoViewAspectFill ? 1 : 0} // 1:AspectFill, 0:AspectFit
       >
         {!isCameraOn ? (
