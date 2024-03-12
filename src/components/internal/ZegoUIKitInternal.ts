@@ -1342,7 +1342,7 @@ const ZegoUIKitInternal =  {
     if (_appInfo.appSign === '' && token === '') {
       token = await ZegoUIKitInternal.getToken();
     }
-    
+    ZegoExpressEngine.instance().logoutRoom();
     return new Promise<void>((resolve, reject) => {
       const user = {
         userID: _localCoreUser.userID,
