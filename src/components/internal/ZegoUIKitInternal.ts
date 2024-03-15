@@ -1072,6 +1072,10 @@ const ZegoUIKitInternal =  {
       _unregisterEngineCallback();
       _registerEngineCallback();
 
+      _localCoreUser.userID = userInfo.userID;
+      _localCoreUser.userName = userInfo.userName;
+      _coreUserMap[userInfo.userID] = _localCoreUser;
+
       Object.keys(_onSDKConnectedCallbackMap).forEach((callbackID) => {
         // TODO cause  WARN  Possible Unhandled Promise Rejection (id: 56)
         if (_onSDKConnectedCallbackMap[callbackID]) {
