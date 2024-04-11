@@ -4,7 +4,15 @@ import ZegoUIKitInternal from "../internal/ZegoUIKitInternal";
 
 export default function ZegoSwitchCameraButton(props: any) {
     // TODO useFrontFacingCamera may cause problems when create a lot of times during connected
-    const { iconFrontFacingCamera, iconBackFacingCamera, useFrontFacingCamera = true, onPress, width = 48, height = 48 } = props;
+    const { 
+      iconFrontFacingCamera, 
+      iconBackFacingCamera, 
+      useFrontFacingCamera = true, 
+      onPress, 
+      width = 48, 
+      height = 48,
+      iconBuilder,
+    } = props;
     const [isFront, setIsFront] = useState(ZegoUIKitInternal.isUsingFrontFacingCamera());
     const getImageSourceByPath = () => {
         const pathFront = iconFrontFacingCamera ? iconFrontFacingCamera : require("../internal/resources/white_button_flip_camera.png");
@@ -32,8 +40,10 @@ export default function ZegoSwitchCameraButton(props: any) {
     }, []);
 
     return (<TouchableOpacity
-        style={{ width: width, height: height }}
+        style={{ width: width, height: height, justifyContent: 'center' }}
         onPress={onButtonPress}>
-        <Image resizeMode='contain' source={getImageSourceByPath()} style={{ width: "100%", height: "100%" }} />
+        {iconBuilder
+        ? iconBuilder(isFront)
+        : <Image resizeMode='contain' source={getImageSourceByPath()} style={{ width: "100%", height: "100%" }} />}
     </TouchableOpacity>)
 }

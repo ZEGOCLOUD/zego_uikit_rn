@@ -1,10 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { Image, TouchableOpacity, View } from "react-native";
 import ZegoUIKitInternal from "../internal/ZegoUIKitInternal";
-import { zloginfo } from "../../utils/logger";
 
 export default function ZegoToggleCameraButton(props: any) {
-    const { userID, iconCameraOn, iconCameraOff, isOn, onPress, width = 48, height = 48 } = props;
+    const { 
+      userID, 
+      iconCameraOn, 
+      iconCameraOff, 
+      isOn, 
+      onPress, 
+      width = 48, 
+      height = 48,
+      iconBuilder,
+    } = props;
+    
     const [isCurrentOn, setIsCurrentOn] = useState(true);// Default on
     const getImageSourceByPath = () => {
         const pathOn = iconCameraOn ? iconCameraOn : require("../internal/resources/white_button_camera_on.png");
@@ -43,9 +52,13 @@ export default function ZegoToggleCameraButton(props: any) {
         }
     }, []);
 
-    return (<TouchableOpacity
-        style={{ width: width, height: height }}
+    return (
+      <TouchableOpacity
+        style={{ width: width, height: height, justifyContent: 'center' }}
         onPress={onButtonPress}>
-        <Image resizeMode='contain' source={getImageSourceByPath()} style={{ width: "100%", height: "100%" }} />
-    </TouchableOpacity>)
+        {iconBuilder
+        ? iconBuilder(isCurrentOn)
+        : <Image resizeMode='contain' source={getImageSourceByPath()} style={{ width: "100%", height: "100%" }} />}
+      </TouchableOpacity>
+    )
 }

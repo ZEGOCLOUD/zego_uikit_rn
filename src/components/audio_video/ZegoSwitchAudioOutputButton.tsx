@@ -4,17 +4,23 @@ import ZegoUIKitInternal from "../internal/ZegoUIKitInternal";
 
 export default function ZegoSwitchAudioOutputButton(props: any) {
     // ZegoAudioRouteSpeaker=(0) ZegoAudioRouteHeadphone=(1) ZegoAudioRouteBluetooth=(2) ZegoAudioRouteReceiver=(3) ZegoAudioRouteExternalUSB=(4) ZegoAudioRouteAirPlay=(5)
-    const { iconSpeaker, iconEarpiece, iconBluetooth, useSpeaker = false, width = 48, height = 48 } = props;
+    const { 
+      iconSpeaker, 
+      iconEarpiece, 
+      iconBluetooth, 
+      useSpeaker = false, 
+      width = 48, 
+      height = 48,
+      iconBuilder,
+    } = props;
     const [currentDevice, setCurrentDevice] = useState(0);// Default to speaker
     const [enable, setEnable] = useState(true);
     const getImageSourceByPath = () => {
-        var path = "";
+        var path = iconEarpiece ? iconEarpiece : require("../internal/resources/white_button_speaker_off.png");
         if (currentDevice == 0) {
             path = iconSpeaker ? iconSpeaker : require("../internal/resources/white_button_speaker_on.png");
         } else if (currentDevice == 2) {
             path = iconBluetooth ? iconBluetooth : require("../internal/resources/white_button_bluetooth_off.png");
-        } else {
-            path = iconEarpiece ? iconEarpiece : require("../internal/resources/white_button_speaker_off.png");
         }
         return path;
     }
@@ -47,10 +53,11 @@ export default function ZegoSwitchAudioOutputButton(props: any) {
     }, []);
 
     return (<TouchableOpacity
-        style={{ width: width, height: height }}
+        style={{ width: width, height: height, justifyContent: 'center' }}
         disabled={!enable} // Only speaker can toggle enable
         onPress={onPress}>
-        {/* @ts-ignore */}
-        <Image resizeMode='contain' source={getImageSourceByPath()} style={{ width: "100%", height: "100%" }} />
+        {iconBuilder
+        ? iconBuilder(currentDevice)
+        : <Image resizeMode='contain' source={getImageSourceByPath()} style={{ width: "100%", height: "100%" }} />}
     </TouchableOpacity>)
 }
