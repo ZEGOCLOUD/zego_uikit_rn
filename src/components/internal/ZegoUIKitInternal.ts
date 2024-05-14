@@ -4,6 +4,7 @@ import ZegoExpressEngine, {
   ZegoUser,
   ZegoEngineProfile,
   ZegoRoomConfig,
+  ZegoPublishChannel,
 } from 'zego-express-engine-reactnative';
 import ZegoUIKitSignalingPluginImpl from '../../plugins/invitation';
 import { zlogerror, zloginfo, zlogwarning } from '../../utils/logger';
@@ -544,7 +545,7 @@ function _turnMicDeviceOn(userID: string, on: boolean) {
           isCameraOn : _localCoreUser.isCameraDeviceOn,
           isMicrophoneOn : on
       }
-      ZegoExpressEngine.instance().setStreamExtraInfo(JSON.stringify(extraInfo))
+      ZegoExpressEngine.instance().setStreamExtraInfo(JSON.stringify(extraInfo), ZegoPublishChannel.Main);
 
       if (on) {
         _tryStartPublishStream();
@@ -592,7 +593,7 @@ function _turnCameraDeviceOn(userID: string, on: boolean) {
           isCameraOn : on,
           isMicrophoneOn : _localCoreUser.isMicDeviceOn
       }
-      ZegoExpressEngine.instance().setStreamExtraInfo(JSON.stringify(extraInfo))
+      ZegoExpressEngine.instance().setStreamExtraInfo(JSON.stringify(extraInfo), ZegoPublishChannel.Main);
 
       if (on) {
         _tryStartPublishStream();
@@ -849,7 +850,7 @@ function _tryStartPublishStream() {
       return;
     }
     ZegoExpressEngine.instance()
-      .startPublishingStream(_localCoreUser.streamID)
+      .startPublishingStream(_localCoreUser.streamID, ZegoPublishChannel.Main, undefined)
       .then(() => {
         zloginfo('Notify local user audioVideoAvailable start', _localCoreUser.streamID + '', JSON.parse(JSON.stringify(_streamCoreUserMap)));
         // if (_localCoreUser.streamID in _streamCoreUserMap) {
@@ -873,7 +874,7 @@ function _tryStartPublishStream() {
           reactTag: _localCoreUser.viewID,
           viewMode: _localCoreUser.fillMode,
           backgroundColor: 0,
-        })
+        }, ZegoPublishChannel.Main)
         .catch((error) => {
           zlogerror(error);
         });
@@ -883,8 +884,8 @@ function _tryStartPublishStream() {
 function _tryStopPublishStream(force = false) {
   if (!_localCoreUser.isMicDeviceOn && !_localCoreUser.isCameraDeviceOn) {
     zloginfo('stopPublishStream');
-    ZegoExpressEngine.instance().stopPublishingStream();
-    ZegoExpressEngine.instance().stopPreview();
+    ZegoExpressEngine.instance().stopPublishingStream(ZegoPublishChannel.Main);
+    ZegoExpressEngine.instance().stopPreview(ZegoPublishChannel.Main);
     if (_localCoreUser.streamID in _streamCoreUserMap) {
       delete _streamCoreUserMap[_localCoreUser.streamID];
 
@@ -1264,8 +1265,8 @@ const ZegoUIKitInternal =  {
     if (_isEngineCreated()) {
       const config = _videoConfig.toSDK(orientation);
       console.log('setAppOrientation, ', orientation, config);
-      ZegoExpressEngine.instance().setVideoConfig(config);
-      ZegoExpressEngine.instance().setAppOrientation(orientation);
+      ZegoExpressEngine.instance().setVideoConfig(config, ZegoPublishChannel.Main);
+      ZegoExpressEngine.instance().setAppOrientation(orientation, ZegoPublishChannel.Main);
     }
   },
   appOrientation() {
@@ -1346,7 +1347,7 @@ const ZegoUIKitInternal =  {
     if (_appInfo.appSign === '' && token === '') {
       token = await ZegoUIKitInternal.getToken();
     }
-    ZegoExpressEngine.instance().logoutRoom();
+    ZegoExpressEngine.instance().logoutRoom(undefined);
     return new Promise<void>((resolve, reject) => {
       const user = {
         userID: _localCoreUser.userID,
@@ -1361,7 +1362,7 @@ const ZegoUIKitInternal =  {
           zloginfo('Join room success.', user);
           _roomMemberCount = 1
           _markAsLargeRoom = markAsLargeRoom;
-          ZegoExpressEngine.instance().startSoundLevelMonitor();
+          ZegoExpressEngine.instance().startSoundLevelMonitor(undefined);
 
           _localCoreUser.streamID = _getPublishStreamID();
           _coreUserMap[_localCoreUser.userID] = _localCoreUser;
