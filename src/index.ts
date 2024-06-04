@@ -85,6 +85,9 @@ export default {
   onError: ZegoUIKitInternal.onError,
   onTokenProvide: ZegoUIKitInternal.onTokenProvide,
   renewToken: ZegoUIKitInternal.renewToken,
+  isScreenSharing: ZegoUIKitInternal.isScreenSharing,
+  onScreenSharingAvailable: ZegoUIKitInternal.onScreenSharingAvailable,
+  onScreenSharingUnavailable: ZegoUIKitInternal.onScreenSharingUnavailable,
   getSignalingPlugin: () => ZegoUIKitSignalingPluginImpl,
 };
 

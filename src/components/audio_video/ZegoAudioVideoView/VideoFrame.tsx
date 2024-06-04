@@ -4,7 +4,7 @@ import { ZegoTextureView } from 'zego-express-engine-reactnative';
 import ZegoUIKitInternal from "../../internal/ZegoUIKitInternal";
 
 export default function VideoFrame(props: any) {
-    const { userID, roomID, fillMode, isPictureInPicture } = props;
+    const { userID, roomID, fillMode, isPictureInPicture, isScreenShare } = props;
     const viewRef = useRef(null);
 
     const updateRenderingProperty = () => {
@@ -16,7 +16,7 @@ export default function VideoFrame(props: any) {
         if (isPictureInPicture && user) {
           newFillMode = appOrientation === 0 ? Number(!user.isLandscape) : Number(user.isLandscape);
         }
-        ZegoUIKitInternal.updateRenderingProperty(userID, viewID, newFillMode);
+        ZegoUIKitInternal.updateRenderingProperty(userID, viewID, newFillMode, isScreenShare);
     }
     useEffect(() => {
         updateRenderingProperty();
