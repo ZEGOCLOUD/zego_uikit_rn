@@ -14,8 +14,13 @@ import Delegate from 'react-delegate-component';
 import { ZegoRoomStateChangedReason } from 'zego-express-engine-reactnative';
 
 export default function ZegoMemberList(props: any) {
-  const { showMicrophoneState, showCameraState, itemBuilder, sortUserList } =
-    props;
+  const { 
+    showMicrophoneState, 
+    showCameraState, 
+    itemBuilder, 
+    sortUserList,
+    avatarBuilder,
+  } = props;
   // let mockList = [
   //     {
   //       userID: 'bd7acbea',
@@ -124,7 +129,12 @@ export default function ZegoMemberList(props: any) {
       <View style={styles.item}>
         <View style={styles.itemLeft}>
           <View style={styles.avatar}>
-            <Text style={styles.nameLabel}>{getShotName(item.userName)}</Text>
+            { avatarBuilder ?       
+            <Delegate
+              to={avatarBuilder}
+              props={{ userInfo: item }}
+            /> :
+            <Text style={styles.nameLabel}>{getShotName(item.userName)}</Text>}
           </View>
           <Text style={styles.name}>
             {item.userName + roleDescription(item)}
