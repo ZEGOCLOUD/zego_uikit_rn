@@ -846,10 +846,8 @@ function _tryStartPublishStream() {
       _localCoreUser.isCameraDeviceOn,
       _localCoreUser.streamID
     );
-    if (!_localCoreUser.streamID) {
-      return;
-    }
-    ZegoExpressEngine.instance()
+    if (_localCoreUser.streamID) {
+      ZegoExpressEngine.instance()
       .startPublishingStream(_localCoreUser.streamID, ZegoPublishChannel.Main, undefined)
       .then(() => {
         zloginfo('Notify local user audioVideoAvailable start', _localCoreUser.streamID + '', JSON.parse(JSON.stringify(_streamCoreUserMap)));
@@ -866,6 +864,7 @@ function _tryStartPublishStream() {
           );
         // }
       });
+    }
 
     if (_localCoreUser.viewID > 0 && _localCoreUser.isCameraDeviceOn) {
       zloginfo('ZegoExpressEngine startPreview:', _localCoreUser);
