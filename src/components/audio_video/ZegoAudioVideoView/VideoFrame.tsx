@@ -40,7 +40,7 @@ export default function VideoFrame(props: any) {
             ZegoUIKitInternal.onSDKConnected(callbackID);
             ZegoUIKitInternal.onUserJoin(callbackID);
             ZegoUIKitInternal.onVideoViewForceRender(callbackID);
-            ZegoUIKitInternal.updateRenderingProperty(userID, -1, fillMode);
+            ZegoUIKitInternal.updateRenderingProperty(userID, -1, fillMode, isScreenShare);
         }
     }, []);
 

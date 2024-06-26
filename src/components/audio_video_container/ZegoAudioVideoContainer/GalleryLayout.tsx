@@ -73,6 +73,9 @@ export default function GalleryLayout(props: any) {
             user.isScreenShare = true;
           });
           setScreenShareUserList(screenShareUserList);
+          if (screenShareUserList.length == 0) {
+            setIsFullScreen(false);
+          }
           refreshUserList();
         });
         ZegoUIKitInternal.onScreenSharingUnavailable(callbackID, (userList: any[]) => {
@@ -81,6 +84,9 @@ export default function GalleryLayout(props: any) {
             user.isScreenShare = true;
           });
           setScreenShareUserList(screenShareUserList);
+          if (screenShareUserList.length == 0) {
+            setIsFullScreen(false);
+          }
           refreshUserList();
         });
         return () => {
@@ -170,8 +176,8 @@ export default function GalleryLayout(props: any) {
     }
 
     const onFullScreenButtonPressed = () => {
-      console.log('onFullScreenButtonPressed', isFullScreen);
-      setIsFullScreen(isFullScreen);
+      console.log('onFullScreenButtonPressed', !isFullScreen);
+      setIsFullScreen(!isFullScreen);
     }
 
     const isAudioVideoViewPadding = addBorderRadiusAndSpacingBetweenView && userList.length > 1 ? styles.audioVideoViewPadding : null;

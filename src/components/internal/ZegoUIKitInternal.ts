@@ -175,7 +175,7 @@ function _onRoomUserUpdate(roomID: string, updateType: number, userList: any[]) 
 
       const screenshareStreamID = _getScreenshareStreamIDByUserID(user.userID);
       if (screenshareStreamID in _streamCoreUserMap) {
-        _coreUserMap[user.userID].screenshareStreamID = streamID;
+        _coreUserMap[user.userID].screenshareStreamID = screenshareStreamID;
       }
 
       _coreUserMap[user.userID].joinTime = Date.now();
@@ -282,13 +282,13 @@ function _onRoomStreamUpdate(roomID: string, updateType: number, streamList: any
       const isScreenSharing = streamID.endsWith(_screenshareStreamIDFlag);
       if (userID in _coreUserMap) {
         if (isScreenSharing) {
-          _coreUserMap[userID].screenshareStreamID = '';
           _tryStopPlayScreenshareStream(userID);
+          _coreUserMap[userID].screenshareStreamID = '';
         } else {
+          _tryStopPlayStream(userID, true);
           _coreUserMap[userID].isCameraDeviceOn = false;
           _coreUserMap[userID].isMicDeviceOn = false;
           _coreUserMap[userID].streamID = '';
-          _tryStopPlayStream(userID, true);
           _notifyUserInfoUpdate(_coreUserMap[userID]);
         }
 
@@ -699,12 +699,18 @@ function _registerEngineCallback() {
     'remoteCameraStateUpdate',
     (streamID, state) => {
       zloginfo('[remoteCameraStateUpdate callback]', streamID, state);
+      if (streamID.endsWith(_screenshareStreamIDFlag)) {
+        return;
+      }
       // 0 for device is on
       _onRemoteCameraStateUpdate(_getUserIDByStreamID(streamID), state == 0);
     }
   );
   ZegoExpressEngine.instance().on('remoteMicStateUpdate', (streamID, state) => {
     zloginfo('[remoteMicStateUpdate callback]', streamID, state);
+    if (streamID.endsWith(_screenshareStreamIDFlag)) {
+      return;
+    }
     // 0 for device is on
     _onRemoteMicStateUpdate(_getUserIDByStreamID(streamID), state == 0);
   });
@@ -1068,6 +1074,7 @@ const ZegoUIKitInternal =  {
       userID,
       viewID,
       fillMode,
+      isScreenshare,
       '<<<<<<<<<<<<<<<<<<<<<<<<<<'
     );
     if (userID === undefined) {
