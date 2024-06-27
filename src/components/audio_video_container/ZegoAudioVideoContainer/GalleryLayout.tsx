@@ -4,6 +4,7 @@ import ZegoUIKitInternal from "../../internal/ZegoUIKitInternal";
 import ZegoAudioVideoView from "../../audio_video/ZegoAudioVideoView";
 import ZegoAudioVideoViewMore from "./MoreFrame";
 import { ZegoRoomStateChangedReason } from "zego-express-engine-reactnative";
+import ScreenSharingView from "../../audio_video/ZegoAudioVideoView/ScreenSharingView";
 
 export default function GalleryLayout(props: any) {
     const { 
@@ -27,6 +28,21 @@ export default function GalleryLayout(props: any) {
     const [localUserID, setLocalUserID] = useState('');
     const [userList, setUserList] = useState([]);
     const [moreUserList, setMoreUserList] = useState([]);
+    const [screenShareUserList, setScreenShareUserList] = useState([]);
+    const [isFullScreen, setIsFullScreen] = useState(false);
+
+    var videoUserList: any[] = [];
+
+    const refreshUserList = () => {
+      var newUserList = [...videoUserList];
+      const index = newUserList.findIndex((user => user.userID == ZegoUIKitInternal.getLocalUserInfo().userID));
+      index !== -1 && (newUserList = newUserList.splice(index, 1).concat(newUserList));
+      
+      const userList = newUserList.slice(0, 7);
+      const moreUserList = newUserList.slice(7);
+      setUserList(userList);
+      setMoreUserList(moreUserList);
+    }
 
     useEffect(() => {
         const callbackID = 'GalleryLayout' + String(Math.floor(Math.random() * 10000));
@@ -48,51 +64,158 @@ export default function GalleryLayout(props: any) {
         ZegoUIKitInternal.onUserCountOrPropertyChanged(callbackID, (userList: any[]) => {
             // console.warn('>>>>>>>>>>> onUserCountOrPropertyChanged', userList)
             // Put yourself first
-            const index = userList.findIndex((user => user.userID == ZegoUIKitInternal.getLocalUserInfo().userID));
-            index !== -1 && (userList = userList.splice(index, 1).concat(userList));
-            setUserList(userList.slice(0, 7));
-            setMoreUserList(userList.slice(7));
+            videoUserList = userList;
+            refreshUserList();
+        });
+        ZegoUIKitInternal.onScreenSharingAvailable(callbackID, (userList: any[]) => {
+          const screenShareUserList = ZegoUIKitInternal.getAllScreenshareUsers();
+          screenShareUserList.forEach(user => {
+            user.isScreenShare = true;
+          });
+          setScreenShareUserList(screenShareUserList);
+          if (screenShareUserList.length == 0) {
+            setIsFullScreen(false);
+          }
+          refreshUserList();
+        });
+        ZegoUIKitInternal.onScreenSharingUnavailable(callbackID, (userList: any[]) => {
+          const screenShareUserList = ZegoUIKitInternal.getAllScreenshareUsers();
+          screenShareUserList.forEach(user => {
+            user.isScreenShare = true;
+          });
+          setScreenShareUserList(screenShareUserList);
+          if (screenShareUserList.length == 0) {
+            setIsFullScreen(false);
+          }
+          refreshUserList();
         });
         return () => {
             ZegoUIKitInternal.onSDKConnected(callbackID);
             ZegoUIKitInternal.onRoomStateChanged(callbackID);
             ZegoUIKitInternal.onUserCountOrPropertyChanged(callbackID);
+            ZegoUIKitInternal.onScreenSharingAvailable(callbackID);
+            ZegoUIKitInternal.onScreenSharingUnavailable(callbackID);
         }
     }, []);
 
+    const getScreenShareViewStyle = () => {
+      var height = '50%';
+      const len = userList.length;
+      if (len <= 2) {
+        height = '50%';
+      } else if (len <= 4) {
+        height = '33.33%';
+      } else if (len <= 6) {
+        height = '25%';
+      } else {
+        height = '20%';
+      }
+      return StyleSheet.create({
+        audioVideoViewSize: {
+          width: '100%',
+          height: height,
+        },
+      }).audioVideoViewSize;
+    }
+
     const getAudioVideoViewStyle = () => {
-        const len = userList.length;
-        let audioVideoViewSizeStyle;
-        switch (len) {
-            case 1:
-                audioVideoViewSizeStyle = styles.audioVideoViewSize1;
-                break;
-            case 2:
-                audioVideoViewSizeStyle = styles.audioVideoViewSize2;
-                break;
-            case 3:
-            case 4:
-                audioVideoViewSizeStyle = styles.audioVideoViewSize4;
-                break;
-            case 5:
-            case 6:
-                audioVideoViewSizeStyle = styles.audioVideoViewSize6;
-                break;
-            case 7:
-            case 8:
-                audioVideoViewSizeStyle = styles.audioVideoViewSize8;
-                break;
-            default:
-                audioVideoViewSizeStyle = styles.audioVideoViewSizeMore;
-                break;
+      const hasScreenShare = screenShareUserList.length > 0;
+      var len = userList.length;
+      var width = '100%';
+      var height = '100%';
+      if (hasScreenShare) {
+        if (len == 1) {
+          width = '100%';
+          height = '50%';
+        } else if (len == 2) {
+          width = '50%';
+          height = '50%';
+        } else if (len <= 4) {
+          width = '50%';
+          height = '33.33%';
+        } else if (len <= 6) {
+          width = '50%';
+          height = '25%';
+        } else {
+          width = '50%';
+          height = '20%';
         }
-        return audioVideoViewSizeStyle;
+      } else {
+        if (len == 1) {
+          width = '100%';
+          height = '100%';
+        } else if (len == 2) {
+          width = '100%';
+          height = '50%';
+        } else if (len <= 4) {
+          width = '50%';
+          height = '50%';
+        } else if (len <= 6) {
+          width = '50%';
+          height = '33.33%';
+        } else {
+          width = '50%';
+          height = '25%';
+        }
+      }
+
+      return StyleSheet.create({
+        audioVideoViewSize: {
+          width: width,
+          height: height,
+        },
+      }).audioVideoViewSize;
+    }
+
+    const getMoreViewStyle = () => {
+      if (screenShareUserList.length > 0) {
+        return styles.audioVideoViewSizeMore2;
+      } else {
+        return styles.audioVideoViewSizeMore1;
+      }
+    }
+
+    const onFullScreenButtonPressed = () => {
+      console.log('onFullScreenButtonPressed', !isFullScreen);
+      setIsFullScreen(!isFullScreen);
     }
 
     const isAudioVideoViewPadding = addBorderRadiusAndSpacingBetweenView && userList.length > 1 ? styles.audioVideoViewPadding : null;
     const isAudioVideoViewBorder = addBorderRadiusAndSpacingBetweenView && userList.length > 1 ? styles.audioVideoViewBorder : null;
 
-    return (<View style={[styles.container, isAudioVideoViewPadding]}>
+    return (<View style={{flex: 1, width: '100%', height: '100%'}}>
+      {isFullScreen && screenShareUserList.length > 0 ? 
+      <View style={[styles.container, isAudioVideoViewPadding]}>
+      {
+        <View key={screenShareUserList[0].userID+'_screenShare'} style={[
+          styles.audioVideoViewContainer,
+          styles.screenShareViewFullScreen,
+        ]}>
+          <ScreenSharingView
+            userID={screenShareUserList[0].userID}
+            userName={screenShareUserList[0].userName}
+            onFullScreenButtonPressed={onFullScreenButtonPressed}
+            isFullScreen={isFullScreen}
+          />
+        </View>
+      }
+      </View>
+      :
+      <View style={[styles.container, isAudioVideoViewPadding]}>
+        {
+          screenShareUserList.map((user, index) => <View key={user.userID+'_screenShare'} style={[
+            styles.audioVideoViewContainer,
+            getScreenShareViewStyle(),
+            isAudioVideoViewPadding
+        ]}>
+          <ScreenSharingView
+            userID={user.userID}
+            userName={user.userName}
+            onFullScreenButtonPressed={onFullScreenButtonPressed}
+            isFullScreen={isFullScreen}
+          />
+          </View>)
+        }
         {
             userList.map((user, index) => <View key={user.userID} style={[
                 styles.audioVideoViewContainer,
@@ -129,7 +252,7 @@ export default function GalleryLayout(props: any) {
                         avatarBuilder={avatarBuilder}
                     />
                 </View>
-            </View>) : <View style={[styles.audioVideoViewContainer, getAudioVideoViewStyle(), isAudioVideoViewPadding]}>
+            </View>) : <View style={[styles.audioVideoViewContainer, getMoreViewStyle(), isAudioVideoViewPadding]}>
                 <View style={[styles.audioVideoViewSubContainer, isAudioVideoViewBorder]}>
                     <ZegoAudioVideoViewMore 
                         userList={moreUserList}
@@ -140,7 +263,9 @@ export default function GalleryLayout(props: any) {
                 </View>
             </View>
         }
-    </View>)
+    </View>}
+    </View>
+  )
 }
 
 const styles = StyleSheet.create({
@@ -170,29 +295,16 @@ const styles = StyleSheet.create({
         paddingTop: 2.5,
         paddingBottom: 2.5,
     },
-
-    audioVideoViewSize1: {
-        width: '100%',
-        height: '100%',
-    },
-    audioVideoViewSize2: {
-        width: '100%',
-        height: '50%',
-    },
-    audioVideoViewSize4: {
-        width: '50%',
-        height: '50%',
-    },
-    audioVideoViewSize6: {
-        width: '50%',
-        height: '33.33%',
-    },
-    audioVideoViewSize8: {
+    audioVideoViewSizeMore1: {
         width: '50%',
         height: '25%',
     },
-    audioVideoViewSizeMore: {
-        width: '50%',
-        height: '25%',
+    audioVideoViewSizeMore2: {
+      width: '50%',
+      height: '20%',
+    },
+    screenShareViewFullScreen: {
+      width: '100%',
+      height: '100%',
     },
 });

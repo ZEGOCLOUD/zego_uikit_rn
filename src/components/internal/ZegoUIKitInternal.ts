@@ -42,6 +42,8 @@ var _onInRoomCommandReceivedCallbackMap: any = {};
 var _onMeRemovedFromRoomCallbackMap: any = {};
 var _onTurnOnYourCameraRequestCallbackMap: any = {};
 var _onTurnOnYourMicrophoneRequestCallbackMap: any = {};
+var _onScreenSharingAvailableCallbackMap: any = {};
+var _onScreenSharingUnavailableCallbackMap: any = {};
 
 // Force update component callback
 var _onMemberListForceSortCallbackMap: any = {};
@@ -65,6 +67,8 @@ var _onTokenProvideCallback: Function = undefined;
 
 var _videoConfig = ZegoUIKitVideoConfig.preset360P();
 var _appOrientation = 0;
+
+const _screenshareStreamIDFlag = '_screensharing';
 
 function _resetData() {
   zloginfo('Reset all data.');
@@ -123,6 +127,9 @@ function _createCoreUser(userID: string, userName: string, profileUrl?: string, 
     viewID: -1,
     viewFillMode: 1,
     streamID: '',
+    screenshareViewID: -1,
+    screenshareViewFillMode: 1,
+    screenshareStreamID: '',
     isMicDeviceOn: false,
     isCameraDeviceOn: false,
     publisherQuality: 0,
@@ -165,6 +172,12 @@ function _onRoomUserUpdate(roomID: string, updateType: number, userList: any[]) 
       if (streamID in _streamCoreUserMap) {
         _coreUserMap[user.userID].streamID = streamID;
       }
+
+      const screenshareStreamID = _getScreenshareStreamIDByUserID(user.userID);
+      if (screenshareStreamID in _streamCoreUserMap) {
+        _coreUserMap[user.userID].screenshareStreamID = screenshareStreamID;
+      }
+
       _coreUserMap[user.userID].joinTime = Date.now();
       _notifyUserInfoUpdate(_coreUserMap[user.userID]);
 
@@ -196,6 +209,7 @@ function _onRoomUserUpdate(roomID: string, updateType: number, userList: any[]) 
 
         // Stop play stream before remove user list
         _tryStopPlayStream(coreUser.userID, true);
+        _tryStopPlayScreenshareStream(coreUser.userID);
         delete _coreUserMap[user.userID];
       }
     });
@@ -218,64 +232,82 @@ function _onRoomUserUpdate(roomID: string, updateType: number, userList: any[]) 
 function _onRoomStreamUpdate(roomID: string, updateType: number, streamList: any[]) {
   zloginfo('_onRoomStreamUpdate: ', roomID, updateType, streamList);
   var users: any[] = [];
+  var screenshareUsers: any[] = [];
   if (updateType == 0) {
     // Add
     streamList.forEach((stream) => {
       const userID = stream.user.userID;
       const userName = stream.user.userName;
-      const streamID = stream.streamID;
+      const streamID: string = stream.streamID;
+      const isScreenSharing = streamID.endsWith(_screenshareStreamIDFlag);
       if (userID in _coreUserMap) {
-        _coreUserMap[userID].streamID = streamID;
+        if (isScreenSharing) {
+          _coreUserMap[userID].screenshareStreamID = streamID;
+        } else {
+          _coreUserMap[userID].streamID = streamID;
+        }
         _streamCoreUserMap[streamID] = _coreUserMap[userID];
         _notifyUserInfoUpdate(_coreUserMap[userID]);
         _tryStartPlayStream(userID);
-
-        users.push(_coreUserMap[userID]);
       } else {
-        _streamCoreUserMap[streamID] = _createCoreUser(
+        const coreUser = _createCoreUser(
           userID,
           userName,
           '',
           {}
         );
-        _streamCoreUserMap[streamID].streamID = streamID;
+        if (isScreenSharing) {
+          coreUser.screenshareStreamID = streamID;
+        } else {
+          coreUser.streamID = streamID;
+        }
+        _streamCoreUserMap[streamID] = coreUser;
+        _coreUserMap[userID] = coreUser;
+      }
 
-        _coreUserMap[userID] = _streamCoreUserMap[streamID];
-
-        users.push(_streamCoreUserMap[streamID]);
+      // Add users.
+      users.push(_coreUserMap[userID]);
+      if (isScreenSharing) {
+        screenshareUsers.push(_coreUserMap[userID]);
       }
     });
 
-    Object.keys(_onAudioVideoAvailableCallbackMap).forEach((callbackID) => {
-      if (_onAudioVideoAvailableCallbackMap[callbackID]) {
-        _onAudioVideoAvailableCallbackMap[callbackID](users);
-      }
-    });
+    // notify
+    _notifyAudioVideoAvailable(users);
+    _notifyScreenSharingAvailable(screenshareUsers);
   } else {
     streamList.forEach((stream) => {
       const userID = stream.user.userID;
       const streamID = stream.streamID;
+      const isScreenSharing = streamID.endsWith(_screenshareStreamIDFlag);
       if (userID in _coreUserMap) {
-        _tryStopPlayStream(userID, true);
-        _coreUserMap[userID].isCameraDeviceOn = false;
-        _coreUserMap[userID].isMicDeviceOn = false;
-        _coreUserMap[userID].streamID = '';
-        _notifyUserInfoUpdate(_coreUserMap[userID]);
+        if (isScreenSharing) {
+          _tryStopPlayScreenshareStream(userID);
+          _coreUserMap[userID].screenshareStreamID = '';
+        } else {
+          _tryStopPlayStream(userID, true);
+          _coreUserMap[userID].isCameraDeviceOn = false;
+          _coreUserMap[userID].isMicDeviceOn = false;
+          _coreUserMap[userID].streamID = '';
+          _notifyUserInfoUpdate(_coreUserMap[userID]);
+        }
 
+        // Add users.
         users.push(_coreUserMap[userID]);
+        if (isScreenSharing) {
+          screenshareUsers.push(_coreUserMap[userID]);
+        }
 
         delete _streamCoreUserMap[streamID];
       }
     });
+
+    // notify.
     _notifyUserCountOrPropertyChanged(
       ZegoChangedCountOrProperty.cameraStateUpdate
     );
-
-    Object.keys(_onAudioVideoUnavailableCallbackMap).forEach((callbackID) => {
-      if (_onAudioVideoUnavailableCallbackMap[callbackID]) {
-        _onAudioVideoUnavailableCallbackMap[callbackID](users);
-      }
-    });
+    _notifyAudioVideoUnavailable(users);
+    _notifyScreenSharingUnavailable(screenshareUsers);
   }
 }
 function _onRemoteCameraStateUpdate(userID: string, isOn: boolean) {
@@ -667,12 +699,18 @@ function _registerEngineCallback() {
     'remoteCameraStateUpdate',
     (streamID, state) => {
       zloginfo('[remoteCameraStateUpdate callback]', streamID, state);
+      if (streamID.endsWith(_screenshareStreamIDFlag)) {
+        return;
+      }
       // 0 for device is on
       _onRemoteCameraStateUpdate(_getUserIDByStreamID(streamID), state == 0);
     }
   );
   ZegoExpressEngine.instance().on('remoteMicStateUpdate', (streamID, state) => {
     zloginfo('[remoteMicStateUpdate callback]', streamID, state);
+    if (streamID.endsWith(_screenshareStreamIDFlag)) {
+      return;
+    }
     // 0 for device is on
     _onRemoteMicStateUpdate(_getUserIDByStreamID(streamID), state == 0);
   });
@@ -838,6 +876,11 @@ function _getPublishStreamID() {
 function _getStreamIDByUserID(userID: string) {
   return _currentRoomID + '_' + userID + '_main';
 }
+
+function _getScreenshareStreamIDByUserID(userID: string) {
+  return _currentRoomID + '_' + userID + _screenshareStreamIDFlag;
+}
+
 function _tryStartPublishStream() {
   if (_localCoreUser.isMicDeviceOn || _localCoreUser.isCameraDeviceOn) {
     zloginfo(
@@ -855,13 +898,7 @@ function _tryStartPublishStream() {
           _streamCoreUserMap[_localCoreUser.streamID] = _localCoreUser;
 
           zloginfo('Notify local user audioVideoAvailable end', _localCoreUser);
-          Object.keys(_onAudioVideoAvailableCallbackMap).forEach(
-            (callbackID) => {
-              if (_onAudioVideoAvailableCallbackMap[callbackID]) {
-                _onAudioVideoAvailableCallbackMap[callbackID]([_localCoreUser]);
-              }
-            }
-          );
+          _notifyAudioVideoAvailable([_localCoreUser]);
         // }
       });
     }
@@ -887,12 +924,7 @@ function _tryStopPublishStream(force = false) {
     ZegoExpressEngine.instance().stopPreview(ZegoPublishChannel.Main);
     if (_localCoreUser.streamID in _streamCoreUserMap) {
       delete _streamCoreUserMap[_localCoreUser.streamID];
-
-      Object.keys(_onAudioVideoUnavailableCallbackMap).forEach((callbackID) => {
-        if (_onAudioVideoUnavailableCallbackMap[callbackID]) {
-          _onAudioVideoUnavailableCallbackMap[callbackID]([_localCoreUser]);
-        }
-      });
+      _notifyAudioVideoUnavailable([_localCoreUser]);
     }
   }
 }
@@ -905,6 +937,8 @@ function _tryStartPlayStream(userID: string) {
       user.fillMode,
       _audioVideoResourceMode,
     );
+
+    // Playing Streaming.
     if (user.streamID !== '') {
       if (user.viewID > 0) {
         ZegoExpressEngine.instance().startPlayingStream(user.streamID, {
@@ -920,6 +954,17 @@ function _tryStartPlayStream(userID: string) {
         });
       }
     }
+
+    // Playing Screenshare Streaming.
+    if (user.screenshareStreamID !== '' && user.screenshareViewID > 0) {
+      ZegoExpressEngine.instance().startPlayingStream(user.screenshareStreamID, {
+        reactTag: user.screenshareViewID,
+        viewMode: user.screenshareViewFillMode,
+        backgroundColor: 0,
+      }, {
+        resourceMode: _audioVideoResourceMode,
+      });
+    }
   }
 }
 function _tryStopPlayStream(userID: string, force = false) {
@@ -927,6 +972,14 @@ function _tryStopPlayStream(userID: string, force = false) {
     const user = _coreUserMap[userID];
     if (force || (!user.isMicDeviceOn && !user.isCameraDeviceOn)) {
       ZegoExpressEngine.instance().stopPlayingStream(user.streamID);
+    }
+  }
+}
+function _tryStopPlayScreenshareStream(userID: string) {
+  if (userID in _coreUserMap) {
+    const user = _coreUserMap[userID];
+    if (user.screenshareStreamID !== '') {
+      ZegoExpressEngine.instance().stopPlayingStream(user.screenshareStreamID);
     }
   }
 }
@@ -965,6 +1018,39 @@ function _notifyMeRemovedFromRoom() {
     }
   });
 }
+
+function _notifyAudioVideoAvailable(users: any[]) {
+  Object.keys(_onAudioVideoAvailableCallbackMap).forEach((callbackID) => {
+    if (_onAudioVideoAvailableCallbackMap[callbackID]) {
+      _onAudioVideoAvailableCallbackMap[callbackID](users);
+    }
+  });
+}
+
+function _notifyAudioVideoUnavailable(users: any[]) {
+  Object.keys(_onAudioVideoUnavailableCallbackMap).forEach((callbackID) => {
+    if (_onAudioVideoUnavailableCallbackMap[callbackID]) {
+      _onAudioVideoUnavailableCallbackMap[callbackID](users);
+    }
+  });
+}
+
+function _notifyScreenSharingAvailable(users: any[]) {
+  Object.keys(_onScreenSharingAvailableCallbackMap).forEach((callbackID) => {
+    if (_onScreenSharingAvailableCallbackMap[callbackID]) {
+      _onScreenSharingAvailableCallbackMap[callbackID](users);
+    }
+  });
+}
+
+function _notifyScreenSharingUnavailable(users: any[]) {
+  Object.keys(_onScreenSharingUnavailableCallbackMap).forEach((callbackID) => {
+    if (_onScreenSharingUnavailableCallbackMap[callbackID]) {
+      _onScreenSharingUnavailableCallbackMap[callbackID](users);
+    }
+  });
+}
+
 const _isEngineCreated = () => {
   try {
     return ZegoExpressEngine.instance() != undefined;
@@ -982,12 +1068,13 @@ const ZegoUIKitInternal =  {
     zloginfo('setAudioVideoResourceMode', audioVideoResourceMode);
     _audioVideoResourceMode = audioVideoResourceMode || ZegoAudioVideoResourceMode.Default;
   },
-  updateRenderingProperty(userID: string, viewID: number, fillMode: number) {
+  updateRenderingProperty(userID: string, viewID: number, fillMode: number, isScreenshare: boolean = false) {
     zloginfo(
       'updateRenderingProperty: ',
       userID,
       viewID,
       fillMode,
+      isScreenshare,
       '<<<<<<<<<<<<<<<<<<<<<<<<<<'
     );
     if (userID === undefined) {
@@ -1000,8 +1087,13 @@ const ZegoUIKitInternal =  {
       userID = _localCoreUser.userID;
     }
     if (userID in _coreUserMap) {
-      _coreUserMap[userID].viewID = viewID;
-      _coreUserMap[userID].fillMode = fillMode;
+      if (isScreenshare) {
+        _coreUserMap[userID].screenshareViewID = viewID;
+        _coreUserMap[userID].screenshareViewFillMode = fillMode;
+      } else {
+        _coreUserMap[userID].viewID = viewID;
+        _coreUserMap[userID].fillMode = fillMode;
+      }
       _notifyUserInfoUpdate(_coreUserMap[userID]);
 
       if (_localCoreUser.userID == userID) {
@@ -1572,6 +1664,18 @@ const ZegoUIKitInternal =  {
   getUser(userID: string) {
     return _coreUserMap[userID];
   },
+  getAllScreenshareUsers() {
+    var users: any[] = [];
+    Object.keys(_streamCoreUserMap).forEach(
+      (streamID) => {
+        const isScreenshare = streamID.endsWith(_screenshareStreamIDFlag);
+        if (isScreenshare) {
+          users.push(_streamCoreUserMap[streamID]);
+        }
+      }
+    );
+    return users;
+  },
   getAllUsers() {
     const users = Object.values(_coreUserMap);
     users.sort((a: any, b: any) => {
@@ -1857,6 +1961,44 @@ const ZegoUIKitInternal =  {
     const token = await _onTokenProvideCallback();
     zloginfo(`[Get Token]: ${token}`);
     return token;
+  },
+  isScreenSharing() {
+    Object.keys(_streamCoreUserMap).forEach((streamID) => {
+      if (streamID.endsWith(_screenshareStreamIDFlag)) {
+        return true;
+      }
+    });
+    return false;
+  },
+
+  onScreenSharingAvailable(callbackID: string, callback?: Function) {
+    if (typeof callback !== 'function') {
+      if (callbackID in _onScreenSharingAvailableCallbackMap) {
+        zloginfo(
+          '[onScreenSharingAvailable] Remove callback for: [',
+          callbackID,
+          '] because callback is not a valid function!'
+        );
+        delete _onScreenSharingAvailableCallbackMap[callbackID];
+      }
+    } else {
+      _onScreenSharingAvailableCallbackMap[callbackID] = callback;
+    }
+  },
+
+  onScreenSharingUnavailable(callbackID: string, callback?: Function) {
+    if (typeof callback !== 'function') {
+      if (callbackID in _onScreenSharingUnavailableCallbackMap) {
+        zloginfo(
+          '[onScreenSharingAvailable] Remove callback for: [',
+          callbackID,
+          '] because callback is not a valid function!'
+        );
+        delete _onScreenSharingUnavailableCallbackMap[callbackID];
+      }
+    } else {
+      _onScreenSharingUnavailableCallbackMap[callbackID] = callback;
+    }
   }
 };
 
