@@ -1391,6 +1391,20 @@ const ZegoUIKitInternal =  {
       _onAudioVideoUnavailableCallbackMap[callbackID] = callback;
     }
   },
+  muteUserAudio(userID: string, mute: boolean) {
+    const user = _coreUserMap[userID];
+    zloginfo('[muteUserAudio]', userID, user.streamID, mute);
+    if (user.streamID) {
+      ZegoExpressEngine.instance().mutePlayStreamAudio(user.streamID, mute);
+    }
+  },
+  muteUserVideo(userID: string, mute: boolean) {
+    const user = _coreUserMap[userID];
+    zloginfo('[muteUserVideo]', userID, user.streamID, mute);
+    if (user.streamID) {
+      ZegoExpressEngine.instance().mutePlayStreamVideo(user.streamID, mute);
+    }
+  },
   startPlayingAllAudioVideo() {
     ZegoExpressEngine.instance().muteAllPlayStreamAudio(false);
     ZegoExpressEngine.instance().muteAllPlayStreamVideo(false);
@@ -1678,6 +1692,17 @@ const ZegoUIKitInternal =  {
   },
   getAllUsers() {
     const users = Object.values(_coreUserMap);
+    users.sort((a: any, b: any) => {
+      return a.joinTime - b.joinTime;
+    });
+    var publicUsers: any[] = [];
+    users.forEach((user) => {
+      publicUsers.push(_createPublicUser(user));
+    });
+    return publicUsers;
+  },
+  getAudioVideoUsers() {
+    const users = Object.values(_streamCoreUserMap);
     users.sort((a: any, b: any) => {
       return a.joinTime - b.joinTime;
     });
