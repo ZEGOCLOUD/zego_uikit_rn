@@ -43,6 +43,7 @@ export default {
   joinRoom: ZegoUIKitInternal.joinRoom,
   leaveRoom: ZegoUIKitInternal.leaveRoom,
   isRoomConnected: ZegoUIKitInternal.isRoomConnected,
+  onJoinRoom: ZegoUIKitInternal.onJoinRoom,
   onOnlySelfInRoom: ZegoUIKitInternal.onOnlySelfInRoom,
   onRoomStateChanged: ZegoUIKitInternal.onRoomStateChanged,
   onRequireNewToken: ZegoUIKitInternal.onRequireNewToken,

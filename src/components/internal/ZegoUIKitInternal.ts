@@ -40,6 +40,7 @@ var _onRoomPropertyUpdatedCallbackMap: any = {};
 var _onRoomPropertiesFullUpdatedCallbackMap: any = {};
 var _onInRoomCommandReceivedCallbackMap: any = {};
 var _onMeRemovedFromRoomCallbackMap: any = {};
+var _onJoinRoomCallbackMap: any = {};
 var _onTurnOnYourCameraRequestCallbackMap: any = {};
 var _onTurnOnYourMicrophoneRequestCallbackMap: any = {};
 var _onScreenSharingAvailableCallbackMap: any = {};
@@ -538,7 +539,7 @@ function _leaveRoom() {
       zlogwarning('You are not join in any room, no need to leave room.');
       resolve();
     } else {
-      zloginfo('leaveRoom: ', _currentRoomID);
+      zloginfo(_localCoreUser.userID, ' leaveRoom: ', _currentRoomID);
       ZegoExpressEngine.instance()
         .logoutRoom(_currentRoomID)
         .then(() => {
@@ -1018,6 +1019,13 @@ function _notifyMeRemovedFromRoom() {
     }
   });
 }
+function _notifyJoinRoom() {
+  Object.keys(_onJoinRoomCallbackMap).forEach((callbackID) => {
+    if (_onJoinRoomCallbackMap[callbackID]) {
+      _onJoinRoomCallbackMap[callbackID]();
+    }
+  });
+}
 
 function _notifyAudioVideoAvailable(users: any[]) {
   Object.keys(_onAudioVideoAvailableCallbackMap).forEach((callbackID) => {
@@ -1474,6 +1482,8 @@ const ZegoUIKitInternal =  {
           _notifyUserCountOrPropertyChanged(ZegoChangedCountOrProperty.userAdd);
 
           _tryStartPublishStream()
+          
+          _notifyJoinRoom()
 
           resolve();
         })
@@ -1661,6 +1671,20 @@ const ZegoUIKitInternal =  {
       _onMeRemovedFromRoomCallbackMap[callbackID] = callback;
     }
   },
+  onJoinRoom(callbackID: string, callback?: Function) {
+    if (typeof callback !== 'function') {
+      if (callbackID in _onJoinRoomCallbackMap) {
+        zloginfo(
+          '[onJoinRoom] Remove callback for: [',
+          callbackID,
+          '] because callback is not a valid function!'
+        );
+        delete _onJoinRoomCallbackMap[callbackID];
+      }
+    } else {
+      _onJoinRoomCallbackMap[callbackID] = callback;
+    }
+  },
 
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> User <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
   connectUser(userID: string, userName: string) {
@@ -1768,6 +1792,7 @@ const ZegoUIKitInternal =  {
       _onUserCountOrPropertyChangedCallbackMap[callbackID] = callback;
     }
   },
+
   removeUserFromRoom(userIDs: string[] = []) {
     const command = JSON.stringify({ zego_remove_user: userIDs });
     const toUserList = (_isLargeRoom || _markAsLargeRoom) ? [] : userIDs.map((userID) => {
