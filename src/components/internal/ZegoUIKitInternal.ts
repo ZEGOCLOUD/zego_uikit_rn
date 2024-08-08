@@ -547,6 +547,8 @@ function _leaveRoom() {
       ZegoExpressEngine.instance()
         .logoutRoom(_currentRoomID)
         .then(() => {
+          _turnCameraDeviceOn(_localCoreUser.userID, false);
+          _turnMicDeviceOn(_localCoreUser.userID, false);
           zloginfo('Leave room succeed.');
           ZegoExpressEngine.instance().stopSoundLevelMonitor();
           _notifyUserCountOrPropertyChanged(
