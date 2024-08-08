@@ -4,6 +4,8 @@ import { ZegoUIKitPluginType } from './defines';
 const _plugins = new Map(); // type -> plugin
 const ZegoUIKitCorePlugin = {
   installPlugins: (plugins: any[]) => {
+    zloginfo(`[ZegoUIKitCorePlugin] installPlugins, plugins: ${plugins}`)
+
     if (!plugins || !(plugins instanceof Array)) {
       zlogerror('[ZegoUIKitCorePlugin][installPlugins]The parameter passed in was incorrect');
       return;

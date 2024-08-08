@@ -9,6 +9,7 @@ import ZegoExpressEngine, {
 import ZegoUIKitSignalingPluginImpl from '../../plugins/invitation';
 import { zlogerror, zloginfo, zlogwarning } from '../../utils/logger';
 import { ZegoAudioVideoResourceMode, ZegoChangedCountOrProperty, ZegoRoomPropertyUpdateType, ZegoUIKitVideoConfig } from './defines'
+import { ZegoUpdateType } from 'zego-express-engine-reactnative';
 
 var _appInfo = {
   appID: 0,
@@ -159,7 +160,7 @@ function _setLocalUserInfo(userInfo: any) {
 function _onRoomUserUpdate(roomID: string, updateType: number, userList: any[]) {
   // No need for roomID, does not support multi-room right now.
   const userInfoList: any[] = [];
-  if (updateType == 0) {
+  if (updateType == ZegoUpdateType.Add) {
     _roomMemberCount += userList.length;
     if (_roomMemberCount >= 500) {
       _isLargeRoom = true;
@@ -196,6 +197,7 @@ function _onRoomUserUpdate(roomID: string, updateType: number, userList: any[]) 
       }
     });
   } else {
+    // updateType == ZegoUpdateType.Delete
     _roomMemberCount -= userList.length;
     userList.forEach((user) => {
       if (user.userID in _coreUserMap) {
@@ -214,8 +216,8 @@ function _onRoomUserUpdate(roomID: string, updateType: number, userList: any[]) 
         delete _coreUserMap[user.userID];
       }
     });
-    _notifyUserCountOrPropertyChanged(ZegoChangedCountOrProperty.userDelete);
     zloginfo('User Leave: ', userInfoList);
+    _notifyUserCountOrPropertyChanged(ZegoChangedCountOrProperty.userDelete);
     Object.keys(_onUserLeaveCallbackMap).forEach((callbackID) => {
       if (_onUserLeaveCallbackMap[callbackID]) {
         _onUserLeaveCallbackMap[callbackID](userInfoList);
@@ -468,6 +470,8 @@ function _onRoomExtraInfoUpdate(roomID: string, roomExtraInfoList: any[]) {
   }
 }
 function _onIMCustomCommandReceived(roomID: string, fromUser: ZegoUser, command: string) {
+  zloginfo(`[ZegoUIKitInternal] _onIMCustomCommandReceived, roomID: ${roomID}, fromUser: ${fromUser}, command: ${command}`);
+  
   try {
     const commandObj = JSON.parse(command);
     if (commandObj && typeof commandObj === 'object') {
@@ -561,7 +565,7 @@ function _leaveRoom() {
 function _turnMicDeviceOn(userID: string, on: boolean) {
   return new Promise<void>((resolve, reject) => {
     if (_isLocalUser(userID)) {
-      zloginfo('turnMicDeviceOn: ', _localCoreUser.userID, on);
+      zloginfo(`turnMicDeviceOn: userID: ${_localCoreUser.userID}, mic: ${on}`);
       ZegoExpressEngine.instance().muteMicrophone(!on);
 
       _onRemoteMicStateUpdate(_localCoreUser.userID, on);
@@ -849,7 +853,7 @@ function _notifyUserCountOrPropertyChanged(type: number) {
       return user2.joinTime - user1.joinTime;
     })
     .map((user) => _createPublicUser(user));
-  zloginfo(`_notifyUserCountOrPropertyChanged ${msg[type]}`, userList);
+  zloginfo(`_notifyUserCountOrPropertyChanged ${msg[type]}, retain users: `, userList);
   Object.keys(_onUserCountOrPropertyChangedCallbackMap).forEach(
     (callbackID) => {
       if (_onUserCountOrPropertyChangedCallbackMap[callbackID]) {

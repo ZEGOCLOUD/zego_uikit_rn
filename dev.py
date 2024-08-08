@@ -8,7 +8,7 @@ def list_options():
     print("2. Reset dev environment")
     print("3. Publish package")
     
-    choice = input("Enter your choice (1-4): ")
+    choice = input("Enter your choice (1-3): ")
     if choice == "1":
         pull_git_submodule()
     elif choice == "2":
@@ -16,10 +16,6 @@ def list_options():
     elif choice == "3":
         publisher = Publisher()
         publisher.start()
-    elif choice == "4":
-        # Call method to pull Git submodule
-        print("Pulling Git Submodule")
-        pull_git_submodule()
     else:
         print("Invalid choice")
 

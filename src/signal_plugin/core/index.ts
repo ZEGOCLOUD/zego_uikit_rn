@@ -442,8 +442,8 @@ export default class ZegoSignalingPluginCore {
   }
   invite(invitees: string[], config: ZIMCallInviteConfig): Promise<{ callID: string; errorInvitees: string[]; code: string, message: string; }> {
     return new Promise((resolve, reject) => {
-      console.warn(invitees);
-      console.warn(config);
+      zloginfo(`[ZegoSignalingPluginCore] invite, invitees: ${invitees}`);
+      zloginfo(`[ZegoSignalingPluginCore] invite, config: ${config}`);
       ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()
         .callInvite(invitees, config)
         .then(({ callID, timeout, errorInvitees }: ZIMCallInvitationSentResult) => {
