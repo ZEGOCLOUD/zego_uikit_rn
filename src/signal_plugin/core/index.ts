@@ -262,6 +262,9 @@ export default class ZegoSignalingPluginCore {
     type: number;
     data: string;
   }) {
+    let callbackCount = Object.keys(this._onCallInvitationReceivedCallbackMap).length;
+    zloginfo(`[ZegoSignalingPluginCore][_notifyCallInvitationReceived] notify count: ${callbackCount}`);
+
     Object.keys(this._onCallInvitationReceivedCallbackMap).forEach(
       (callbackID) => {
         if (this._onCallInvitationReceivedCallbackMap[callbackID]) {

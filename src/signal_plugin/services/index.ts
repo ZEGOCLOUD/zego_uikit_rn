@@ -1,6 +1,6 @@
 import ZegoSignalingPluginCore from '../core';
 import ZegoPluginResult from '../core/defines';
-import { zlogerror, zloginfo } from '../utils/logger';
+import { zlogerror, zloginfo, zlogwarning } from '../utils/logger';
 import type { CXAction, ZPNsRegisterMessage, ZPNsMessage } from 'zego-zpns-react-native';
 import type { ZIMCallInviteConfig, ZIMCallCancelConfig, ZIMConnectionState } from 'zego-zim-react-native';
 import { CXCallEndedReason } from '../defines';
@@ -104,21 +104,24 @@ export default class ZegoPluginInvitationService {
         ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().applyNotificationPermission();
         
         const iOSEnvironment = isIOSDevelopmentEnvironment == null ? 2 : (isIOSDevelopmentEnvironment ? 1 : 0);
-        console.log('#########registerPush, iOSEnvironment', iOSEnvironment);
+        console.log('[ZegoPluginInvitationService] registerPush, iOSEnvironment', iOSEnvironment);
         ZegoUIKitCorePlugin.getZPNsPlugin().default.setPushConfig({ 'appType': certificateIndex });
         ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().registerPush({ 
           enableIOSVoIP: true,
           iOSEnvironment: iOSEnvironment,
         });
       } else {
+        zloginfo('[ZegoPluginInvitationService] registerPush, Android');
         ZegoUIKitCorePlugin.getZPNsPlugin().default.setPushConfig({ "enableFCMPush": true, "enableHWPush": false, "enableMiPush": false, "enableOppoPush": false, "enableVivoPush": false, "appType": certificateIndex });
 
         ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().registerPush({ enableIOSVoIP: true });
       }
 
-
       ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().on("registered", (message: ZPNsRegisterMessage) => {
-        console.log("@@@@@@@@@@@@@@@@>>>>>>>>>>>>>>>############", message)
+        zloginfo("[ZegoPluginInvitationService] ZPNs registered, ", message)
+        if (message.msg.includes("SERVICE_NOT_AVAILABLE")) {
+          zlogwarning('[ZegoPluginInvitationService] ZPNs registered, Please check the network connectivity with FCM.')
+        }
       });
 
       // ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().on("notificationArrived", (message) => {

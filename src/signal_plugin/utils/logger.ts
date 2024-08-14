@@ -1,10 +1,13 @@
+import { getLocalDateFormat } from '../../utils/timer';
+
 export const zloginfo = (...msg: any[]) => {
-  console.log('SignalingPlugin[INFO]: ', ...msg);
+  console.info(getLocalDateFormat() + ' SignalingPlugin[INFO]: ', ...msg);
 };
+
 export const zlogwarning = (...msg: any[]) => {
-  console.warn('SignalingPlugin[WARNING]: ', ...msg);
+  console.warn(getLocalDateFormat() + ' SignalingPlugin[WARNING]: ', ...msg);
 };
 
 export const zlogerror = (...msg: any[]) => {
-  console.error('SignalingPlugin[ERROR]: ', ...msg);
+  console.error(getLocalDateFormat() + ' SignalingPlugin[ERROR]: ', ...msg);
 };

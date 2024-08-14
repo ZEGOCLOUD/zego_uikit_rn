@@ -28,6 +28,8 @@ def getExtOrIntegerDefault(name) {
 }
 
 android {
+  namespace "com.zegouikitrn"
+  
   compileSdkVersion getExtOrIntegerDefault('compileSdkVersion')
 
   defaultConfig {

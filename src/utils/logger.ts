@@ -1,7 +1,7 @@
 import { getLocalDateFormat } from './timer';
 
 export const zloginfo = (...msg: any[]) => {
-  console.log(getLocalDateFormat() + ' ZEGOUIKit[INFO]: ', ...msg);
+  console.info(getLocalDateFormat() + ' ZEGOUIKit[INFO]: ', ...msg);
 };
 
 export const zlogwarning = (...msg: any[]) => {
