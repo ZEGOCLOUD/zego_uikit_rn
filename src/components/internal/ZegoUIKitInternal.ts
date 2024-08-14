@@ -10,6 +10,7 @@ import ZegoUIKitSignalingPluginImpl from '../../plugins/invitation';
 import { zlogerror, zloginfo, zlogwarning } from '../../utils/logger';
 import { ZegoAudioVideoResourceMode, ZegoChangedCountOrProperty, ZegoRoomPropertyUpdateType, ZegoUIKitVideoConfig } from './defines'
 import { ZegoUpdateType } from 'zego-express-engine-reactnative';
+import { logComponentsVersion } from '../../utils/version';
 
 var _appInfo = {
   appID: 0,
@@ -1075,6 +1076,9 @@ const _isEngineCreated = () => {
 
 const ZegoUIKitInternal =  {
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Internal <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+  logComponentsVersion(extraInfo: Map<string, string>) {
+    logComponentsVersion(extraInfo);
+  },
   isRoomConnected() {
     return _isRoomConnected;
   },
