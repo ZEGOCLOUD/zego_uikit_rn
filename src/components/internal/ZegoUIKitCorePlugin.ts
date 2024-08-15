@@ -10,7 +10,7 @@ const ZegoUIKitCorePlugin = {
       zlogerror('[ZegoUIKitCorePlugin][installPlugins]The parameter passed in was incorrect');
       return;
     }
-    plugins.forEach((plugin) => {
+    plugins.forEach((plugin, index) => {
       if (plugin.ZIMConnectionState) {
         if (_plugins.get('ZIM')) {
           zloginfo(
@@ -18,7 +18,7 @@ const ZegoUIKitCorePlugin = {
           );
         } else {
           _plugins.set('ZIM', plugin);
-          zloginfo('[ZegoUIKitCorePlugin][installPlugins]Plugin install success, plugin: ZIM');
+          zloginfo(`[ZegoUIKitCorePlugin][installPlugins]Plugin install success, plugin: ZIM, index: ${index}`);
         }
       } else if (plugin.ZPNsPushSourceType) {
         if (_plugins.get('ZPNs')) {
@@ -27,7 +27,16 @@ const ZegoUIKitCorePlugin = {
           );
         } else {
           _plugins.set('ZPNs', plugin);
-          zloginfo('[ZegoUIKitCorePlugin][installPlugins]Plugin install success, plugin: ZPNs');
+          zloginfo(`[ZegoUIKitCorePlugin][installPlugins]Plugin install success, plugin: ZPNs, index: ${index}`);
+        }
+      } else if (plugin.CXHandleType) {
+        if (_plugins.get('CallKit')) {
+          zloginfo(
+            '[ZegoUIKitCorePlugin][installPlugins]Plugin already exists, this install does not take effect, plugin: CallKit'
+          );
+        } else {
+          _plugins.set('CallKit', plugin);
+          zloginfo(`[ZegoUIKitCorePlugin][installPlugins]Plugin install success, plugin: CallKit, index: ${index}`);
         }
       } else if (typeof plugin.getInstance === 'function') {
         // Compatible with the original usage
@@ -52,6 +61,9 @@ const ZegoUIKitCorePlugin = {
   },
   getZPNsPlugin: () => {
     return _plugins.get('ZPNs');
+  },
+  getCallKitPlugin: () => {
+    return _plugins.get('CallKit');
   },
   getPlugin: (type: number) => {
     if (type === ZegoUIKitPluginType.signaling) {
