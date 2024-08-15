@@ -308,8 +308,8 @@ export default class ZegoPluginInvitationService {
   }
   onCallInvitationReceived(callbackID: string, callback: (notifyData: {
     callID: string;
-    inviter: { name: string; id: string; };
     type: number;
+    inviter: { name: string; id: string; };
     data: string;
   }) => void) {
     ZegoSignalingPluginCore.getInstance().onCallInvitationReceived(

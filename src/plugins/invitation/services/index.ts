@@ -237,11 +237,13 @@ const ZegoUIKitSignalingPluginImpl = {
       callback
     );
   },
-  onInvitationReceived: (callbackID: string, callback?: Function) => {
+  onInvitationReceived: (callbackID: string, callback?: Function, from?: string) => {
     if (!ZegoUIKitSignalingPlugin) {
       zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
       return;
     }
+
+    zloginfo(`[ZegoUIKitSignalingPluginImpl] onInvitationReceived, callbackID: ${callbackID}, from: ${from}`);
     ZegoUIKitSignalingPlugin.getInstance().registerPluginEventHandler(
       'invitationReceived',
       callbackID,

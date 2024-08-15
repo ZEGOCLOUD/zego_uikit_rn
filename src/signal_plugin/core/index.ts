@@ -39,7 +39,9 @@ export default class ZegoSignalingPluginCore {
   _onConnectionStateChangedCallbackMap: { [index: string]: (notifyData: { state: ZIMConnectionState }) => void } = {};
   _onCallInvitationReceivedCallbackMap: { [index: string]: (notifyData: {
     callID: string;
-    inviter: { name: string; id: string; }; type: number; data: string;
+    type: number;
+    inviter: { name: string; id: string; };
+    data: string;
   }) => void } = {};
   _onCallInvitationCancelledCallbackMap: { [index: string]: (notifyData: {
     callID: string;
@@ -258,8 +260,8 @@ export default class ZegoSignalingPluginCore {
   }
   _notifyCallInvitationReceived(notifyData: {
     callID: string;
-    inviter: { name: string; id: string; };
     type: number;
+    inviter: { name: string; id: string; };
     data: string;
   }) {
     let callbackCount = Object.keys(this._onCallInvitationReceivedCallbackMap).length;
@@ -581,7 +583,9 @@ export default class ZegoSignalingPluginCore {
   }
   onCallInvitationReceived(callbackID: string, callback: (notifyData: {
     callID: string;
-    inviter: { name: string; id: string; }; type: number; data: string;
+    type: number;
+    inviter: { name: string; id: string; };
+    data: string;
   }) => void) {
     if (typeof callback !== 'function') {
       if (callbackID in this._onCallInvitationReceivedCallbackMap) {
