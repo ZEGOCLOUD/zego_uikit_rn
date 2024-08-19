@@ -23,7 +23,10 @@ export const logComponentsVersion = (extraInfo: Map<string, string>) => {
       extraInfo.forEach((version, component) => {
         versionTable.set(component, version);
       });
+
       zloginfo('Components version: ')
-      zloginfo(versionTable)
+      versionTable.forEach((version, component) => {
+        zloginfo(`  ${component} => ${version}`);
+      });
     })
 };

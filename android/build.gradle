@@ -5,7 +5,7 @@ buildscript {
   }
 
   dependencies {
-    classpath 'com.android.tools.build:gradle:3.5.3'
+    classpath 'com.android.tools.build:gradle:7.3.1'
   }
 }
 
@@ -29,7 +29,7 @@ def getExtOrIntegerDefault(name) {
 
 android {
   namespace "com.zegouikitrn"
-  
+
   compileSdkVersion getExtOrIntegerDefault('compileSdkVersion')
 
   defaultConfig {
@@ -128,6 +128,8 @@ dependencies {
     //noinspection GradleDynamicVersion
   implementation "com.facebook.react:react-native:+"
 // From node_modules
+
+  implementation "com.elvishew:xlog:1.11.1"
 }
 
 if (isNewArchitectureEnabled()) {

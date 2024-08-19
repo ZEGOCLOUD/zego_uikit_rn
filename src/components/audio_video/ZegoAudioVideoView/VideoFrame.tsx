@@ -2,13 +2,14 @@ import React, { useEffect, useRef } from "react";
 import { findNodeHandle, View, StyleSheet } from "react-native";
 import { ZegoTextureView } from 'zego-express-engine-reactnative';
 import ZegoUIKitInternal from "../../internal/ZegoUIKitInternal";
+import { zloginfo } from "../../../utils/logger";
 
 export default function VideoFrame(props: any) {
     const { userID, roomID, fillMode, isPictureInPicture, isScreenShare } = props;
     const viewRef = useRef(null);
 
     const updateRenderingProperty = () => {
-        console.log('VideoFrame updateRenderingProperty', isPictureInPicture);
+        zloginfo('VideoFrame updateRenderingProperty', isPictureInPicture);
         const viewID = findNodeHandle(viewRef.current);
         const appOrientation = ZegoUIKitInternal.appOrientation();
         const user = ZegoUIKitInternal.getUser(userID);
@@ -20,7 +21,7 @@ export default function VideoFrame(props: any) {
     }
     useEffect(() => {
         updateRenderingProperty();
-        console.log('VideoFrame', userID);
+        zloginfo('VideoFrame', userID);
 
         const callbackID = 'VideoFrame' + userID + String(Math.floor(Math.random() * 10000));
         ZegoUIKitInternal.onSDKConnected(callbackID, () => {

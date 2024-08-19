@@ -123,7 +123,7 @@ export default class ZegoSignalingPluginCore {
           this._currentInvitationID = callID
         }
         this._callIDUsers.set(callID, inviter);
-        console.log('ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().onCallInvitationReceived', callID, extendedData)
+        zloginfo('ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().onCallInvitationReceived', callID, extendedData)
         
         const notifyData: any = { callID, inviter: { id: inviter } };
         if (extendedData) {
@@ -403,6 +403,7 @@ export default class ZegoSignalingPluginCore {
     }
   }
   login(userInfo: ZIMUserInfo, token = ''): Promise<void> {
+    zloginfo('ZIM login...');
     return new Promise((resolve, reject) => {
       if (!this._isLogin) {
         ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()
@@ -427,6 +428,7 @@ export default class ZegoSignalingPluginCore {
     });
   }
   logout(): Promise<void> {
+    zloginfo('ZIM logout...');
     return ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()
       .logout()
       .then(() => {

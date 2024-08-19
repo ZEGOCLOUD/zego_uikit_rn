@@ -3,6 +3,7 @@ import ZegoUIKitInternal from "../../internal/ZegoUIKitInternal";
 import ZegoAudioVideoView from "../../audio_video/ZegoAudioVideoView";
 import { StyleSheet, View, PanResponder, TouchableWithoutFeedback, SafeAreaView } from 'react-native'
 import { ZegoViewPosition } from './defines'
+import { zloginfo } from "../../../utils/logger";
 
 export default function PictureInPictureLayout(props: any) {
     const { 
@@ -36,12 +37,12 @@ export default function PictureInPictureLayout(props: any) {
     const panResponder = useRef(PanResponder.create({
         // @ts-ignore
         onStartShouldSetPanResponderCapture: () => {
-            console.log('Switch the big screen');
+            zloginfo('Switch the big screen');
         }
     })).current;
 
     useEffect(() => {
-        console.log('########cacheAudioVideoUserList########', cacheAudioVideoUserList);
+        zloginfo('########cacheAudioVideoUserList########', cacheAudioVideoUserList);
         const callbackID = 'PictureInPictureLayout' + String(Math.floor(Math.random() * 10000));
         ZegoUIKitInternal.onAudioVideoAvailable(callbackID, (userList: any[]) => {
             userList.forEach((user) => {
@@ -106,7 +107,7 @@ export default function PictureInPictureLayout(props: any) {
         const { nativeEvent } = event;
         const { layout } = nativeEvent;
         const { width, height, x, y } = layout;
-        console.log('######layoutHandle', layout);
+        zloginfo('######layoutHandle', layout);
     }
 
     return (<View style={styles.container}>

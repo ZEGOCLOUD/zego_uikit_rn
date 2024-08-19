@@ -92,20 +92,20 @@ export default function ZegoSendInvitationButton(props: any) {
     
     let canSendInvitation = true;
     if (onWillPressed) {
-      console.log('#########onWillPressed judge', typeof onWillPressed === 'object', typeof (onWillPressed.then) === 'function', typeof (onWillPressed.catch) === 'function');
+      zloginfo('#########onWillPressed judge', typeof onWillPressed === 'object', typeof (onWillPressed.then) === 'function', typeof (onWillPressed.catch) === 'function');
       if (typeof onWillPressed === 'object' && typeof (onWillPressed.then) === 'function' && typeof (onWillPressed.catch) === 'function') {
         // Promise
-        console.log('#########onWillPressed promise', onWillPressed);
+        zloginfo('#########onWillPressed promise', onWillPressed);
         try {
           canSendInvitation = await onWillPressed;
         } catch (error) {
           canSendInvitation = false;
         }
       } else if (typeof onWillPressed === 'function') {
-        console.log('#########onWillPressed function', onWillPressed);
+        zloginfo('#########onWillPressed function', onWillPressed);
         const temp = onWillPressed();
         if (typeof temp === 'object' && typeof (temp.then) === 'function' && typeof (temp.catch) === 'function') {
-          console.log('#########onWillPressed promise', temp);
+          zloginfo('#########onWillPressed promise', temp);
           try {
             canSendInvitation = await temp;
           } catch (error) {

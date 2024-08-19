@@ -1,13 +1,13 @@
-import { getLocalDateFormat } from './timer';
+import ZegoUIKitLogger from './kitlogger';
 
 export const zloginfo = (...msg: any[]) => {
-  console.info(getLocalDateFormat() + ' ZEGOUIKit[INFO]: ', ...msg);
+  ZegoUIKitLogger.kitLogInfo('ZEGOUIKit', ...msg);
 };
 
 export const zlogwarning = (...msg: any[]) => {
-  console.warn(getLocalDateFormat() + ' ZEGOUIKit[WARNING]: ', ...msg);
+  ZegoUIKitLogger.kitLogWarning('ZEGOUIKit', ...msg);
 };
 
 export const zlogerror = (...msg: any[]) => {
-  console.error(getLocalDateFormat() + ' ZEGOUIKit[ERROR]: ', ...msg);
+  ZegoUIKitLogger.kitLogError('ZEGOUIKit', ...msg);
 };

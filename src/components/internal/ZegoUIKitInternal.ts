@@ -507,7 +507,7 @@ function _onIMCustomCommandReceived(roomID: string, fromUser: ZegoUser, command:
       }
     }
   } catch (error) {
-    console.error(error);
+    zlogerror(error);
   }
   zloginfo('_onIMCustomCommandReceived: ', roomID, fromUser, command);
   Object.keys(_onInRoomCommandReceivedCallbackMap).forEach((callbackID) => {
@@ -1373,7 +1373,7 @@ const ZegoUIKitInternal =  {
     }
     if (_isEngineCreated()) {
       const config = _videoConfig.toSDK(orientation);
-      console.log('setAppOrientation, ', orientation, config);
+      zloginfo('setAppOrientation, ', orientation, config);
       ZegoExpressEngine.instance().setVideoConfig(config, ZegoPublishChannel.Main);
       ZegoExpressEngine.instance().setAppOrientation(orientation, ZegoPublishChannel.Main);
     }

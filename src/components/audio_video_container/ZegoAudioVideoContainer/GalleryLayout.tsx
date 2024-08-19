@@ -5,6 +5,7 @@ import ZegoAudioVideoView from "../../audio_video/ZegoAudioVideoView";
 import ZegoAudioVideoViewMore from "./MoreFrame";
 import { ZegoRoomStateChangedReason } from "zego-express-engine-reactnative";
 import ScreenSharingView from "../../audio_video/ZegoAudioVideoView/ScreenSharingView";
+import { zloginfo, zlogwarning } from "../../../utils/logger";
 
 export default function GalleryLayout(props: any) {
     const { 
@@ -62,7 +63,7 @@ export default function GalleryLayout(props: any) {
             }
         })
         ZegoUIKitInternal.onUserCountOrPropertyChanged(callbackID, (userList: any[]) => {
-            // console.warn('>>>>>>>>>>> onUserCountOrPropertyChanged', userList)
+            // zlogwarning('>>>>>>>>>>> onUserCountOrPropertyChanged', userList)
             // Put yourself first
             videoUserList = userList;
             refreshUserList();
@@ -176,7 +177,7 @@ export default function GalleryLayout(props: any) {
     }
 
     const onFullScreenButtonPressed = () => {
-      console.log('onFullScreenButtonPressed', !isFullScreen);
+      zloginfo('onFullScreenButtonPressed', !isFullScreen);
       setIsFullScreen(!isFullScreen);
     }
 

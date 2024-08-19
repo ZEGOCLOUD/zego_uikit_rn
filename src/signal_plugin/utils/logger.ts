@@ -1,13 +1,13 @@
-import { getLocalDateFormat } from '../../utils/timer';
+import ZegoUIKitLogger from '../../utils/kitlogger';
 
 export const zloginfo = (...msg: any[]) => {
-  console.info(getLocalDateFormat() + ' SignalingPlugin[INFO]: ', ...msg);
+  ZegoUIKitLogger.kitLogInfo('SignalingPlugin', ...msg);
 };
 
 export const zlogwarning = (...msg: any[]) => {
-  console.warn(getLocalDateFormat() + ' SignalingPlugin[WARNING]: ', ...msg);
+  ZegoUIKitLogger.kitLogWarning('SignalingPlugin', ...msg);
 };
 
 export const zlogerror = (...msg: any[]) => {
-  console.error(getLocalDateFormat() + ' SignalingPlugin[ERROR]: ', ...msg);
+  ZegoUIKitLogger.kitLogError('SignalingPlugin', ...msg);
 };

@@ -12,6 +12,7 @@ import ZegoMicrophoneStateIcon from '../audio_video/ZegoMicrophoneStateIcon';
 import ZegoCameraStateIcon from '../audio_video/ZegoCameraStateIcon';
 import Delegate from 'react-delegate-component';
 import { ZegoRoomStateChangedReason } from 'zego-express-engine-reactnative';
+import { zloginfo, zlogwarning } from '../../utils/logger';
 
 export default function ZegoMemberList(props: any) {
   const { 
@@ -55,7 +56,7 @@ export default function ZegoMemberList(props: any) {
   const [memberList, setMemberList] = useState([]);
 
   const refreshMemberList = () => {
-    console.log('############refreshMemberList')
+    zloginfo('############refreshMemberList')
     let memberList = ZegoUIKitInternal.getAllUsers();
     if (typeof sortUserList === 'function') {
       const temp = sortUserList(memberList) || memberList;
@@ -114,7 +115,7 @@ export default function ZegoMemberList(props: any) {
     );
 
   const roleDescription = (item: any) => {
-    console.warn('===============roleDescription==============', item);
+    zloginfo('===============roleDescription==============', item);
     const localUserID = ZegoUIKitInternal.getLocalUserInfo().userID;
     const showMe = item.userID == localUserID ? 'You' : '';
     if (!showMe) {
@@ -171,7 +172,7 @@ export default function ZegoMemberList(props: any) {
       }
     );
     ZegoUIKitInternal.onUserCountOrPropertyChanged(callbackID, (userList: any[]) => {
-      console.warn(
+      zloginfo(
         '===============onUserCountOrPropertyChanged==============',
         userList
       );
@@ -188,7 +189,7 @@ export default function ZegoMemberList(props: any) {
       }
     });
     ZegoUIKitInternal.onMemberListForceSort(callbackID, (userList: any[]) => {
-      console.log('===============onMemberListForceSort==============', userList)
+      zloginfo('===============onMemberListForceSort==============', userList)
       if (typeof sortUserList === 'function') {
         const temp = sortUserList(userList) || userList;
         setMemberList((arr) => [...temp]);

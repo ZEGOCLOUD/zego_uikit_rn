@@ -2,6 +2,7 @@ import { View, StyleSheet, Text, ImageBackground, Image } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import ZegoUIKitInternal from '../../internal/ZegoUIKitInternal';
 import Delegate from 'react-delegate-component';
+import { zloginfo } from '../../../utils/logger';
 
 const defaultAvatarSizeRatio = 129 / 375;
 const flexStyle = ['center', 'flex-start', 'flex-end'];
@@ -142,10 +143,10 @@ export default function AudioFrame(props: any) {
                   style={{ width: '100%', height: '100%', resizeMode: 'contain' }}
                   resizeMode="contain"
                   source={{ uri: avatar }}
-                  onLoadStart={() =>  console.log('avatar onLoadStart')}
-                  onLoadEnd={() =>  console.log('avatar onLoadEnd')}
-                  onError={() =>  { console.log('avatar onError'); setIsLoadError(true);}}
-                  onLoad={() =>  { console.log('avatar onLoad'); setIsLoadError(false);}}
+                  onLoadStart={() =>  zloginfo('avatar onLoadStart')}
+                  onLoadEnd={() =>  zloginfo('avatar onLoadEnd')}
+                  onError={() =>  { zloginfo('avatar onError'); setIsLoadError(true);}}
+                  onLoad={() =>  { zloginfo('avatar onLoad'); setIsLoadError(false);}}
                 />
               : <View style={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center', }}>
                 {

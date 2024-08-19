@@ -4,6 +4,7 @@ import Delegate from 'react-delegate-component';
 import AudioFrame from './AudioFrame';
 import VideoFrame from './VideoFrame';
 import ZegoUIKitInternal from '../../internal/ZegoUIKitInternal';
+import { zloginfo } from '../../../utils/logger';
 
 function MaskViewDefault(props: any) {
   const { userInfo } = props;
@@ -80,7 +81,7 @@ export default function ZegoVideoView(props: any) {
       }
     );
     ZegoUIKitInternal.onUserCountOrPropertyChanged(callbackID, (userList: any[]) => {
-      console.log('=========[ZegoVideoView]onUserCountOrPropertyChanged=========', userID, userList);
+      zloginfo('=========[ZegoVideoView]onUserCountOrPropertyChanged=========', userID, userList);
       userList.forEach((user) => {
         const temp = user.inRoomAttributes ? user.inRoomAttributes.avatar : '';
         if (user.userID === userID && temp) {

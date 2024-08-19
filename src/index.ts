@@ -26,6 +26,7 @@ import ZegoUIKitSignalingPluginImpl, {
   ZegoAcceptInvitationButton,
   ZegoRefuseInvitationButton,
 } from './plugins/invitation';
+import ZegoUIKitLogger from './utils/kitlogger';
 
 export default {
   init: ZegoUIKitInternal.connectSDK,
@@ -94,6 +95,9 @@ export default {
   onScreenSharingAvailable: ZegoUIKitInternal.onScreenSharingAvailable,
   onScreenSharingUnavailable: ZegoUIKitInternal.onScreenSharingUnavailable,
   getSignalingPlugin: () => ZegoUIKitSignalingPluginImpl,
+  kitLogInfo: ZegoUIKitLogger.kitLogInfo,
+  kitLogWarning: ZegoUIKitLogger.kitLogWarning,
+  kitLogError: ZegoUIKitLogger.kitLogError,
 };
 
 export {
