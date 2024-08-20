@@ -1,7 +1,7 @@
 import { getSystemName, getSystemVersion, getBrand, getModel } from 'react-native-device-info';
 import ZegoUIKitCorePlugin from '../components/internal/ZegoUIKitCorePlugin';
 import { zloginfo } from './logger';
-import { packageVersion } from './package';
+import { getPackageVersion } from './package_version';
 
 export const logComponentsVersion = (extraInfo: Map<string, string>) => {
     var expressVersionPromise = require('zego-express-engine-reactnative').default.getVersion()
@@ -18,7 +18,7 @@ export const logComponentsVersion = (extraInfo: Map<string, string>) => {
         'ZIM': versions[1],
         'ZPNs': versions[2],
         'CallKit': versions[3],
-        'ZegoUIKit': packageVersion()
+        'ZegoUIKit': getPackageVersion()
       }));
       extraInfo.forEach((version, component) => {
         versionTable.set(component, version);

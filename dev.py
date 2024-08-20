@@ -138,6 +138,12 @@ class Publisher:
         with open(packagejson_file_path, "w") as f:
             f.write(json.dumps(packagejson_obj, indent=4))
             f.close()
+        
+        # 将版本号写入 package_version.js，代码执行的时候读取
+        package_version_js_path = os.path.join(os.getcwd(), package_path, "src/utils/package_version.js")
+        with open(package_version_js_path, "w") as f:
+            f.write('export const getPackageVersion = () => {return "%s";};' % new_version)
+            f.close()
 
         print("\nPublishing package.json...\n")
         if is_beta:
