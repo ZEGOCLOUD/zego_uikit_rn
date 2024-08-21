@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import { zloginfo, zlogerror } from '../../utils/logger';
 import { ZegoUIKitPluginType } from './defines';
 
@@ -28,15 +29,12 @@ const ZegoUIKitCorePlugin = {
         } else {
           _plugins.set('ZPNs', plugin);
           zloginfo(`[ZegoUIKitCorePlugin][installPlugins]Plugin install success, plugin: ZPNs, index: ${index}`);
-        }
-      } else if (plugin.CXHandleType) {
-        if (_plugins.get('CallKit')) {
-          zloginfo(
-            '[ZegoUIKitCorePlugin][installPlugins]Plugin already exists, this install does not take effect, plugin: CallKit'
-          );
-        } else {
-          _plugins.set('CallKit', plugin);
-          zloginfo(`[ZegoUIKitCorePlugin][installPlugins]Plugin install success, plugin: CallKit, index: ${index}`);
+
+          if ((Platform.OS === 'ios') && !(_plugins.get('CallKit'))) {
+            let callKitPlugin = require('zego-callkit-react-native');
+            _plugins.set('CallKit', callKitPlugin);
+            zloginfo(`[ZegoUIKitCorePlugin][installPlugins]Plugin install success, plugin: CallKit, index: ${index}`);
+          }
         }
       } else if (typeof plugin.getInstance === 'function') {
         // Compatible with the original usage

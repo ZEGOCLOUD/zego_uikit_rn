@@ -409,12 +409,14 @@ export default class ZegoSignalingPluginCore {
         ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()
           .login(userInfo, token)
           .then(() => {
+            zloginfo('ZIM login success.');
             zloginfo('[Core]Login success.');
             this._loginUser = userInfo;
             this._isLogin = true;
             resolve();
           }).catch((error: ZIMError) => {
             if (error.code == 6000111) {
+              zloginfo('ZIM login success.');
               zloginfo('[Core]Login already success.', error);
               resolve();
             } else {
