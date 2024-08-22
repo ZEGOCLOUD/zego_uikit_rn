@@ -152,6 +152,12 @@ class Publisher:
             os.system("cd " + package_path + "; npm publish --access public")
         os.system("mv " + packagejson_file_path + ".back " + packagejson_file_path)
         webbrowser.open("https://www.npmjs.com/package/" + package_name + "?activeTab=versions")
+
+        # package_version.js 还原
+        with open(package_version_js_path, "w") as f:
+            f.write('export const getPackageVersion = () => {return "undefine";}; // Avoid manual modification.')
+            f.close()
+
         print("Done")
 
 # 定义 __main__ 方法
