@@ -281,7 +281,7 @@ export default class ZegoPluginInvitationService {
     const callID =
       ZegoSignalingPluginCore.getInstance().getCallIDByUserID(inviterID);
     if (!callID) {
-      zloginfo('[Service]Call id corresponding to the inviterID is empty.', inviterID, data);
+      zlogerror('[Service]Call id corresponding to the inviterID is empty.', inviterID, data);
       return Promise.reject(new ZegoPluginResult());
     }
     const config = { extendedData: data };

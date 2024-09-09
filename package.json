@@ -1,6 +1,6 @@
 {
   "name": "@zegocloud/zego-uikit-rn",
-  "version": "2.14.3",
+  "version": "2.14.4",
   "description": "ZegoUIKit is a low-code offering with pre-built and UI-ready components, such as AudioVideoView, CameraButtons, etc. Save time and assemble features fast with ZegoUIKit.",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -62,6 +62,7 @@
     "react": "17.0.2",
     "react-native": "0.68.2",
     "react-native-builder-bob": "^0.18.2",
+    "react-native-device-info": "^11.1.0",
     "redux": "^4.2.0",
     "release-it": "^15.0.0",
     "typescript": "^4.5.2"
@@ -73,10 +74,8 @@
     "react": "*",
     "react-delegate-component": "*",
     "react-native": "*",
-    "zego-callkit-react-native": "^1.0.6",
     "zego-express-engine-reactnative": "^3.14.5",
-    "zego-zim-react-native": "2.16.0",
-    "zego-zpns-react-native": "2.6.6"
+    "zego-zim-react-native": "2.16.0"
   },
   "jest": {
     "preset": "react-native",
@@ -149,7 +148,6 @@
   },
   "dependencies": {
     "react-delegate-component": "^1.0.0",
-    "react-native-device-info": "^11.1.0",
     "zego-callkit-react-native": "^1.0.6",
     "zego-express-engine-reactnative": "^3.14.5",
     "zego-zim-react-native": "2.16.0",
