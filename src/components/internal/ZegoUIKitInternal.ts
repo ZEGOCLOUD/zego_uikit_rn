@@ -367,7 +367,7 @@ function _onRemoteMicStateUpdate(userID: string, isOn: boolean) {
   }
 }
 function _onRoomStateChanged(roomID: string, reason: ZegoRoomStateChangedReason, errorCode: number, extendedData: string) {
-  zloginfo('Room state chaged: ', roomID, reason, errorCode, extendedData);
+  zloginfo('Room state changed: ', roomID, reason, errorCode, extendedData);
   // Not support multi-room right now
   if (reason == 1 || reason == 4) {
     // Logined || Reconnected
