@@ -1,6 +1,7 @@
+import { NativeModules, Platform } from 'react-native';
+
 import { getLocalDateFormat } from './timer';
 
-import { NativeModules, Platform } from 'react-native';
 const { ZegoUIKitRNModule } = NativeModules;
 
 const ZegoUIKitLogger = {
@@ -8,21 +9,30 @@ const ZegoUIKitLogger = {
         if (Platform.OS === 'android') {
             ZegoUIKitRNModule.logInfo(`I/${module}: ` + _formatLog(...msg));
         }
-        console.info(`${getLocalDateFormat()} ${module}[INFO]`, ...msg);
+
+        if (__DEV__) {
+            console.info(`${getLocalDateFormat()} ${module}[INFO]`, ...msg);
+        }
     },
     
     kitLogWarning: (module: string, ...msg: any[]) => {
         if (Platform.OS === 'android') {
             ZegoUIKitRNModule.logWarning(`W/${module}: ` + _formatLog(...msg));
         }
-        console.warn(`${getLocalDateFormat()} ${module}[WARNING]`, ...msg);
+
+        if (__DEV__) {
+            console.warn(`${getLocalDateFormat()} ${module}[WARNING]`, ...msg);
+        }
     },
     
     kitLogError: (module: string, ...msg: any[]) => {
         if (Platform.OS === 'android') {
             ZegoUIKitRNModule.logError(`E/${module}: ` + _formatLog(...msg));
         }
-        console.error(`${getLocalDateFormat()} ${module}[ERROR]`, ...msg);
+
+        if (__DEV__) {
+            console.error(`${getLocalDateFormat()} ${module}[ERROR]`, ...msg);
+        }
     },
 }
 
