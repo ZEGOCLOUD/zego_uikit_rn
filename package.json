@@ -74,6 +74,7 @@
     "react": "*",
     "react-delegate-component": "*",
     "react-native": "*",
+    "react-native-device-info": "^11.1.0",
     "zego-express-engine-reactnative": "^3.14.5",
     "zego-zim-react-native": "2.16.0"
   },
@@ -148,7 +149,6 @@
   },
   "dependencies": {
     "react-delegate-component": "^1.0.0",
-    "zego-callkit-react-native": "^1.0.6",
     "zego-express-engine-reactnative": "^3.14.5",
     "zego-zim-react-native": "2.16.0",
     "zego-zpns-react-native": "2.6.6"
