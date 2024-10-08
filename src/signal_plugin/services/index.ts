@@ -36,6 +36,7 @@ export default class ZegoPluginInvitationService {
     })
   }
   setAndroidOfflineDataHandler(handler: (data: any) => void) {
+    zloginfo('[ZegoPluginInvitationService] ZPNs setAndroidOfflineDataHandler')
     this._androidOfflineDataHandler = handler;
   }
   getAndroidOfflineDataHandler() {

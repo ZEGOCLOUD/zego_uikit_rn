@@ -441,6 +441,7 @@ export default class ZegoSignalingPluginCore {
       });
   }
   destroy() {
+    zloginfo('ZIM destroy...');
     ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().destroy();
     zloginfo('[Core]Destroy success.');
     this._resetData();
