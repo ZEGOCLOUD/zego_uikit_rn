@@ -1,6 +1,6 @@
 {
   "name": "@zegocloud/zego-uikit-rn",
-  "version": "2.14.5",
+  "version": "2.14.7",
   "description": "ZegoUIKit is a low-code offering with pre-built and UI-ready components, such as AudioVideoView, CameraButtons, etc. Save time and assemble features fast with ZegoUIKit.",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -65,7 +65,8 @@
     "react-native-device-info": "^11.1.0",
     "redux": "^4.2.0",
     "release-it": "^15.0.0",
-    "typescript": "^4.5.2"
+    "typescript": "^4.5.2",
+    "zego-callkit-react-native": "^1.0.6"
   },
   "resolutions": {
     "@types/react": "17.0.21"

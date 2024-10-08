@@ -27,14 +27,31 @@ export default class ZegoPluginInvitationService {
     }
     return ZegoPluginInvitationService.shared;
   }
+
   setBackgroundMessageHandler() {
+    zloginfo('[ZegoPluginInvitationService] ZPNs setBackgroundMessageHandler')
     ZegoUIKitCorePlugin.getZPNsPlugin().default.setBackgroundMessageHandler((message: ZPNsMessage) => {
-      zloginfo('ZPNs setBackgroundMessageHandler: ', message)
+      zloginfo('ZPNs backgroundMessageHandler message: ', message)
       const dataObj = JSON.parse(message.extras.payload);
       dataObj.zim_call_id = message.extras.call_id;
-      ZegoPluginInvitationService.getInstance().getAndroidOfflineDataHandler()(dataObj)
+
+      let offlineDataHandler = ZegoPluginInvitationService.getInstance().getAndroidOfflineDataHandler()
+      offlineDataHandler(dataObj)
     })
   }
+
+  setThroughMessageReceivedHandler() {
+    zloginfo('[ZegoPluginInvitationService] ZPNs setThroughMessageReceivedHandler')
+    ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().on("throughMessageReceived", (message: ZPNsMessage) => {
+      zloginfo('ZPNs throughMessageReceived message: ', message)
+      const dataObj = JSON.parse(message.extras.payload);
+      dataObj.zim_call_id = message.extras.call_id;
+
+      let offlineDataHandler = ZegoPluginInvitationService.getInstance().getAndroidOfflineDataHandler()
+      offlineDataHandler(dataObj)
+    })
+  }
+
   setAndroidOfflineDataHandler(handler: (data: any) => void) {
     zloginfo('[ZegoPluginInvitationService] ZPNs setAndroidOfflineDataHandler')
     this._androidOfflineDataHandler = handler;
