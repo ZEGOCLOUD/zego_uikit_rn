@@ -113,8 +113,8 @@ class Publisher:
     def publish_package(self, package_path, package_name):
         # 组合当前脚本路径及 package_path
         packagejson_file_path = os.path.join(os.getcwd(), package_path, "package.json")
-        # 将 package.json 文件拷贝一份为 package.json.back
-        os.system("cp " + packagejson_file_path + " " + packagejson_file_path + ".back")
+        # 将 package.json 文件拷贝一份为 package.json.bak
+        os.system("cp " + packagejson_file_path + " " + packagejson_file_path + ".bak")
         # 读取 package.json 文件并删除其中的 react-native,source,files.src节点
         packagejson_obj = {}
         with open(packagejson_file_path, "r") as f:
@@ -150,7 +150,7 @@ class Publisher:
             os.system("cd " + package_path + "; npm publish --tag beta --access public")
         else:
             os.system("cd " + package_path + "; npm publish --access public")
-        os.system("mv " + packagejson_file_path + ".back " + packagejson_file_path)
+        os.system("mv " + packagejson_file_path + ".bak " + packagejson_file_path)
         webbrowser.open("https://www.npmjs.com/package/" + package_name + "?activeTab=versions")
 
         # package_version.js 还原
