@@ -112,10 +112,10 @@ export default class ZegoSignalingPluginCore {
       (zim: any, { callID, inviter, timeout, extendedData }: ZIMEventOfCallInvitationReceivedResult) => {
         zloginfo(
           '[Core][callInvitationReceived callback]',
-          callID,
-          inviter,
-          timeout,
-          extendedData
+          'callID:', callID,
+          'inviter:', inviter,
+          'timeout:', timeout,
+          'extendedData:', extendedData
         );
         if (this._currentInvitationID == callID) {
           return
@@ -123,7 +123,6 @@ export default class ZegoSignalingPluginCore {
           this._currentInvitationID = callID
         }
         this._callIDUsers.set(callID, inviter);
-        zloginfo('ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().onCallInvitationReceived', callID, extendedData)
         
         const notifyData: any = { callID, inviter: { id: inviter } };
         if (extendedData) {
