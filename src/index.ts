@@ -27,6 +27,7 @@ import ZegoUIKitSignalingPluginImpl, {
   ZegoRefuseInvitationButton,
 } from './plugins/invitation';
 import ZegoUIKitLogger from './utils/kitlogger';
+import ZegoUIKitReport from './utils/report';
 
 export default {
   init: ZegoUIKitInternal.connectSDK,
@@ -125,4 +126,5 @@ export {
   ZegoInvitationConnectionState,
   ZegoAudioVideoResourceMode,
   ZegoUIKitVideoConfig,
+  ZegoUIKitReport,
 };

@@ -12,7 +12,7 @@ import { ZegoAudioVideoResourceMode, ZegoChangedCountOrProperty, ZegoRoomPropert
 import { ZegoUpdateType } from 'zego-express-engine-reactnative';
 import { getPackageVersion } from '../../utils/package_version';
 import { getRnVersion, logComponentsVersion } from '../../utils/version';
-import UIKitReport from '../../utils/report';
+import ZegoUIKitReport from '../../utils/report';
 
 var _appInfo = {
   appID: 0,
@@ -551,7 +551,7 @@ function _leaveRoom() {
         .logoutRoom(_currentRoomID)
         .then(() => {
           zloginfo('Leave room succeed.');
-          UIKitReport.reportEvent('logoutRoom', {
+          ZegoUIKitReport.reportEvent('logoutRoom', {
             'room_id': _currentRoomID,
             'error': 0,
             'msg': ''
@@ -568,7 +568,7 @@ function _leaveRoom() {
         })
         .catch((error) => {
           zlogerror('Leave room failed: ', error);
-          UIKitReport.reportEvent('logoutRoom', {
+          ZegoUIKitReport.reportEvent('logoutRoom', {
             'room_id': _currentRoomID,
             'error': -1,
             'msg': JSON.stringify(error)
@@ -1226,7 +1226,7 @@ const ZegoUIKitInternal =  {
         appSign: appSign,
         scenario: 0,
       };
-      UIKitReport.create(appID, appSign, {
+      ZegoUIKitReport.create(appID, appSign, {
         'platform': 'rn',
         'platform_version': getRnVersion(),
         'uikit_version': getPackageVersion(),
@@ -1508,7 +1508,7 @@ const ZegoUIKitInternal =  {
         .loginRoom(roomID, user, config)
         .then(() => {
           zloginfo('Join room success.', user);
-          UIKitReport.reportEvent('loginRoom', {
+          ZegoUIKitReport.reportEvent('loginRoom', {
             'room_id': roomID,
             'error': 0,
             'msg' : '',
@@ -1531,7 +1531,7 @@ const ZegoUIKitInternal =  {
         })
         .catch((error) => {
           zlogerror('Join room falied: ', error);
-          UIKitReport.reportEvent('loginRoom', {
+          ZegoUIKitReport.reportEvent('loginRoom', {
             'room_id': roomID,
             'error': -1,
             'msg' : JSON.stringify(error),

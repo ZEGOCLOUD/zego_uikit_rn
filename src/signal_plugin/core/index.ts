@@ -30,7 +30,7 @@ import ZegoPluginUserInRoomAttributesCore from './user_in_room_attributes_core';
 import ZegoPluginRoomPropertiesCore from './room_properties_core';
 import ZegoUIKitCorePlugin from "../../components/internal/ZegoUIKitCorePlugin";
 import ZegoPluginRoomMessageCore from './in_room_message_core';
-import UIKitReport from '../../utils/report';
+import ZegoUIKitReport from '../../utils/report';
 
 export default class ZegoSignalingPluginCore {
   static shared: ZegoSignalingPluginCore;
@@ -134,7 +134,7 @@ export default class ZegoSignalingPluginCore {
           notifyData.data = extendedMap.data;
         }
         this._notifyCallInvitationReceived(notifyData);
-        UIKitReport.reportEvent('invitationReceived', {
+        ZegoUIKitReport.reportEvent('invitationReceived', {
           'call_id': notifyData.callID,
           'inviter': notifyData.inviter.id,
           'app_state': AppState.currentState,
@@ -464,7 +464,7 @@ export default class ZegoSignalingPluginCore {
       ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()
         .callInvite(invitees, config)
         .then(({ callID, timeout, errorInvitees, errorUserList }: ZIMCallInvitationSentResult) => {
-          UIKitReport.reportEvent('callInvite', {
+          ZegoUIKitReport.reportEvent('callInvite', {
             'invitees': JSON.stringify(invitees),
             'count': invitees.length,
             'error_userlist': JSON.stringify(errorUserList),
@@ -505,7 +505,7 @@ export default class ZegoSignalingPluginCore {
           }
         })
         .catch((error: ZIMError) => {
-          UIKitReport.reportEvent('callInvite', {
+          ZegoUIKitReport.reportEvent('callInvite', {
             'invitees': JSON.stringify(invitees),
             'count': invitees.length,
             'call_id': '',

@@ -3,14 +3,14 @@ import { getSystemName, getSystemVersion, getBrand, getModel } from 'react-nativ
 import ZegoUIKitCorePlugin from '../components/internal/ZegoUIKitCorePlugin';
 import { zloginfo } from './logger';
 import { getPackageVersion } from './package_version';
-import UIKitReport from './report';
+import ZegoUIKitReport from './report';
 
 export const logComponentsVersion = (extraInfo: Map<string, string>) => {
     var expressVersionPromise = require('zego-express-engine-reactnative').default.getVersion()
     var zimVersionPromise = ZegoUIKitCorePlugin.getZIMPlugin().default.getVersion()
     var zpnsVersionPromise = ZegoUIKitCorePlugin.getZPNsPlugin() ? ZegoUIKitCorePlugin.getZPNsPlugin().default.getVersion() : ""
     var callkitVersionPromise = ZegoUIKitCorePlugin.getCallKitPlugin() ? "unknown" : ""
-    var reportVersionPromise = UIKitReport.getVersion()
+    var reportVersionPromise = ZegoUIKitReport.getVersion()
 
     Promise.all([expressVersionPromise, zimVersionPromise, zpnsVersionPromise, callkitVersionPromise, reportVersionPromise])
     .then(versions => {
