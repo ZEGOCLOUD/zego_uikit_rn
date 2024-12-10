@@ -1,3 +1,4 @@
+import { AppState } from 'react-native';
 import type {
   ZIMAppConfig,
   ZIMUserInfo,
@@ -29,6 +30,7 @@ import ZegoPluginUserInRoomAttributesCore from './user_in_room_attributes_core';
 import ZegoPluginRoomPropertiesCore from './room_properties_core';
 import ZegoUIKitCorePlugin from "../../components/internal/ZegoUIKitCorePlugin";
 import ZegoPluginRoomMessageCore from './in_room_message_core';
+import UIKitReport from '../../utils/report';
 
 export default class ZegoSignalingPluginCore {
   static shared: ZegoSignalingPluginCore;
@@ -132,6 +134,12 @@ export default class ZegoSignalingPluginCore {
           notifyData.data = extendedMap.data;
         }
         this._notifyCallInvitationReceived(notifyData);
+        UIKitReport.reportEvent('invitationReceived', {
+          'call_id': notifyData.callID,
+          'inviter': notifyData.inviter.id,
+          'app_state': AppState.currentState,
+          'extended_data': extendedData
+        })    
       }
     );
     // Callback of the disinvitation notification received by the invitee.
@@ -455,7 +463,18 @@ export default class ZegoSignalingPluginCore {
       zloginfo(`[ZegoSignalingPluginCore] invite, config: ${config}`);
       ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()
         .callInvite(invitees, config)
-        .then(({ callID, timeout, errorInvitees }: ZIMCallInvitationSentResult) => {
+        .then(({ callID, timeout, errorInvitees, errorUserList }: ZIMCallInvitationSentResult) => {
+          UIKitReport.reportEvent('callInvite', {
+            'invitees': JSON.stringify(invitees),
+            'count': invitees.length,
+            'error_userlist': JSON.stringify(errorUserList),
+            'error_count': errorUserList.length,
+            'call_id': callID,
+            'extended_data': config.extendedData,
+            'error': 0,
+            'msg': ''
+          })
+
           this._callIDUsers.set(callID, this._loginUser.userID);
           if (!errorInvitees || !errorInvitees.length) {
             zloginfo(`[Core]Invite done, call id: ${callID}`);
@@ -486,6 +505,15 @@ export default class ZegoSignalingPluginCore {
           }
         })
         .catch((error: ZIMError) => {
+          UIKitReport.reportEvent('callInvite', {
+            'invitees': JSON.stringify(invitees),
+            'count': invitees.length,
+            'call_id': '',
+            'extended_data': config.extendedData,
+            'error': error.code,
+            'msg': error.message
+          })
+
           reject(error);
         });
     });

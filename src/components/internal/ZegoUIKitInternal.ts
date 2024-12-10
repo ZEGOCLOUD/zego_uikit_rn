@@ -10,7 +10,9 @@ import ZegoUIKitSignalingPluginImpl from '../../plugins/invitation';
 import { zlogerror, zloginfo, zlogwarning } from '../../utils/logger';
 import { ZegoAudioVideoResourceMode, ZegoChangedCountOrProperty, ZegoRoomPropertyUpdateType, ZegoUIKitVideoConfig } from './defines'
 import { ZegoUpdateType } from 'zego-express-engine-reactnative';
-import { logComponentsVersion } from '../../utils/version';
+import { getPackageVersion } from '../../utils/package_version';
+import { getRnVersion, logComponentsVersion } from '../../utils/version';
+import UIKitReport from '../../utils/report';
 
 var _appInfo = {
   appID: 0,
@@ -548,9 +550,15 @@ function _leaveRoom() {
       ZegoExpressEngine.instance()
         .logoutRoom(_currentRoomID)
         .then(() => {
+          zloginfo('Leave room succeed.');
+          UIKitReport.reportEvent('logoutRoom', {
+            'room_id': _currentRoomID,
+            'error': 0,
+            'msg': ''
+          })
+
           _turnCameraDeviceOn(_localCoreUser.userID, false);
           _turnMicDeviceOn(_localCoreUser.userID, false);
-          zloginfo('Leave room succeed.');
           ZegoExpressEngine.instance().stopSoundLevelMonitor();
           _notifyUserCountOrPropertyChanged(
             ZegoChangedCountOrProperty.userDelete
@@ -560,6 +568,12 @@ function _leaveRoom() {
         })
         .catch((error) => {
           zlogerror('Leave room failed: ', error);
+          UIKitReport.reportEvent('logoutRoom', {
+            'room_id': _currentRoomID,
+            'error': -1,
+            'msg': JSON.stringify(error)
+          })
+
           reject(error);
         });
     }
@@ -1076,6 +1090,9 @@ const _isEngineCreated = () => {
 
 const ZegoUIKitInternal =  {
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Internal <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+  getPackageVersion() {
+    return getPackageVersion();
+  },
   logComponentsVersion(extraInfo: Map<string, string>) {
     logComponentsVersion(extraInfo);
   },
@@ -1209,6 +1226,12 @@ const ZegoUIKitInternal =  {
         appSign: appSign,
         scenario: 0,
       };
+      UIKitReport.create(appID, appSign, {
+        'platform': 'rn',
+        'platform_version': getRnVersion(),
+        'uikit_version': getPackageVersion(),
+        'user_id': userInfo.userID
+      });
       ZegoExpressEngine.createEngineWithProfile(engineProfile)
         .then((engine) => {
           zloginfo('Create ZegoExpressEngine succeed!');
@@ -1479,10 +1502,19 @@ const ZegoUIKitInternal =  {
       const config = { isUserStatusNotify: true } as ZegoRoomConfig;
       token && (config.token = token);
       _currentRoomID = roomID;
+
+      const eventBegin = Date.now();
       ZegoExpressEngine.instance()
         .loginRoom(roomID, user, config)
         .then(() => {
           zloginfo('Join room success.', user);
+          UIKitReport.reportEvent('loginRoom', {
+            'room_id': roomID,
+            'error': 0,
+            'msg' : '',
+            'start_time': eventBegin
+          })
+
           _roomMemberCount = 1
           _markAsLargeRoom = markAsLargeRoom;
           ZegoExpressEngine.instance().startSoundLevelMonitor(undefined);
@@ -1499,6 +1531,13 @@ const ZegoUIKitInternal =  {
         })
         .catch((error) => {
           zlogerror('Join room falied: ', error);
+          UIKitReport.reportEvent('loginRoom', {
+            'room_id': roomID,
+            'error': -1,
+            'msg' : JSON.stringify(error),
+            'start_time': eventBegin
+          })
+
           _currentRoomID = '';
           reject(error);
         });

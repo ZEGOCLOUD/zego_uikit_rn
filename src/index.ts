@@ -98,6 +98,7 @@ export default {
   kitLogInfo: ZegoUIKitLogger.kitLogInfo,
   kitLogWarning: ZegoUIKitLogger.kitLogWarning,
   kitLogError: ZegoUIKitLogger.kitLogError,
+  getVersion: ZegoUIKitInternal.getPackageVersion,
 };
 
 export {

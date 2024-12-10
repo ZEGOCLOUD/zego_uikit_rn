@@ -7,6 +7,7 @@ import type { ZIMCallInviteConfig, ZIMCallCancelConfig, ZIMConnectionState } fro
 import { CXCallEndedReason } from '../defines';
 import ZegoUIKitCorePlugin from '../../components/internal/ZegoUIKitCorePlugin';
 import { Platform } from 'react-native';
+import UIKitReport from '../../utils/report';
 
 export default class ZegoPluginInvitationService {
   static shared: ZegoPluginInvitationService;
@@ -34,6 +35,17 @@ export default class ZegoPluginInvitationService {
       zloginfo('ZPNs backgroundMessageHandler message: ', message)
       const dataObj = JSON.parse(message.extras.payload);
       dataObj.zim_call_id = message.extras.call_id;
+
+      // Pre-emptively determine whether to cancel for accurate reporting
+      const cancelInvitation = dataObj && dataObj.operation_type === "cancel_invitation"
+      if (!cancelInvitation) {
+        UIKitReport.reportEvent('invitationReceived', {
+          'call_id': dataObj.zim_call_id,
+          'inviter': dataObj.inviter.id,
+          'app_state': 'restarted',
+          'extended_data': message.extras.payload
+        })
+      }
 
       let offlineDataHandler = ZegoPluginInvitationService.getInstance().getAndroidOfflineDataHandler()
       offlineDataHandler(dataObj)
