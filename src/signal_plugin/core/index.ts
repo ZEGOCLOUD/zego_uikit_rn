@@ -423,10 +423,11 @@ export default class ZegoSignalingPluginCore {
             resolve();
           }).catch((error: ZIMError) => {
             if (error.code == 6000111) {
-              zloginfo('ZIM login success.');
+              zloginfo('ZIM login already.');
               zloginfo('[Core]Login already success.', error);
               resolve();
             } else {
+              zloginfo('ZIM login fail.');
               reject(error);
             }
           });
