@@ -1,5 +1,4 @@
-import { NativeModules } from 'react-native';
-import { getSystemName, getSystemVersion, getBrand, getModel } from 'react-native-device-info';
+import { NativeModules, Platform } from 'react-native';
 import ZegoUIKitCorePlugin from '../components/internal/ZegoUIKitCorePlugin';
 import { zloginfo } from './logger';
 import { getPackageVersion } from './package_version';
@@ -15,8 +14,7 @@ export const logComponentsVersion = (extraInfo: Map<string, string>) => {
     Promise.all([expressVersionPromise, zimVersionPromise, zpnsVersionPromise, callkitVersionPromise, reportVersionPromise])
     .then(versions => {
       let versionTable = new Map<string, string>(Object.entries({
-        'Device': `${getBrand()} ${getModel()}`,
-        'OS': `${getSystemName()} ${getSystemVersion()}`,
+        'OS': `${Platform.OS} ${Platform.Version ?? ''}`,
         'Express': versions[0],
         'ZIM': versions[1],
         'ZPNs': versions[2],
