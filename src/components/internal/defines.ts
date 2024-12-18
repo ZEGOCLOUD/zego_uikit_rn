@@ -98,6 +98,14 @@ class ZegoUIKitVideoConfig {
     return config;
   }
 }
+
+const ZegoToastType = {
+  default: 0,
+  info: 1,
+  success: 2,
+  warning: 3,
+  error: 4,
+};
   
 export {
     ZegoAudioVideoResourceMode,
@@ -105,4 +113,5 @@ export {
     ZegoUIKitPluginType,
     ZegoRoomPropertyUpdateType,
     ZegoUIKitVideoConfig,
+    ZegoToastType,
 };

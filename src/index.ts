@@ -2,7 +2,7 @@ import ZegoUIKitInternal from './components/internal/ZegoUIKitInternal';
 import ZegoUIKitCorePlugin, {
   ZegoUIKitPluginType,
 } from './components/internal/ZegoUIKitCorePlugin';
-import { ZegoRoomPropertyUpdateType } from './components/internal/defines';
+import { ZegoRoomPropertyUpdateType, ZegoToastType } from './components/internal/defines';
 import ZegoAudioVideoView from './components/audio_video/ZegoAudioVideoView';
 import ZegoCameraStateIcon from './components/audio_video/ZegoCameraStateIcon';
 import ZegoMicrophoneStateIcon from './components/audio_video/ZegoMicrophoneStateIcon';
@@ -28,6 +28,7 @@ import ZegoUIKitSignalingPluginImpl, {
 } from './plugins/invitation';
 import ZegoUIKitLogger from './utils/kitlogger';
 import ZegoUIKitReport from './utils/report';
+import ZegoToast from './components/ZegoToast';
 
 export default {
   init: ZegoUIKitInternal.connectSDK,
@@ -127,4 +128,6 @@ export {
   ZegoAudioVideoResourceMode,
   ZegoUIKitVideoConfig,
   ZegoUIKitReport,
+  ZegoToast,
+  ZegoToastType,
 };
