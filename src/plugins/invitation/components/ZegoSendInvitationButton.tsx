@@ -86,7 +86,12 @@ export default function ZegoSendInvitationButton(props: any) {
   const onButtonPress = async () => {
     if (requesting) {
       zloginfo('[Components]Send invitation requesting..... return.');
+      callOnFailure({ code: -1, message: 'Press too frequently.' })
       return;
+    }
+    if (invitees.length == 0) {
+      callOnFailure({ code: -1, message: 'Invitees is empty.' })
+      return
     }
     requesting = true;
     
@@ -152,9 +157,7 @@ export default function ZegoSendInvitationButton(props: any) {
       })
       .catch(({ code, message }: any) => {
         ZegoUIKitInternal.notifyErrorUpdate('SendInvitation', code, message);
-        if (typeof onFailure === 'function') {
-          onFailure({ code: code, message: message });
-        }
+        callOnFailure({code, message})
         setTimeout(() => {
           requesting = false;
         }, 1000);
@@ -163,6 +166,14 @@ export default function ZegoSendInvitationButton(props: any) {
         );
       });
   };
+
+  const callOnFailure = ({code, message}: any) => {
+    if (typeof onFailure === 'function') {
+      onFailure({ code: code, message: message });
+      zloginfo('[ZegoSendInvitationButton][onButtonPress] onFailure execute end')
+    }
+  }
+
   return (
     <TouchableOpacity
       style={[
