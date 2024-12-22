@@ -5,6 +5,7 @@ import ZegoExpressEngine, {
   ZegoEngineProfile,
   ZegoRoomConfig,
   ZegoPublishChannel,
+  ZegoStream,
 } from 'zego-express-engine-reactnative';
 import ZegoUIKitSignalingPluginImpl from '../../plugins/invitation';
 import { zlogerror, zloginfo, zlogwarning } from '../../utils/logger';
@@ -276,6 +277,8 @@ function _onRoomStreamUpdate(roomID: string, updateType: number, streamList: any
       if (isScreenSharing) {
         screenshareUsers.push(_coreUserMap[userID]);
       }
+
+      parseStreamExtraInfo(stream)
     });
 
     // notify
@@ -809,17 +812,7 @@ function _registerEngineCallback() {
   ZegoExpressEngine.instance().on('roomStreamExtraInfoUpdate', (roomID, streamList) => {
     zloginfo('roomStreamExtraInfoUpdate', streamList)
     streamList.forEach((stream) => {
-        try {
-            var extraInfo = JSON.parse(stream.extraInfo)
-            if ('isCameraOn' in extraInfo) {
-                _onRemoteCameraStateUpdate(stream.user.userID, extraInfo.isCameraOn)
-            }
-            if ('isMicrophoneOn' in extraInfo) {
-                _onRemoteMicStateUpdate(stream.user.userID, extraInfo.isMicrophoneOn)
-            }
-        } catch (error) {
-            zlogerror('roomStreamExtraInfoUpdate ERROR: ', error)
-        }
+      parseStreamExtraInfo(stream)
     })
   });
   ZegoExpressEngine.instance().on('IMRecvCustomCommand', (roomID, fromUser, command) => {
@@ -902,6 +895,21 @@ function _getStreamIDByUserID(userID: string) {
 
 function _getScreenshareStreamIDByUserID(userID: string) {
   return _currentRoomID + '_' + userID + _screenshareStreamIDFlag;
+}
+
+
+function parseStreamExtraInfo(stream: ZegoStream) {
+  try {
+    var extraInfo = JSON.parse(stream.extraInfo)
+    if ('isCameraOn' in extraInfo) {
+        _onRemoteCameraStateUpdate(stream.user.userID, extraInfo.isCameraOn)
+    }
+    if ('isMicrophoneOn' in extraInfo) {
+        _onRemoteMicStateUpdate(stream.user.userID, extraInfo.isMicrophoneOn)
+    }
+  } catch (error) {
+    zlogerror('parse streamExtraInfo ERROR: ', error)
+  }
 }
 
 function _tryStartPublishStream() {
