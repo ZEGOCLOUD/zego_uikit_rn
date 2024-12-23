@@ -1300,7 +1300,7 @@ const ZegoUIKitInternal =  {
 
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Audio Video <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
   useFrontFacingCamera(isFrontFacing: boolean) {
-    zloginfo('Use front facing camera: ', isFrontFacing);
+    zloginfo('UseFrontFacingCamera: ', isFrontFacing);
     _usingFrontFacingCamera = isFrontFacing;
     return ZegoExpressEngine.instance().useFrontCamera(isFrontFacing, 0);
   },

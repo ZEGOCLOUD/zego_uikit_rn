@@ -34,6 +34,7 @@ export default {
   init: ZegoUIKitInternal.connectSDK,
   uninit: ZegoUIKitInternal.disconnectSDK,
   useFrontFacingCamera: ZegoUIKitInternal.useFrontFacingCamera,
+  isUsingFrontFacingCamera: ZegoUIKitInternal.isUsingFrontFacingCamera,
   isMicrophoneOn: ZegoUIKitInternal.isMicDeviceOn,
   isCameraOn: ZegoUIKitInternal.isCameraDeviceOn,
   setAudioOutputToSpeaker: ZegoUIKitInternal.setAudioOutputToSpeaker,
