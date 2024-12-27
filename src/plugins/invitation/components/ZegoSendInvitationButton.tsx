@@ -14,6 +14,7 @@ export default function ZegoSendInvitationButton(props: any) {
     invitees = [],
     type = ZegoInvitationType.videoCall,
     data,
+    onRequestData,
     timeout = 60,
     onPressed,
     onFailure,
@@ -32,6 +33,7 @@ export default function ZegoSendInvitationButton(props: any) {
     notificationTitle,
     notificationMessage
   } = props;
+
   const getImageSourceByPath = () => {
     if (type === ZegoInvitationType.videoCall) {
       return require('../resources/blue_button_video_call.png');
@@ -125,10 +127,21 @@ export default function ZegoSendInvitationButton(props: any) {
       requesting = false;
       return; 
     }
+
+    let updatedData = null
+    if (typeof onRequestData === 'function') {
+      updatedData = onRequestData()
+    } else if (data) {
+      updatedData = data
+    } else {
+      requesting = false;
+      return; 
+    }
+
     zloginfo(
-      `[Components]Send invitation start, invitees: ${invitees}, timeout: ${timeout}, type: ${type}, data: ${data}`
+      `[Components]Send invitation start, invitees: ${invitees}, timeout: ${timeout}, type: ${type}, data: ${updatedData}`
     );
-    ZegoUIKitInvitationService.sendInvitation(invitees, timeout, type, data, { resourceID, title: notificationTitle, message: notificationMessage })
+    ZegoUIKitInvitationService.sendInvitation(invitees, timeout, type, updatedData, { resourceID, title: notificationTitle, message: notificationMessage })
       .then(({ code, message, callID, errorInvitees }: any) => {
         zloginfo(
           `[Components]Send invitation success, code: ${code}, message: ${message}, errorInvitees: ${errorInvitees}`
