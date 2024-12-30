@@ -1,13 +1,13 @@
 import ZegoUIKitLogger from '../../utils/kitlogger';
 
 export const zloginfo = (...msg: any[]) => {
-  ZegoUIKitLogger.kitLogInfo('SignalingPlugin', ...msg);
+  ZegoUIKitLogger.logInfo('SignalingPlugin', ...msg);
 };
 
 export const zlogwarning = (...msg: any[]) => {
-  ZegoUIKitLogger.kitLogWarning('SignalingPlugin', ...msg);
+  ZegoUIKitLogger.logWarning('SignalingPlugin', ...msg);
 };
 
 export const zlogerror = (...msg: any[]) => {
-  ZegoUIKitLogger.kitLogError('SignalingPlugin', ...msg);
+  ZegoUIKitLogger.logError('SignalingPlugin', ...msg);
 };

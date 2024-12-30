@@ -11,7 +11,7 @@ export const getLocalDateFormat = () => {
       const hours = addLeadingZero(now.getHours());
       const minutes = addLeadingZero(now.getMinutes());
       const seconds = addLeadingZero(now.getSeconds());
-      const milliseconds = addLeadingZero(now.getMilliseconds(), 4);
+      const milliseconds = addLeadingZero(now.getMilliseconds(), 3);
       const formattedDateTime = `${month}${day} ${hours}:${minutes}:${seconds}.${milliseconds}`;
 
       return formattedDateTime

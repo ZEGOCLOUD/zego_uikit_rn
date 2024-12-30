@@ -97,9 +97,6 @@ export default {
   onScreenSharingAvailable: ZegoUIKitInternal.onScreenSharingAvailable,
   onScreenSharingUnavailable: ZegoUIKitInternal.onScreenSharingUnavailable,
   getSignalingPlugin: () => ZegoUIKitSignalingPluginImpl,
-  kitLogInfo: ZegoUIKitLogger.kitLogInfo,
-  kitLogWarning: ZegoUIKitLogger.kitLogWarning,
-  kitLogError: ZegoUIKitLogger.kitLogError,
   getVersion: ZegoUIKitInternal.getPackageVersion,
 };
 
@@ -127,6 +124,7 @@ export {
   ZegoInvitationConnectionState,
   ZegoAudioVideoResourceMode,
   ZegoUIKitVideoConfig,
+  ZegoUIKitLogger,
   ZegoUIKitReport,
   ZegoToast,
   ZegoToastType,

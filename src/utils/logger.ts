@@ -1,13 +1,15 @@
 import ZegoUIKitLogger from './kitlogger';
 
+const module = 'ZegoUIKit'
+
 export const zloginfo = (...msg: any[]) => {
-  ZegoUIKitLogger.kitLogInfo('ZEGOUIKit', ...msg);
+  ZegoUIKitLogger.logInfo(module, ...msg);
 };
 
 export const zlogwarning = (...msg: any[]) => {
-  ZegoUIKitLogger.kitLogWarning('ZEGOUIKit', ...msg);
+  ZegoUIKitLogger.logWarning(module, ...msg);
 };
 
 export const zlogerror = (...msg: any[]) => {
-  ZegoUIKitLogger.kitLogError('ZEGOUIKit', ...msg);
+  ZegoUIKitLogger.logError(module, ...msg);
 };

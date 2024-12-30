@@ -18,6 +18,7 @@ public class ZegoUIKitRNPackage implements ReactPackage {
         List<NativeModule> modules = new ArrayList<>();
         modules.add(new ZegoUIKitRNModule(reactContext));
         modules.add(new ReportRNModule(reactContext));
+        modules.add(new LogRNModule(reactContext));
         return modules;
     }
 

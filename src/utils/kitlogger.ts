@@ -2,42 +2,42 @@ import { NativeModules, Platform } from 'react-native';
 
 import { getLocalDateFormat } from './timer';
 
-const { ZegoUIKitRNModule } = NativeModules;
+const { LogRNModule } = NativeModules;
+
+let _userID = ''
 
 const ZegoUIKitLogger = {
-    kitLogInfo: (module: string, ...msg: any[]) => {
-        if (Platform.OS === 'android') {
-            ZegoUIKitRNModule.logInfo(`I/${module}: ` + _formatLog(...msg));
-        }
+    logSetUserID: (userID: string) => {
+        _userID = userID
+    },
+
+    logInfo: (module: string, ...msg: any[]) => {
+        LogRNModule.logInfo(`I/${module}: ` + _formatLog(...msg));
 
         if (__DEV__) {
-            console.info(`${getLocalDateFormat()} ${module}[INFO]`, ...msg);
+            console.info(`${getLocalDateFormat()} [${module}][${_userID}]`, ...msg);
         }
     },
     
-    kitLogWarning: (module: string, ...msg: any[]) => {
-        if (Platform.OS === 'android') {
-            ZegoUIKitRNModule.logWarning(`W/${module}: ` + _formatLog(...msg));
-        }
+    logWarning: (module: string, ...msg: any[]) => {
+        LogRNModule.logWarning(`W/${module}: ` + _formatLog(...msg));
 
         if (__DEV__) {
-            console.warn(`${getLocalDateFormat()} ${module}[WARNING]`, ...msg);
+            console.warn(`${getLocalDateFormat()} [${module}][${_userID}]`, ...msg);
         }
     },
     
-    kitLogError: (module: string, ...msg: any[]) => {
-        if (Platform.OS === 'android') {
-            ZegoUIKitRNModule.logError(`E/${module}: ` + _formatLog(...msg));
-        }
+    logError: (module: string, ...msg: any[]) => {
+        LogRNModule.logError(`E/${module}: ` + _formatLog(...msg));
 
         if (__DEV__) {
-            console.error(`${getLocalDateFormat()} ${module}[ERROR]`, ...msg);
+            console.error(`${getLocalDateFormat()} [${module}][${_userID}]`, ...msg);
         }
     },
 }
 
 export default ZegoUIKitLogger;
-
+    
 function _formatLog(...msg: any[]): string {
     let isPureString = true;
     for (let i = 0; i < msg.length; i++) {
