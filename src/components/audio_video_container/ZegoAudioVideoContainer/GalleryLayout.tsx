@@ -64,7 +64,6 @@ export default function GalleryLayout(props: any) {
         })
         ZegoUIKitInternal.onUserCountOrPropertyChanged(callbackID, (userList: any[]) => {
             // zlogwarning('>>>>>>>>>>> onUserCountOrPropertyChanged', userList)
-            // Put yourself first
             videoUserList = userList;
             refreshUserList();
         });
@@ -188,16 +187,17 @@ export default function GalleryLayout(props: any) {
       {isFullScreen && screenShareUserList.length > 0 ? 
       <View style={[styles.container, isAudioVideoViewPadding]}>
       {
-        <View key={screenShareUserList[0].userID+'_screenShare'} style={[
-          styles.audioVideoViewContainer,
-          styles.screenShareViewFullScreen,
-        ]}>
-          <ScreenSharingView
-            userID={screenShareUserList[0].userID}
-            userName={screenShareUserList[0].userName}
-            onFullScreenButtonPressed={onFullScreenButtonPressed}
-            isFullScreen={isFullScreen}
-          />
+        <View key={screenShareUserList[0].userID+'_screenShare'}
+          style={[
+            styles.audioVideoViewContainer,
+            styles.screenShareViewFullScreen,
+          ]}>
+            <ScreenSharingView
+              userID={screenShareUserList[0].userID}
+              userName={screenShareUserList[0].userName}
+              onFullScreenButtonPressed={onFullScreenButtonPressed}
+              isFullScreen={isFullScreen}
+            />
         </View>
       }
       </View>
@@ -218,11 +218,12 @@ export default function GalleryLayout(props: any) {
           </View>)
         }
         {
-            userList.map((user, index) => <View key={user.userID} style={[
+            userList.map((user, index) =>
+              <View key={user.userID} style={[
                 styles.audioVideoViewContainer,
                 getAudioVideoViewStyle(),
                 isAudioVideoViewPadding
-            ]}>
+              ]}>
                 <View style={[styles.audioVideoViewSubContainer, isAudioVideoViewBorder]}>
                     <ZegoAudioVideoView
                         userID={user.userID}
@@ -234,7 +235,8 @@ export default function GalleryLayout(props: any) {
                         avatarBuilder={avatarBuilder}
                     />
                 </View>
-            </View>)
+              </View>
+            )
         }
         {
             moreUserList.length <=1 ? moreUserList.map((user, index) => <View key={user.userID} style={[

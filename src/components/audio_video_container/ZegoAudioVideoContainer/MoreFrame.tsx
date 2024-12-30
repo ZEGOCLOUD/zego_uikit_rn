@@ -10,7 +10,7 @@ export default function MoreFrame(props: any) {
         useVideoViewAspectFill = false,
     } = props;
 
-    const getShotName = (name: string) => {
+    const getShortName = (name: string) => {
         if (!name) {
             return '';
         }
@@ -34,10 +34,10 @@ export default function MoreFrame(props: any) {
             >
                 <View style={styles.avatarContainer}>
                     <View style={[styles.avatar, styles.avatar1]}>
-                        <Text style={styles.nameLabel}>{getShotName(userList[0].userName)}</Text>
+                        <Text style={styles.nameLabel}>{getShortName(userList[0].userName)}</Text>
                     </View>
                     <View style={[styles.avatar, styles.avatar2]}>
-                        <Text style={styles.nameLabel}>{getShotName(userList[1].userName)}</Text>
+                        <Text style={styles.nameLabel}>{getShortName(userList[1].userName)}</Text>
                     </View>
                 </View>
                 <Text style={styles.totalText}>{`${userList.length} others`}</Text>

@@ -78,7 +78,7 @@ export default function ZegoMemberList(props: any) {
     refreshMemberList();
   }, []);
 
-  const getShotName = (name: string) => {
+  const getShortName = (name: string) => {
     if (!name) {
       return '';
     }
@@ -135,7 +135,7 @@ export default function ZegoMemberList(props: any) {
               to={avatarBuilder}
               props={{ userInfo: item }}
             /> :
-            <Text style={styles.nameLabel}>{getShotName(item.userName)}</Text>}
+            <Text style={styles.nameLabel}>{getShortName(item.userName)}</Text>}
           </View>
           <Text style={styles.name}>
             {item.userName + roleDescription(item)}

@@ -42,6 +42,8 @@ export default function PictureInPictureLayout(props: any) {
     })).current;
 
     useEffect(() => {
+        zloginfo(`[PictureInPictureLayout] useEffect`)
+
         zloginfo('########cacheAudioVideoUserList########', cacheAudioVideoUserList);
         const callbackID = 'PictureInPictureLayout' + String(Math.floor(Math.random() * 10000));
         ZegoUIKitInternal.onAudioVideoAvailable(callbackID, (userList: any[]) => {
@@ -82,12 +84,20 @@ export default function PictureInPictureLayout(props: any) {
             }
         });
         return () => {
+            zloginfo(`[PictureInPictureLayout] useEffect return`)
+
             ZegoUIKitInternal.onAudioVideoListForceSort(callbackID);
             ZegoUIKitInternal.onAudioVideoAvailable(callbackID);
             ZegoUIKitInternal.onAudioVideoUnavailable(callbackID);
             ZegoUIKitInternal.onUserLeave(callbackID);
         }
     }, [])
+
+    useEffect(() => {
+        let userIDInGlobalAudioVideoUserList = globalAudioVideoUserList.map((userInfo: any) => userInfo.userID)
+        zloginfo(`[PictureInPictureLayout] globalAudioVideoUserList updated: ${userIDInGlobalAudioVideoUserList}`)
+    }, [globalAudioVideoUserList])
+
     const getSmallViewPostStyle = () => {
         const styleList = [styles.smallViewPostTopLeft, styles.smallViewPostTopRight, styles.smallViewPostBottomLeft, styles.smallViewPostBottomRight];
         if (smallViewPostion >= ZegoViewPosition.topLeft && smallViewPostion <= ZegoViewPosition.bottomRight) {

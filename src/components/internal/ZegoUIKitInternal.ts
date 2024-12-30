@@ -319,6 +319,7 @@ function _onRoomStreamUpdate(roomID: string, updateType: number, streamList: any
 function _onRemoteCameraStateUpdate(userID: string, isOn: boolean) {
   if (userID in _coreUserMap) {
     _coreUserMap[userID].isCameraDeviceOn = isOn;
+    zloginfo(`RemoteCameraStateUpdate, ${userID} camera: ${isOn}`)
     _notifyUserInfoUpdate(_coreUserMap[userID]);
     _notifyUserCountOrPropertyChanged(
       ZegoChangedCountOrProperty.cameraStateUpdate
@@ -543,7 +544,7 @@ function _sendInRoomCommand(command: string, toUserList: any[]) {
 function _leaveRoom() {
   return new Promise<void>((resolve, reject) => {
     if (_currentRoomID == '') {
-      zlogwarning('You are not join in any room, no need to leave room.');
+      zloginfo('You are not join in any room, no need to leave room.');
       resolve();
     } else {
       zloginfo(_localCoreUser.userID, ' leaveRoom: ', _currentRoomID);
@@ -604,7 +605,7 @@ function _turnMicDeviceOn(userID: string, on: boolean) {
       if (on) {
         _tryStartPublishStream();
       } else {
-        _tryStopPublishStream();
+        _tryStopPublishStream();  // Don't worry! It will check internally that both the camera and microphone are turned off before stopping the stream.
       }
       resolve();
     } else {
@@ -652,7 +653,7 @@ function _turnCameraDeviceOn(userID: string, on: boolean) {
       if (on) {
         _tryStartPublishStream();
       } else {
-        _tryStopPublishStream();
+        _tryStopPublishStream();  // Don't worry! It will check internally that both the camera and microphone are turned off before stopping the stream.
       }
       resolve();
     } else {
@@ -907,7 +908,9 @@ function _tryStartPublishStream() {
   if (_localCoreUser.isMicDeviceOn || _localCoreUser.isCameraDeviceOn) {
     zloginfo(
       '_tryStartPublishStream',
+      ', mic:',
       _localCoreUser.isMicDeviceOn,
+      ', camera:',
       _localCoreUser.isCameraDeviceOn,
       _localCoreUser.streamID
     );
@@ -969,10 +972,20 @@ function _tryStartPlayStream(userID: string) {
           backgroundColor: 0,
         }, {
           resourceMode: _audioVideoResourceMode,
+        })
+        .then(() => {
+        })
+        .catch((error) => {
+          zlogerror(`startPlayingStream fail, stream: ${user.streamID}`)
         });
       } else {
         ZegoExpressEngine.instance().startPlayingStream(user.streamID, undefined, {
           resourceMode: _audioVideoResourceMode,
+        })
+        .then(() => {
+        })
+        .catch((error) => {
+          zlogerror(`startPlayingStream fail, stream: ${user.streamID}`)
         });
       }
     }
@@ -1485,9 +1498,13 @@ const ZegoUIKitInternal =  {
 
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Room <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
   async joinRoom(roomID: string, token: string, markAsLargeRoom = false) {
+    if (!roomID || roomID.trim().length == 0) {
+      throw new Error("roomID can't is empty when loginRoom!");
+    }
+
     // Solve the problem of repeated join
     if (_isRoomConnected && _currentRoomID === roomID) {
-      zloginfo('Join room success already');
+      zloginfo(`Join room: ${roomID} success already.`);
       return Promise.resolve();
     }
     if (_appInfo.appSign === '' && token === '') {
@@ -1507,7 +1524,7 @@ const ZegoUIKitInternal =  {
       ZegoExpressEngine.instance()
         .loginRoom(roomID, user, config)
         .then(() => {
-          zloginfo('Join room success.', user);
+          zloginfo(`Join room: ${roomID} success. ${JSON.stringify(user)}`);
           ZegoUIKitReport.reportEvent('loginRoom', {
             'room_id': roomID,
             'error': 0,
