@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
+import { Dimensions, PanResponder, SafeAreaView, ScrollView, StyleSheet, TouchableWithoutFeedback, View } from 'react-native'
 import ZegoUIKitInternal from "../../internal/ZegoUIKitInternal";
 import ZegoAudioVideoView from "../../audio_video/ZegoAudioVideoView";
-import { StyleSheet, View, PanResponder, TouchableWithoutFeedback, SafeAreaView } from 'react-native'
 import { ZegoViewPosition } from './defines'
 import { zloginfo } from "../../../utils/logger";
 
@@ -31,6 +31,9 @@ export default function PictureInPictureLayout(props: any) {
         showSoundWavesInAudioMode = true,
         cacheAudioVideoUserList,
     } = audioVideoConfig;
+
+    const { height: screenHeight } = Dimensions.get('window');
+
     const realTimeData: any = useRef(cacheAudioVideoUserList || []);
     const [globalAudioVideoUserList, setGlobalAudioVideoUserList] = useState(cacheAudioVideoUserList || []);
 
@@ -87,6 +90,7 @@ export default function PictureInPictureLayout(props: any) {
             zloginfo(`[PictureInPictureLayout] useEffect return`)
 
             ZegoUIKitInternal.onAudioVideoListForceSort(callbackID);
+            ZegoUIKitInternal.onVideoViewForceRender(callbackID);
             ZegoUIKitInternal.onAudioVideoAvailable(callbackID);
             ZegoUIKitInternal.onAudioVideoUnavailable(callbackID);
             ZegoUIKitInternal.onUserLeave(callbackID);
@@ -117,13 +121,16 @@ export default function PictureInPictureLayout(props: any) {
         const { nativeEvent } = event;
         const { layout } = nativeEvent;
         const { width, height, x, y } = layout;
-        zloginfo('######layoutHandle', layout);
+        // zloginfo('######layoutHandle', layout);
     }
 
     return (<View style={styles.container}>
-        <View style={[styles.smallViewContainer, getSmallViewPostStyle()]} onLayout={layoutHandle}>
+        <ScrollView 
+            style={[styles.smallViewContainer, getSmallViewPostStyle(), {maxHeight: screenHeight-80-100}]} 
+            contentContainerStyle={ smallViewPostion >= ZegoViewPosition.bottomLeft ? {justifyContent: 'flex-end', alignItems: 'flex-end'} : null }
+            onLayout={layoutHandle}>
             {
-                globalAudioVideoUserList.slice(1, 4).map((user: any, index: number) => <TouchableWithoutFeedback key={user.userID} {...panResponder.panHandlers} onPress={switchLargeOrSmallView.bind(this, index, user)}>
+                globalAudioVideoUserList.slice(1).map((user: any, index: number) => <TouchableWithoutFeedback key={user.userID} {...panResponder.panHandlers} onPress={switchLargeOrSmallView.bind(this, index, user)}>
                   <SafeAreaView >
                     <View
                       key={user.userID}
@@ -148,7 +155,7 @@ export default function PictureInPictureLayout(props: any) {
                   </SafeAreaView>
                 </TouchableWithoutFeedback>)
             }
-        </View>
+        </ScrollView>
         <View style={styles.bigView}>
             {globalAudioVideoUserList[0] ?
                 <ZegoAudioVideoView
@@ -228,11 +235,9 @@ const styles = StyleSheet.create({
     smallViewPostBottomLeft: {
         bottom: 100,
         left: 12,
-        justifyContent: 'flex-end'
     },
     smallViewPostBottomRight: {
         bottom: 100,
         right: 12,
-        justifyContent: 'flex-end'
     }
 })
