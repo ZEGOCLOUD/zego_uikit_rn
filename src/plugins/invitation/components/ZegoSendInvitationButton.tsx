@@ -86,7 +86,7 @@ export default function ZegoSendInvitationButton(props: any) {
     },
   });
 
-  const onButtonPress = async () => {
+  const onButtonPress = () => {
     if (requesting) {
       zloginfo('[Components]Send invitation requesting..... return.');
       callOnFailure({ code: -1, message: 'Press too frequently.' })
@@ -101,20 +101,16 @@ export default function ZegoSendInvitationButton(props: any) {
     
     let canSendInvitation = true;
     if (onWillPressed) {
-      zloginfo('#########onWillPressed judge', typeof onWillPressed === 'object', typeof (onWillPressed.then) === 'function', typeof (onWillPressed.catch) === 'function');
-      if (typeof onWillPressed === 'object' && typeof (onWillPressed.then) === 'function' && typeof (onWillPressed.catch) === 'function') {
-        // Promise
-        zloginfo('#########onWillPressed promise', onWillPressed);
-        try {
-          canSendInvitation = await onWillPressed;
-        } catch (error) {
-          canSendInvitation = false;
-        }
-      } else if (typeof onWillPressed === 'function') {
+      if (typeof onWillPressed === 'function') {
         zloginfo('#########onWillPressed function', onWillPressed);
         canSendInvitation = onWillPressed();
+      } else {
+        // don't support promise
+        canSendInvitation = false
       }
     }
+    zloginfo('#########onWillPressed result:', canSendInvitation);
+
     if (!canSendInvitation) {
       requesting = false;
       (typeof onRequestStatusChanged === 'function') ? onRequestStatusChanged(requesting) : null
