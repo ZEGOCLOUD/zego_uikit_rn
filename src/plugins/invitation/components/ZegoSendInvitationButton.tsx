@@ -19,6 +19,7 @@ export default function ZegoSendInvitationButton(props: any) {
     onPressed,
     onFailure,
     onWillPressed,
+    onRequestStatusChanged,
     backgroundColor = '#F3F4F7',
     fontSize = 16,
     color = '#2A2A2A',
@@ -96,6 +97,7 @@ export default function ZegoSendInvitationButton(props: any) {
       return
     }
     requesting = true;
+    (typeof onRequestStatusChanged === 'function') ? onRequestStatusChanged(requesting) : null
     
     let canSendInvitation = true;
     if (onWillPressed) {
@@ -115,6 +117,7 @@ export default function ZegoSendInvitationButton(props: any) {
     }
     if (!canSendInvitation) {
       requesting = false;
+      (typeof onRequestStatusChanged === 'function') ? onRequestStatusChanged(requesting) : null
       return; 
     }
 
@@ -125,6 +128,7 @@ export default function ZegoSendInvitationButton(props: any) {
       updatedData = data
     } else {
       requesting = false;
+      (typeof onRequestStatusChanged === 'function') ? onRequestStatusChanged(requesting) : null
       return; 
     }
 
@@ -156,6 +160,7 @@ export default function ZegoSendInvitationButton(props: any) {
         }
         setTimeout(() => {
           requesting = false;
+          (typeof onRequestStatusChanged === 'function') ? onRequestStatusChanged(requesting) : null
         }, 1000);
       })
       .catch(({ code, message }: any) => {
@@ -163,6 +168,7 @@ export default function ZegoSendInvitationButton(props: any) {
         callOnFailure({code, message})
         setTimeout(() => {
           requesting = false;
+          (typeof onRequestStatusChanged === 'function') ? onRequestStatusChanged(requesting) : null
         }, 1000);
         zlogerror(
           `[Components]Send invitation error, code: ${code}, message: ${message}`
