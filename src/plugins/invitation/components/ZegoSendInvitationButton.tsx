@@ -110,17 +110,7 @@ export default function ZegoSendInvitationButton(props: any) {
         }
       } else if (typeof onWillPressed === 'function') {
         zloginfo('#########onWillPressed function', onWillPressed);
-        const temp = onWillPressed();
-        if (typeof temp === 'object' && typeof (temp.then) === 'function' && typeof (temp.catch) === 'function') {
-          zloginfo('#########onWillPressed promise', temp);
-          try {
-            canSendInvitation = await temp;
-          } catch (error) {
-            canSendInvitation = false;
-          }
-        } else {
-          canSendInvitation = temp;
-        }
+        canSendInvitation = onWillPressed();
       }
     }
     if (!canSendInvitation) {
