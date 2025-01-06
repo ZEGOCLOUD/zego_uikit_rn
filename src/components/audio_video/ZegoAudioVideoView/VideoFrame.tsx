@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { findNodeHandle, View, StyleSheet } from "react-native";
-import { ZegoTextureView } from 'zego-express-engine-reactnative';
+import ZegoExpressEngine, { ZegoTextureView } from 'zego-express-engine-reactnative';
 import ZegoUIKitInternal from "../../internal/ZegoUIKitInternal";
 import { zloginfo } from "../../../utils/logger";
 
@@ -20,7 +20,12 @@ export default function VideoFrame(props: any) {
         ZegoUIKitInternal.updateRenderingProperty(userID, viewID, newFillMode, isScreenShare);
     }
     useEffect(() => {
-        updateRenderingProperty();
+        try {
+            ZegoExpressEngine.instance            
+            updateRenderingProperty();
+        } catch (error) {
+            
+        }
         zloginfo('VideoFrame', userID);
 
         const callbackID = 'VideoFrame' + userID + String(Math.floor(Math.random() * 10000));

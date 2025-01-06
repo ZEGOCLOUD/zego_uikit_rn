@@ -828,7 +828,10 @@ function _registerEngineCallback() {
   ZegoExpressEngine.instance().on('publisherVideoSizeChanged', (width, height, channel) => {
     zloginfo('publisherVideoSizeChanged', width, height, channel);
     _localCoreUser.isLandscape = width > height;
-    _coreUserMap[_localCoreUser.userID].isLandscape = width > height;
+    if (_currentRoomID) {
+      // _coreUserMap will be fill after entering the room.
+      _coreUserMap[_localCoreUser.userID].isLandscape = width > height;
+    }
     ZegoUIKitInternal.forceRenderVideoView();
   });
 }
@@ -1253,6 +1256,8 @@ const ZegoUIKitInternal =  {
         'uikit_version': getPackageVersion(),
         'user_id': userInfo.userID
       });
+
+      zloginfo(`[ZegoUIKitInternal][connectSDK] createEngine`)
       ZegoExpressEngine.createEngineWithProfile(engineProfile)
         .then((engine) => {
           zloginfo('Create ZegoExpressEngine succeed!');
@@ -1279,6 +1284,7 @@ const ZegoUIKitInternal =  {
   },
   disconnectSDK() {
     return new Promise<void>((resolve, reject) => {
+      zloginfo(`[ZegoUIKitInternal][disconnectSDK] destroyEngine`)
       if (ZegoExpressEngine.instance()) {
         ZegoExpressEngine.destroyEngine()
           .then(() => {
@@ -1515,6 +1521,8 @@ const ZegoUIKitInternal =  {
       zloginfo(`Join room: ${roomID} success already.`);
       return Promise.resolve();
     }
+    
+    zloginfo(`[ZegoUIKitInternal][joinRoom] roomID: ${roomID}`)
     if (_appInfo.appSign === '' && token === '') {
       token = await ZegoUIKitInternal.getToken();
     }
@@ -1529,6 +1537,7 @@ const ZegoUIKitInternal =  {
       _currentRoomID = roomID;
 
       const eventBegin = Date.now();
+      zloginfo(`[ZegoUIKitInternal][joinRoom] loginRoom, roomID: ${roomID}`)
       ZegoExpressEngine.instance()
         .loginRoom(roomID, user, config)
         .then(() => {
