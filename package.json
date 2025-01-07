@@ -76,8 +76,8 @@
     "typescript": "^4.5.2",
     "zego-express-engine-reactnative": "^3.17.1",
     "zego-callkit-react-native": "^1.0.6",
-    "zego-zim-react-native": "2.16.0",
-    "zego-zpns-react-native": "2.6.6"
+    "zego-zim-react-native": "2.19.0",
+    "zego-zpns-react-native": "^2.6.6"
   },
   "resolutions": {
     "@types/react": "17.0.21"
@@ -87,7 +87,7 @@
     "react-delegate-component": "*",
     "react-native": "*",
     "zego-express-engine-reactnative": "^3.17.1",
-    "zego-zim-react-native": "2.16.0"
+    "zego-zim-react-native": "2.19.0"
   },
   "jest": {
     "preset": "react-native",
