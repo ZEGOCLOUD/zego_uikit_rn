@@ -2,6 +2,7 @@ import ZegoExpressEngine, {
   ZegoAudioRoute,
   ZegoEngineProfile,
   ZegoPublishChannel,
+  ZegoRemoteDeviceState,
   ZegoRoomConfig,
   ZegoRoomStateChangedReason,
   ZegoStream,
@@ -718,15 +719,15 @@ function _registerEngineCallback() {
       // TODO
     }
   );
-  ZegoExpressEngine.instance().on(
-    'remoteCameraStateUpdate',
-    (streamID, state) => {
+  ZegoExpressEngine.instance().on('remoteCameraStateUpdate', (streamID, state: ZegoRemoteDeviceState) => {
       zloginfo('[remoteCameraStateUpdate callback]', streamID, state);
       if (streamID.endsWith(_screenshareStreamIDFlag)) {
         return;
       }
-      // 0 for device is on
-      _onRemoteCameraStateUpdate(_getUserIDByStreamID(streamID), state == 0);
+
+      // 0 or 11 for device is on
+      let isCameraOn = (state == ZegoRemoteDeviceState.Open || state == ZegoRemoteDeviceState.Interruption)
+      _onRemoteCameraStateUpdate(_getUserIDByStreamID(streamID), isCameraOn);
     }
   );
   ZegoExpressEngine.instance().on('remoteMicStateUpdate', (streamID, state) => {
