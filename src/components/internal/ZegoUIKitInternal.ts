@@ -952,9 +952,14 @@ function _tryStartPublishStream() {
 }
 function _tryStopPublishStream(force = false) {
   if (!_localCoreUser.isMicDeviceOn && !_localCoreUser.isCameraDeviceOn) {
-    zloginfo('stopPublishStream');
-    ZegoExpressEngine.instance().stopPublishingStream(ZegoPublishChannel.Main);
-    ZegoExpressEngine.instance().stopPreview(ZegoPublishChannel.Main);
+    zloginfo('stopPublishStream stopPreview');
+    try {
+      ZegoExpressEngine.instance().stopPublishingStream(ZegoPublishChannel.Main);
+      ZegoExpressEngine.instance().stopPreview(ZegoPublishChannel.Main);  
+    } catch (e) {
+      zloginfo('stopPublishStream stopPreview, but expressengine is null')
+    }
+
     if (_localCoreUser.streamID in _streamCoreUserMap) {
       delete _streamCoreUserMap[_localCoreUser.streamID];
       _notifyAudioVideoUnavailable([_localCoreUser]);
