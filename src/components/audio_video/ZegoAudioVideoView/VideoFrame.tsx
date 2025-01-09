@@ -6,11 +6,11 @@ import { zloginfo } from "../../../utils/logger";
 
 export default function VideoFrame(props: any) {
     const { userID, roomID, fillMode, isPictureInPicture, isScreenShare } = props;
-    const viewRef = useRef(null);
+    const textureViewRef = useRef(null);
 
     const updateRenderingProperty = () => {
-        zloginfo('VideoFrame updateRenderingProperty', isPictureInPicture);
-        const viewID = findNodeHandle(viewRef.current);
+        zloginfo(`[VideoFrame][updateRenderingProperty] isPictureInPicture: ${isPictureInPicture}`);
+        const viewID = findNodeHandle(textureViewRef.current);
         const appOrientation = ZegoUIKitInternal.appOrientation();
         const user = ZegoUIKitInternal.getUser(userID);
         var newFillMode = fillMode;
@@ -19,16 +19,20 @@ export default function VideoFrame(props: any) {
         }
         ZegoUIKitInternal.updateRenderingProperty(userID, viewID, newFillMode, isScreenShare);
     }
-    useEffect(() => {
-        try {
-            ZegoExpressEngine.instance            
-            updateRenderingProperty();
-        } catch (error) {
-            
-        }
-        zloginfo('VideoFrame', userID);
 
+    const onTextureLayout = () => {
+        zloginfo(`[VideoFrame][onTextureLayout] textureViewID: ${findNodeHandle(textureViewRef.current)}`)
+        try {
+            ZegoExpressEngine.instance
+            updateRenderingProperty();
+        } catch (error) {   
+        }
+    }
+
+    useEffect(() => {
         const callbackID = 'VideoFrame' + userID + String(Math.floor(Math.random() * 10000));
+        zloginfo(`[VideoFrame] useEffect, userID: ${userID}, viewID: ${findNodeHandle(textureViewRef.current)}, callbackID: ${callbackID}`)
+
         ZegoUIKitInternal.onSDKConnected(callbackID, () => {
             updateRenderingProperty();
         });
@@ -43,6 +47,8 @@ export default function VideoFrame(props: any) {
             updateRenderingProperty();
         });
         return () => {
+            zloginfo(`[VideoFrame] useEffect return`)
+
             ZegoUIKitInternal.onSDKConnected(callbackID);
             ZegoUIKitInternal.onUserJoin(callbackID);
             ZegoUIKitInternal.onVideoViewForceRender(callbackID);
@@ -55,8 +61,9 @@ export default function VideoFrame(props: any) {
             <ZegoTextureView
                 // @ts-ignore
                 style={styles.videoContainer}
-                ref={viewRef}
+                ref={textureViewRef}
                 collapsable={false}
+                onLayout={onTextureLayout}
             />
             <View style={styles.audioContainer}>
                 {props.children}
