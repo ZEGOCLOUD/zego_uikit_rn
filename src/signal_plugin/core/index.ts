@@ -30,6 +30,7 @@ import ZegoPluginUserInRoomAttributesCore from './user_in_room_attributes_core';
 import ZegoPluginRoomPropertiesCore from './room_properties_core';
 import ZegoUIKitCorePlugin from "../../components/internal/ZegoUIKitCorePlugin";
 import ZegoPluginRoomMessageCore from './in_room_message_core';
+import { getZimConnectionEventName, getZimConnectionStateName } from '../../utils/enum_name';
 import ZegoUIKitReport from '../../utils/report';
 
 export default class ZegoSignalingPluginCore {
@@ -98,7 +99,7 @@ export default class ZegoSignalingPluginCore {
       'connectionStateChanged',
       (zim: any, { state, event, extendedData }: ZIMEventOfConnectionStateChangedResult) => {
         zloginfo(
-          `[Core]Connection state changed, state:${state}, event:${event}, extended data:${extendedData}`
+          `[Core]Connection state changed, state:${getZimConnectionStateName(state)}, event:${getZimConnectionEventName(event)}, extended data:${extendedData}`
         );
         this._connectionState = state;
         this._notifyConnectionStateChanged({ state });

@@ -161,7 +161,7 @@ const ZegoUIKitSignalingPluginImpl = {
       return Promise.reject();
     }
 
-    zloginfo(`[ZegoUIKitSignalingPluginImpl][sendInvitation] invitees: ${invitees}, timeout: ${timeout}, type: ${type}, data: ${data}, notificationConfig: ${notificationConfig}`)
+    zloginfo(`[ZegoUIKitSignalingPluginImpl][sendInvitation] invitees: ${invitees}, timeout: ${timeout}, type: ${type}, data: ${data}, notificationConfig: ${JSON.stringify(notificationConfig)}`)
 
     return ZegoUIKitSignalingPlugin.getInstance().invoke('sendInvitation', {
       inviterName: _localUser.userName,

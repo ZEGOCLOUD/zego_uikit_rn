@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useEffect } from 'react';
 import { Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import ZegoUIKitInvitationService from '../services';
 import ZegoInvitationType from './ZegoInvitationType';
@@ -128,10 +128,11 @@ export default function ZegoSendInvitationButton(props: any) {
       return; 
     }
 
+    let notificationConfig = { resourceID, title: notificationTitle, message: notificationMessage }
     zloginfo(
-      `[Components]Send invitation start, invitees: ${invitees}, timeout: ${timeout}, type: ${type}, data: ${updatedData}`
+      `[Components]Send invitation start, invitees: ${invitees}, timeout: ${timeout}, type: ${type}, data: ${updatedData}, notificationConfig: ${JSON.stringify(notificationConfig)}`
     );
-    ZegoUIKitInvitationService.sendInvitation(invitees, timeout, type, updatedData, { resourceID, title: notificationTitle, message: notificationMessage })
+    ZegoUIKitInvitationService.sendInvitation(invitees, timeout, type, updatedData, notificationConfig)
       .then(({ code, message, callID, errorInvitees }: any) => {
         zloginfo(
           `[Components]Send invitation success, code: ${code}, message: ${message}, errorInvitees: ${errorInvitees}`
@@ -178,6 +179,13 @@ export default function ZegoSendInvitationButton(props: any) {
       zloginfo('[ZegoSendInvitationButton][onButtonPress] onFailure execute end')
     }
   }
+
+  useEffect(() => {
+    zloginfo(`[ZegoSendInvitationButton] useEffect, notificationTitle: ${notificationTitle}`)
+    return () => {
+      zloginfo(`[ZegoSendInvitationButton] useEffect return`)
+    };
+  }, []);
 
   return (
     <TouchableOpacity

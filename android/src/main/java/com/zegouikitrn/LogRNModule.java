@@ -79,7 +79,7 @@ public class LogRNModule extends ReactContextBaseJavaModule {
                 .Builder(getStorageFilesPath(reactContext) + File.separator + UIKIT_LOGS_SUBPATH)    // 指定保存日志文件的路径
                 .fileNameGenerator(new CustomFileNameGenerator())        // 指定日志文件名生成器
                 .backupStrategy(new NeverBackupStrategy())             // 指定日志文件备份策略，默认为 FileSizeBackupStrategy(1024 * 1024)
-                .cleanStrategy(new FileLastModifiedCleanStrategy(3L*24*60*60*1000))     // 指定日志文件清除策略，默认为 NeverCleanStrategy()
+                .cleanStrategy(new FileLastModifiedCleanStrategy(7L*24*60*60*1000))     // 指定日志文件清除策略，默认为 NeverCleanStrategy()
                 .flattener(new PatternFlattener("{d MMdd HH:mm:ss.SSS} {m}"))
                 .build();
             XLog.init(config, filePrinter);

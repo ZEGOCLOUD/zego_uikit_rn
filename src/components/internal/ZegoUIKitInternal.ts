@@ -1,19 +1,21 @@
 import ZegoExpressEngine, {
-  ZegoRoomStateChangedReason,
   ZegoAudioRoute,
-  ZegoUser,
   ZegoEngineProfile,
-  ZegoRoomConfig,
   ZegoPublishChannel,
+  ZegoRoomConfig,
+  ZegoRoomStateChangedReason,
   ZegoStream,
+  ZegoUpdateType,
+  ZegoUser,
 } from 'zego-express-engine-reactnative';
-import ZegoUIKitSignalingPluginImpl from '../../plugins/invitation';
-import { zlogerror, zloginfo, zlogwarning } from '../../utils/logger';
+
 import { ZegoAudioVideoResourceMode, ZegoChangedCountOrProperty, ZegoRoomPropertyUpdateType, ZegoUIKitVideoConfig } from './defines'
-import { ZegoUpdateType } from 'zego-express-engine-reactnative';
+import ZegoUIKitSignalingPluginImpl from '../../plugins/invitation';
+import { getZegoUpdateTypeName } from '../../utils/enum_name';
+import { zlogerror, zloginfo, zlogwarning } from '../../utils/logger';
 import { getPackageVersion } from '../../utils/package_version';
-import { getRnVersion, logComponentsVersion } from '../../utils/version';
 import ZegoUIKitReport from '../../utils/report';
+import { getRnVersion, logComponentsVersion } from '../../utils/version';
 
 var _appInfo = {
   appID: 0,
@@ -677,17 +679,12 @@ function _turnCameraDeviceOn(userID: string, on: boolean) {
 }
 function _registerEngineCallback() {
   zloginfo('Register callback for ZegoExpressEngine...');
-  ZegoExpressEngine.instance().on(
-    'roomUserUpdate',
-    (roomID, updateType, userList) => {
-      zloginfo('[roomUserUpdate callback]', roomID, updateType, userList);
+  ZegoExpressEngine.instance().on('roomUserUpdate', (roomID, updateType: ZegoUpdateType, userList) => {
+      zloginfo('[roomUserUpdate callback]', roomID, getZegoUpdateTypeName(updateType), userList);
       _onRoomUserUpdate(roomID, updateType, userList);
-    }
-  );
-  ZegoExpressEngine.instance().on(
-    'roomStreamUpdate',
-    (roomID, updateType, streamList) => {
-      zloginfo('[roomStreamUpdate callback]', roomID, updateType, streamList);
+  });
+  ZegoExpressEngine.instance().on('roomStreamUpdate', (roomID, updateType: ZegoUpdateType, streamList) => {
+      zloginfo('[roomStreamUpdate callback]', roomID, getZegoUpdateTypeName(updateType), streamList);
       _onRoomStreamUpdate(roomID, updateType, streamList);
     }
   );
@@ -967,12 +964,7 @@ function _tryStopPublishStream(force = false) {
 function _tryStartPlayStream(userID: string) {
   if (userID in _coreUserMap) {
     const user = _coreUserMap[userID];
-    zloginfo(
-      '########_tryStartPlayStream##############: ',
-      user,
-      user.fillMode,
-      _audioVideoResourceMode,
-    );
+    zloginfo(`[_tryStartPlayStream] userID: ${user.userID}, viewID: ${user.viewID}, fillMode: ${user.fillMode}, resourceMode: ${_audioVideoResourceMode}`)
 
     // Playing Streaming.
     if (user.streamID !== '') {
@@ -1014,6 +1006,7 @@ function _tryStartPlayStream(userID: string) {
   }
 }
 function _tryStopPlayStream(userID: string, force = false) {
+  zloginfo(`[_tryStopPlayStream] userID: ${userID}`)
   if (userID in _coreUserMap) {
     const user = _coreUserMap[userID];
     if (force || (!user.isMicDeviceOn && !user.isCameraDeviceOn)) {
@@ -1128,17 +1121,10 @@ const ZegoUIKitInternal =  {
     _audioVideoResourceMode = audioVideoResourceMode || ZegoAudioVideoResourceMode.Default;
   },
   updateRenderingProperty(userID: string, viewID: number, fillMode: number, isScreenshare: boolean = false) {
-    zloginfo(
-      'updateRenderingProperty: ',
-      userID,
-      viewID,
-      fillMode,
-      isScreenshare,
-      '<<<<<<<<<<<<<<<<<<<<<<<<<<'
-    );
+    zloginfo(`[updateRenderingProperty] userID: ${userID}, viewID: ${viewID}, fillMode: ${fillMode}, isScreenshare: ${isScreenshare}`)
     if (userID === undefined) {
       zlogwarning(
-        'updateRenderingProperty: ignore undifine useid. Use empty string for local user.'
+        'updateRenderingProperty: ignore undefined useid. Use empty string for local user.'
       );
       return;
     }
