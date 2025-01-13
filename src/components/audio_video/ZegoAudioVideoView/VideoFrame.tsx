@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from "react";
-import { findNodeHandle, View, StyleSheet } from "react-native";
+import React, { useCallback, useEffect, useRef } from "react";
+import { findNodeHandle, LayoutChangeEvent, View, StyleSheet } from "react-native";
 import ZegoExpressEngine, { ZegoTextureView } from 'zego-express-engine-reactnative';
 import ZegoUIKitInternal from "../../internal/ZegoUIKitInternal";
 import { zloginfo } from "../../../utils/logger";
@@ -7,31 +7,39 @@ import { zloginfo } from "../../../utils/logger";
 export default function VideoFrame(props: any) {
     const { userID, roomID, fillMode, isPictureInPicture, isScreenShare } = props;
     const textureViewRef = useRef(null);
+    let textureViewID = -1;
 
     const updateRenderingProperty = () => {
         zloginfo(`[VideoFrame][updateRenderingProperty] isPictureInPicture: ${isPictureInPicture}`);
-        const viewID = findNodeHandle(textureViewRef.current);
         const appOrientation = ZegoUIKitInternal.appOrientation();
         const user = ZegoUIKitInternal.getUser(userID);
         var newFillMode = fillMode;
         if (isPictureInPicture && user) {
           newFillMode = appOrientation === 0 ? Number(!user.isLandscape) : Number(user.isLandscape);
         }
-        ZegoUIKitInternal.updateRenderingProperty(userID, viewID, newFillMode, isScreenShare);
+        ZegoUIKitInternal.updateRenderingProperty(userID, textureViewID, undefined, newFillMode, isScreenShare);
     }
 
-    const onTextureLayout = () => {
-        zloginfo(`[VideoFrame][onTextureLayout] textureViewID: ${findNodeHandle(textureViewRef.current)}`)
-        try {
-            ZegoExpressEngine.instance
-            updateRenderingProperty();
-        } catch (error) {   
+    const onTextureLayout = useCallback((event: LayoutChangeEvent) => {
+        const { width, height } = event.nativeEvent.layout;
+        zloginfo(`[VideoFrame][onTextureLayout] userID: ${userID}, textureViewID: ${textureViewID}, width: ${width}, height: ${height}`)
+
+        if (width > 0 || height > 0) {
+            try {
+                ZegoExpressEngine.instance
+                updateRenderingProperty();
+            } catch (error) {
+            }
+        } else {
+            // for FloatingMinimizedView
+            ZegoUIKitInternal.updateRenderingProperty(userID, -1, textureViewID, fillMode, isScreenShare);
         }
-    }
+    }, []);
 
     useEffect(() => {
         const callbackID = 'VideoFrame' + userID + String(Math.floor(Math.random() * 10000));
-        zloginfo(`[VideoFrame] useEffect, userID: ${userID}, viewID: ${findNodeHandle(textureViewRef.current)}, callbackID: ${callbackID}`)
+        textureViewID = findNodeHandle(textureViewRef.current)
+        zloginfo(`[VideoFrame] useEffect, userID: ${userID}, viewID: ${textureViewID}, callbackID: ${callbackID}`)
 
         ZegoUIKitInternal.onSDKConnected(callbackID, () => {
             updateRenderingProperty();
@@ -47,12 +55,13 @@ export default function VideoFrame(props: any) {
             updateRenderingProperty();
         });
         return () => {
-            zloginfo(`[VideoFrame] useEffect return`)
+            zloginfo(`[VideoFrame] useEffect return, viewID: ${textureViewID}`)
 
             ZegoUIKitInternal.onSDKConnected(callbackID);
             ZegoUIKitInternal.onUserJoin(callbackID);
             ZegoUIKitInternal.onVideoViewForceRender(callbackID);
-            ZegoUIKitInternal.updateRenderingProperty(userID, -1, fillMode, isScreenShare);
+            // for normal view
+            ZegoUIKitInternal.updateRenderingProperty(userID, -1, textureViewID, fillMode, isScreenShare);
         }
     }, []);
 

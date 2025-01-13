@@ -1126,8 +1126,8 @@ const ZegoUIKitInternal =  {
     zloginfo('setAudioVideoResourceMode', audioVideoResourceMode);
     _audioVideoResourceMode = audioVideoResourceMode || ZegoAudioVideoResourceMode.Default;
   },
-  updateRenderingProperty(userID: string, viewID: number, fillMode: number, isScreenshare: boolean = false) {
-    zloginfo(`[updateRenderingProperty] userID: ${userID}, viewID: ${viewID}, fillMode: ${fillMode}, isScreenshare: ${isScreenshare}`)
+  updateRenderingProperty(userID: string, viewID: number, lastViewID: number, fillMode: number, isScreenshare: boolean = false) {
+    zloginfo(`[updateRenderingProperty] userID: ${userID}, viewID: ${viewID}, lastViewID: ${lastViewID}, fillMode: ${fillMode}, isScreenshare: ${isScreenshare}`)
     if (userID === undefined) {
       zlogwarning(
         'updateRenderingProperty: ignore undefined useid. Use empty string for local user.'
@@ -1138,14 +1138,27 @@ const ZegoUIKitInternal =  {
       userID = _localCoreUser.userID;
     }
     if (userID in _coreUserMap) {
-      if (isScreenshare) {
-        _coreUserMap[userID].screenshareViewID = viewID;
-        _coreUserMap[userID].screenshareViewFillMode = fillMode;
-      } else {
-        _coreUserMap[userID].viewID = viewID;
-        _coreUserMap[userID].fillMode = fillMode;
+      // Avoid issues when the stream is handed over between two views.
+      let canUpdateViewID = true
+      if (viewID <= 0) {
+        if (isScreenshare) {
+          canUpdateViewID = (lastViewID === _coreUserMap[userID].screenshareViewID)
+        } else {
+          canUpdateViewID = (lastViewID === _coreUserMap[userID].viewID)
+        }
       }
-      _notifyUserInfoUpdate(_coreUserMap[userID]);
+      if (canUpdateViewID) {
+        if (isScreenshare) {
+          _coreUserMap[userID].screenshareViewID = viewID;
+          _coreUserMap[userID].screenshareViewFillMode = fillMode;
+        } else {
+          _coreUserMap[userID].viewID = viewID;
+          _coreUserMap[userID].fillMode = fillMode;
+        }
+        _notifyUserInfoUpdate(_coreUserMap[userID]);
+      } else {
+        zloginfo('[updateRenderingProperty] can not update viewID')
+      }
 
       if (_localCoreUser.userID == userID) {
         _localCoreUser.viewID = viewID;
