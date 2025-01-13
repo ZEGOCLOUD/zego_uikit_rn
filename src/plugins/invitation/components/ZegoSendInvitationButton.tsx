@@ -13,7 +13,7 @@ export default function ZegoSendInvitationButton(props: any) {
     text,
     invitees = [],
     type = ZegoInvitationType.videoCall,
-    data,
+    data = '',
     onRequestData,
     timeout = 60,
     onPressed,
@@ -120,7 +120,7 @@ export default function ZegoSendInvitationButton(props: any) {
     let updatedData = null
     if (typeof onRequestData === 'function') {
       updatedData = onRequestData()
-    } else if (data) {
+    } else if (data != undefined) {
       updatedData = data
     } else {
       requesting = false;
