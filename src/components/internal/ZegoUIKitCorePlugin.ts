@@ -30,10 +30,14 @@ const ZegoUIKitCorePlugin = {
           _plugins.set('ZPNs', plugin);
           zloginfo(`[ZegoUIKitCorePlugin][installPlugins]Plugin install success, plugin: ZPNs, index: ${index}`);
 
-          if ((Platform.OS === 'ios') && !(_plugins.get('CallKit'))) {
-            let callKitPlugin = require('zego-callkit-react-native');
-            _plugins.set('CallKit', callKitPlugin);
-            zloginfo(`[ZegoUIKitCorePlugin][installPlugins]Plugin install success, plugin: CallKit, index: ${index}`);
+          if (!(_plugins.get('CallKit')) && Platform.OS === 'ios') {
+            try {
+              let callKitPlugin = require('zego-callkit-react-native');
+              _plugins.set('CallKit', callKitPlugin);
+              zloginfo(`[ZegoUIKitCorePlugin][installPlugins] Plugin install success, plugin: CallKit, index: ${index}`);
+            } catch(error) {
+              zloginfo(`[ZegoUIKitCorePlugin][installPlugins] Cannot resolve module zego-callkit-react-native`);
+            }
           }
         }
       } else if (typeof plugin.getInstance === 'function') {

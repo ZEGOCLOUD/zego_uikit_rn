@@ -3,8 +3,6 @@ import { ZegoUIKitPluginType } from './defines';
 import ZegoPluginRoomPropertiesService from './services/room_properties_service';
 import ZegoPluginInRoomMessageService from './services/in_room_message_service';
 import ZegoPluginUserInRoomAttributesService from './services/user_in_room_attributes_service';
-import CallKit from 'zego-callkit-react-native';
-import { CXAction } from 'zego-callkit-react-native';
 
 export default class ZegoUIKitSignalingPlugin {
   static shared: ZegoUIKitSignalingPlugin;
@@ -46,10 +44,10 @@ export default class ZegoUIKitSignalingPlugin {
   setIOSOfflineDataHandler(handler: (data: any, uuid: string) => void) {
     ZegoPluginInvitationService.getInstance().setIOSOfflineDataHandler(handler);
   }
-  onCallKitAnswerCall(handler: (action: CXAction) => void) {
+  onCallKitAnswerCall(handler: (action: any) => void) {
     ZegoPluginInvitationService.getInstance().onCallKitAnswerCall(handler);
   }
-  onCallKitEndCall(handler: (action: CXAction) => void) {
+  onCallKitEndCall(handler: (action: any) => void) {
     ZegoPluginInvitationService.getInstance().onCallKitEndCall(handler);
   }
   reportCallKitCallEnded(uuid: string, reason: number) {

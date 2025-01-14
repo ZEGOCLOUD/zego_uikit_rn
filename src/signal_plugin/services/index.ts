@@ -1,7 +1,6 @@
 import ZegoSignalingPluginCore from '../core';
 import ZegoPluginResult from '../core/defines';
 import { zlogerror, zloginfo, zlogwarning } from '../utils/logger';
-import { CXAction } from 'zego-callkit-react-native';
 import type { ZPNsRegisterMessage, ZPNsMessage } from 'zego-zpns-react-native';
 import type { ZIMCallInviteConfig, ZIMCallCancelConfig, ZIMConnectionState } from 'zego-zim-react-native';
 import { CXCallEndedReason } from '../defines';
@@ -13,8 +12,8 @@ export default class ZegoPluginInvitationService {
   static shared: ZegoPluginInvitationService;
   _androidOfflineDataHandler: (data: any) => void;
   _iOSOfflineDataHandler: (data: any, uuid: string) => void;
-  _callKitAnswerCallHandler: (action: CXAction) => void;
-  _callKitEndCallHandler: (action: CXAction) => void;
+  _callKitAnswerCallHandler: (action: any) => void;
+  _callKitEndCallHandler: (action: any) => void;
 
   constructor() {
     if (!ZegoPluginInvitationService.shared) {
@@ -74,10 +73,10 @@ export default class ZegoPluginInvitationService {
   setIOSOfflineDataHandler(handler: (data: any, uuid: string) => void) {
     this._iOSOfflineDataHandler = handler;
   }
-  onCallKitAnswerCall(handler: (action: CXAction) => void) {
+  onCallKitAnswerCall(handler: (action: any) => void) {
     this._callKitAnswerCallHandler = handler;
   }
-  onCallKitEndCall(handler: (action: CXAction) => void) {
+  onCallKitEndCall(handler: (action: any) => void) {
     this._callKitEndCallHandler = handler;
   }
   getIOSOfflineDataHandler() {
@@ -127,7 +126,11 @@ export default class ZegoPluginInvitationService {
     }
     zloginfo(`[Service] enableNotifyWhenAppRunningInBackgroundOrQuit, certificateIndex: ${certificateIndex}, isIOSDevelopmentEnvironment: ${isIOSDevelopmentEnvironment}, appName: ${appName}`);
     if (ZegoUIKitCorePlugin.getZPNsPlugin()) {
-      if (Platform.OS === 'ios') {
+      if (Platform.OS === 'android') {
+        zloginfo('[ZegoPluginInvitationService] registerPush, Android');
+        ZegoUIKitCorePlugin.getZPNsPlugin().default.setPushConfig({ "enableFCMPush": true, "enableHWPush": false, "enableMiPush": false, "enableOppoPush": false, "enableVivoPush": false, "appType": certificateIndex });
+        ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().registerPush({ });
+      } else if (Platform.OS === 'ios' && ZegoUIKitCorePlugin.getCallKitPlugin()) {
         const CXProviderConfiguration = {
           localizedName: appName ?? 'My app',
           iconTemplateImageName: "AppIcon",
@@ -142,10 +145,6 @@ export default class ZegoPluginInvitationService {
           enableIOSVoIP: true,
           iOSEnvironment: iOSEnvironment,
         });
-      } else {
-        zloginfo('[ZegoPluginInvitationService] registerPush, Android');
-        ZegoUIKitCorePlugin.getZPNsPlugin().default.setPushConfig({ "enableFCMPush": true, "enableHWPush": false, "enableMiPush": false, "enableOppoPush": false, "enableVivoPush": false, "appType": certificateIndex });
-        ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().registerPush({ });
       }
 
       ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().on("registered", (message: ZPNsRegisterMessage) => {
@@ -189,35 +188,35 @@ export default class ZegoPluginInvitationService {
         ZegoUIKitCorePlugin.getCallKitPlugin().default.getInstance().on("didDeactivateAudioSession", () => {
           zloginfo('#########didDeactivateAudioSession');
         });
-        ZegoUIKitCorePlugin.getCallKitPlugin().default.getInstance().on("timedOutPerformingAction", (action: CXAction) => {
+        ZegoUIKitCorePlugin.getCallKitPlugin().default.getInstance().on("timedOutPerformingAction", (action: any) => {
           zloginfo('#########timedOutPerformingAction', action);
           action.fulfill();
         });
-        ZegoUIKitCorePlugin.getCallKitPlugin().default.getInstance().on("performStartCallAction", (action: CXAction) => {
+        ZegoUIKitCorePlugin.getCallKitPlugin().default.getInstance().on("performStartCallAction", (action: any) => {
           zloginfo('#########performStartCallAction', action);
           action.fulfill();
         });
-        ZegoUIKitCorePlugin.getCallKitPlugin().default.getInstance().on("performAnswerCallAction", (action: CXAction) => {
+        ZegoUIKitCorePlugin.getCallKitPlugin().default.getInstance().on("performAnswerCallAction", (action: any) => {
           zloginfo('#########performAnswerCallAction', action);
           ZegoPluginInvitationService.getInstance().getAnswerCallHandle()(action);
         });
-        ZegoUIKitCorePlugin.getCallKitPlugin().default.getInstance().on("performEndCallAction", (action: CXAction) => {
+        ZegoUIKitCorePlugin.getCallKitPlugin().default.getInstance().on("performEndCallAction", (action: any) => {
           zloginfo('#########performEndCallAction', action);
           ZegoPluginInvitationService.getInstance().getEndCallHandle()(action);
         });
-        ZegoUIKitCorePlugin.getCallKitPlugin().default.getInstance().on("performSetHeldCallAction", (action: CXAction) => {
+        ZegoUIKitCorePlugin.getCallKitPlugin().default.getInstance().on("performSetHeldCallAction", (action: any) => {
           zloginfo('#########performSetHeldCallAction', action);
           action.fulfill();
         });
-        ZegoUIKitCorePlugin.getCallKitPlugin().default.getInstance().on("performSetMutedCallAction", (action: CXAction) => {
+        ZegoUIKitCorePlugin.getCallKitPlugin().default.getInstance().on("performSetMutedCallAction", (action: any) => {
           zloginfo('#########performSetMutedCallAction', action);
           action.fulfill();
         });
-        ZegoUIKitCorePlugin.getCallKitPlugin().default.getInstance().on("performSetGroupCallAction", (action: CXAction) => {
+        ZegoUIKitCorePlugin.getCallKitPlugin().default.getInstance().on("performSetGroupCallAction", (action: any) => {
           zloginfo('#########performSetGroupCallAction', action);
           action.fulfill();
         });
-        ZegoUIKitCorePlugin.getCallKitPlugin().default.getInstance().on("performPlayDTMFCallAction", (action: CXAction) => {
+        ZegoUIKitCorePlugin.getCallKitPlugin().default.getInstance().on("performPlayDTMFCallAction", (action: any) => {
           zloginfo('#########performPlayDTMFCallAction', action);
           action.fulfill();
         });
