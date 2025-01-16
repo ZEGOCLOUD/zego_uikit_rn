@@ -229,19 +229,17 @@ export default class ZegoPluginInvitationService {
   }
 
   sendInvitation(inviterName: string, invitees: string[], timeout: number, type: number, data?: string, notificationConfig?: any) {
-
-    // invitees = invitees.map((invitee) => invitee);
     if (!invitees.length) {
       zlogerror('[Service]Send invitees is empty.');
       return Promise.reject(new ZegoPluginResult());
     }
+    
     const config = { timeout } as ZIMCallInviteConfig;
     config.extendedData = JSON.stringify({
       inviter_name: inviterName,
       type,
       data,
     });
-
     if (ZegoUIKitCorePlugin.getZPNsPlugin()) {
       config.pushConfig = {
         title: notificationConfig.title ?? "",
@@ -255,9 +253,10 @@ export default class ZegoPluginInvitationService {
         }
       };
     }
-    zloginfo(
-      `[Service]Send invitation: invitees: ${invitees}, timeout: ${timeout}, type: ${type}, data: ${data}.`
-    );
+    zloginfo(`[Service]Send invitation invitees: ${invitees}`);
+    zloginfo(`[Service]Send invitation config, timeout: ${timeout}, extendedData: ${config.extendedData}`);
+    zloginfo(`[Service]Send invitation config, pushConfig: ${config.pushConfig ? JSON.stringify(config.pushConfig) : ''}`);
+    
     return ZegoSignalingPluginCore.getInstance().invite(invitees, config);
   }
   cancelInvitation(invitees: string[], data?: string, notificationConfig?: any) {

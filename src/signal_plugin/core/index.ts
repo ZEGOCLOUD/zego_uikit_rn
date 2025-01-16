@@ -1,29 +1,26 @@
 import { AppState } from 'react-native';
-import type {
-  ZIMAppConfig,
-  ZIMUserInfo,
-  ZIMCallInviteConfig,
-  ZIMCallCancelConfig,
-  ZIMCallAcceptConfig,
-  ZIMCallRejectConfig,
-  ZIMError,
-  ZIMEventOfConnectionStateChangedResult,
-  ZIMEventOfCallInvitationReceivedResult,
-  ZIMEventOfCallInvitationCancelledResult,
-  ZIMEventOfCallInvitationAcceptedResult,
-  ZIMEventOfCallInvitationRejectedResult,
-  ZIMEventOfCallInvitationTimeoutResult,
-  ZIMEventOfCallInviteesAnsweredTimeoutResult,
-  ZIMCallInvitationSentResult,
-  ZIMCallCancelSentResult,
-  ZIMCallAcceptanceSentResult,
-  ZIMCallRejectionSentResult,
-  ZIMCallInvitationQueryConfig,
-  ZIMCallInvitationListQueriedResult,
-  ZIMCallInfo,
-  ZIMEventOfTokenWillExpireResult,
+import {
+  type ZIMAppConfig,
+  type ZIMUserInfo,
+  type ZIMCallInviteConfig,
+  type ZIMCallCancelConfig,
+  type ZIMCallAcceptConfig,
+  type ZIMCallRejectConfig,
+  type ZIMError,
+  type ZIMEventOfConnectionStateChangedResult,
+  type ZIMEventOfCallInvitationReceivedResult,
+  type ZIMEventOfCallUserStateChangedResult,
+  type ZIMCallInvitationSentResult,
+  type ZIMCallCancelSentResult,
+  type ZIMCallAcceptanceSentResult,
+  type ZIMCallRejectionSentResult,
+  type ZIMCallInvitationQueryConfig,
+  type ZIMCallInvitationListQueriedResult,
+  type ZIMCallInfo,
+  type ZIMEventOfTokenWillExpireResult,
+  ZIMCallUserState,
+  ZIMConnectionState,
 } from 'zego-zim-react-native';
-import { ZIMConnectionState, ZIMCallUserState } from "../defines";
 import ZegoPluginResult from './defines';
 import { zlogerror, zloginfo, zlogwarning } from '../utils/logger';
 import ZegoPluginUserInRoomAttributesCore from './user_in_room_attributes_core';
@@ -90,11 +87,13 @@ export default class ZegoSignalingPluginCore {
   // ------- internal events register ------
   _registerEngineCallback() {
     zloginfo('[Core]Register callback for ZIM...');
+
     ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().on('error', (zim: any, errorInfo: ZIMError) => {
       zlogerror(
         `[Core]Zim error, code:${errorInfo.code}, message:${errorInfo.message}.`
       );
     });
+
     ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().on(
       'connectionStateChanged',
       (zim: any, { state, event, extendedData }: ZIMEventOfConnectionStateChangedResult) => {
@@ -109,6 +108,7 @@ export default class ZegoSignalingPluginCore {
         }
       }
     );
+
     // Callback of the call invitation received by the invitee.
     ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().on(
       'callInvitationReceived',
@@ -140,93 +140,95 @@ export default class ZegoSignalingPluginCore {
           'inviter': notifyData.inviter.id,
           'app_state': AppState.currentState,
           'extended_data': extendedData
-        })    
+        })
       }
     );
-    // Callback of the disinvitation notification received by the invitee.
-    ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().on(
-      'callInvitationCancelled',
-      (zim: any, { callID, inviter, extendedData }: ZIMEventOfCallInvitationCancelledResult) => {
-        zloginfo(
-          '[Core][callInvitationCancelled callback]',
-          callID,
-          inviter,
-          extendedData
-        );
-        this._callIDUsers.delete(callID);
-        const notifyData = {
-          callID,
-          inviter: { id: inviter, name: '' },
-          data: extendedData,
-        };
-        this._notifyCallInvitationCancelled(notifyData);
-      }
-    );
-    // Callback of the invitation acceptance notification received by the inviter.
-    ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().on(
-      'callInvitationAccepted',
-      (zim: any, { callID, invitee, extendedData }: ZIMEventOfCallInvitationAcceptedResult) => {
-        zloginfo(
-          '[Core][callInvitationAccepted callback]',
-          callID,
-          invitee,
-          extendedData
-        );
-        const notifyData = {
-          callID,
-          invitee: { id: invitee, name: '' },
-          data: extendedData,
-        };
-        this._notifyCallInvitationAccepted(notifyData);
-      }
-    );
-    // Callback of notification received by the inviter that the inviter has declined the invitation.
-    ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().on(
-      'callInvitationRejected',
-      (zim: any, { callID, invitee, extendedData }: ZIMEventOfCallInvitationRejectedResult) => {
-        zloginfo(
-          '[Core][callInvitationRejected callback]',
-          callID,
-          invitee,
-          extendedData
-        );
-        const notifyData = {
-          callID,
-          invitee: { id: invitee, name: '' },
-          data: extendedData,
-        };
-        this._notifyCallInvitationRejected(notifyData);
-      }
-    );
-    // Call invitation timeout notification callback for the invitee.
-    ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().on('callInvitationTimeout', (zim: any, { callID }: ZIMEventOfCallInvitationTimeoutResult) => {
-      zloginfo('[Core][callInvitationTimeout callback]', callID);
-      const notifyData = {
-        callID,
-        inviter: { id: this._getInviterIDByCallID(callID), name: '' },
-        data: '',
-      };
-      this._notifyCallInvitationTimeout(notifyData);
+
+    ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().on('callUserStateChanged', (zim: any, result: ZIMEventOfCallUserStateChangedResult) => {
+      let callID = result.callID
+      let callUserList = result.callUserList
+      let callerID = this._getInviterIDByCallID(callID)
+      zloginfo(`[SignalingPluginCore][callUserStateChanged callback], callID: ${callID}, callerID: ${callerID}, callUserList: ${JSON.stringify(callUserList)}`)
+
+      callUserList.map(callUserInfo => {
+        let callUserID = callUserInfo.userID
+        let callUserState = callUserInfo.state
+        let callExtendedData = callUserInfo.extendedData
+
+        if (callUserState === ZIMCallUserState.Accepted && callUserID !== this._loginUser.userID) {   // 1
+          // as caller, state changed to Accepted as soon as after call, and wait for the other callees to change to the Accepted state
+          // as callee, should ignore anyone state changed callback
+          zloginfo(`[SignalingPluginCore][callUserStateChanged callback], detect ${callUserID} Accepted`)
+          if (this._loginUser.userID !== callerID) {
+            zloginfo(`[SignalingPluginCore][callUserStateChanged callback], ignore`)
+          } else if (callUserID !== this._loginUser.userID) {
+            // detect other state changed
+            zloginfo(`[SignalingPluginCore][callUserStateChanged callback], notifyCallInvitationAccepted`)
+            const notifyData = {
+              callID,
+              invitee: { id: callUserID, name: '' },
+              data: callExtendedData,
+            };
+            this._notifyCallInvitationAccepted(notifyData);
+          }
+        } else if (callUserState === ZIMCallUserState.Rejected) {  // 2
+          // as caller, wait for the other callees's state changed to Rejected
+          // as callee, should ignore anyone state changed callback
+          zloginfo(`[SignalingPluginCore][callUserStateChanged callback], detect ${callUserID} Rejected`)
+          if (this._loginUser.userID !== callerID) {
+            zloginfo(`[SignalingPluginCore][callUserStateChanged callback], ignore`)
+          } else {
+            // detect other state changed
+            zloginfo(`[SignalingPluginCore][callUserStateChanged callback], notifyCallInvitationRejected`)
+            const notifyData = {
+              callID,
+              invitee: { id: callUserID, name: '' },
+              data: callExtendedData,
+            };
+            this._notifyCallInvitationRejected(notifyData);  
+          }
+        } else if (callUserState === ZIMCallUserState.Timeout) {  // 6
+          // as caller, wait for the other callees's state changed to the Timeout
+          // as callee, should only care own state changed to Timeout
+          zloginfo(`[SignalingPluginCore][callUserStateChanged callback], detect ${callUserID} Timeout`)
+          if (this._loginUser.userID === callerID) {
+            zloginfo(`[SignalingPluginCore][callUserStateChanged callback], notifyCallInviteesAnsweredTimeout`)
+            const notifyData = {
+              callID,
+              invitees: [{ id: callUserID, name: '' }],
+              data: '',
+            };
+            this._notifyCallInviteesAnsweredTimeout(notifyData);
+          } else if (callUserID === this._loginUser.userID) {
+            zloginfo(`[SignalingPluginCore][callUserStateChanged callback], notifyCallInvitationTimeout`)
+            const notifyData = {
+              callID,
+              inviter: { id: this._getInviterIDByCallID(callID), name: '' },
+              data: '',
+            };
+            this._notifyCallInvitationTimeout(notifyData);      
+          } else {
+            zloginfo(`[SignalingPluginCore][callUserStateChanged callback], ignore`)
+          }
+        } else if (callUserState === ZIMCallUserState.Cancelled || callUserState === ZIMCallUserState.BeCancelled) {  // 3 or 10
+          // as caller, will detect own state Cancelled after cancel active or cancelled by the svr during the network disconnection
+          // as callee, will detect own state BeCancelled after the invitation cancelled
+          zloginfo(`[SignalingPluginCore][callUserStateChanged callback], detect ${callUserID} ${callUserState === ZIMCallUserState.Cancelled ? 'Cancelled' : 'BeCancelled'}`)
+          if (callUserID !== this._loginUser.userID) {
+            zloginfo(`[SignalingPluginCore][callUserStateChanged callback], ignore`)
+          } else {
+            this._callIDUsers.delete(callID);
+            zloginfo(`[SignalingPluginCore][callUserStateChanged callback], notifyCallInvitationCancelled`)
+            const notifyData = {
+              callID,
+              inviter: { id: callUserID, name: '' },
+              data: callExtendedData,
+            };
+            this._notifyCallInvitationCancelled(notifyData);
+          }
+        }
+      })
     });
-    // Call invitation timeout notification callback by the inviter.
-    ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().on(
-      'callInviteesAnsweredTimeout',
-      (zim: any, { callID, invitees }: ZIMEventOfCallInviteesAnsweredTimeoutResult) => {
-        zloginfo(
-          '[Core][callInviteesAnsweredTimeout callback]',
-          callID,
-          invitees
-        );
-        const notifyData = {
-          callID,
-          invitees: invitees.map((invitee) => {
-            return { id: invitee, name: '' };
-          }),
-          data: '',
-        };
-        this._notifyCallInviteesAnsweredTimeout(notifyData);
-      }
-    );
 
     ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().on('tokenWillExpire', (zim: any, { second }: ZIMEventOfTokenWillExpireResult) => {
       zloginfo('zim token will expire.');
@@ -248,12 +250,8 @@ export default class ZegoSignalingPluginCore {
     zloginfo('[Core]Unregister callback from ZIM...');
     ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().off('error');
     ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().off('connectionStateChanged');
+    ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().off('callUserStateChanged');
     ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().off('callInvitationReceived');
-    ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().off('callInvitationCancelled');
-    ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().off('callInvitationAccepted');
-    ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().off('callInvitationRejected');
-    ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().off('callInvitationTimeout');
-    ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().off('callInviteesAnsweredTimeout');
     ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance().off('tokenWillExpire');
   }
   // ------- internal events exec ------
@@ -384,7 +382,7 @@ export default class ZegoSignalingPluginCore {
       const value = this._callIDUsers.get(key);
       if (userID === value) {
         callID = key;
-        zloginfo('[Core]getCallIDByUserID', userID, this._callIDUsers, callID);
+        zloginfo(`[Core]getCallIDByUserID, ${userID} => ${callID}`);
       }
     });
     return callID;
@@ -461,8 +459,6 @@ export default class ZegoSignalingPluginCore {
   }
   invite(invitees: string[], config: ZIMCallInviteConfig): Promise<{ callID: string; errorInvitees: string[]; code: string, message: string; }> {
     return new Promise((resolve, reject) => {
-      zloginfo(`[ZegoSignalingPluginCore] invite, invitees: ${invitees}`);
-      zloginfo(`[ZegoSignalingPluginCore] invite, config: ${config}`);
       ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()
         .callInvite(invitees, config)
         .then(({ callID, timeout, errorInvitees, errorUserList }: ZIMCallInvitationSentResult) => {

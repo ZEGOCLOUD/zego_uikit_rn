@@ -28,7 +28,6 @@ DerivedData
 *.ipa
 *.xcuserstate
 project.xcworkspace
-example/ios/Podfile.lock
 
 # Android/IJ
 #
@@ -68,3 +67,4 @@ npm
 zego-uikit-rn.zip
 build_local_package.sh
 dev.py
+Podfile.lock
