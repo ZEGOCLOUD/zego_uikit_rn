@@ -1,5 +1,5 @@
 export const getLocalDateFormat = () => {
-    function addLeadingZero(value, totalDigits = 2) {
+      function addLeadingZero(value, totalDigits = 2) {
         const stringValue = value.toString();
         const padding = '0'.repeat(totalDigits - stringValue.length);
         return padding + stringValue;

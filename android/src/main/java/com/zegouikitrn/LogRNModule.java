@@ -72,6 +72,11 @@ public class LogRNModule extends ReactContextBaseJavaModule {
         XLog.e(log);
     }
 
+    @ReactMethod
+    public void flush() {
+        // not support
+    }
+
     private void ensureXLogInitialized(ReactApplicationContext reactContext) {
         if (xlogHasInitialized == false) {
             LogConfiguration config = new LogConfiguration.Builder().build();
