@@ -1,5 +1,5 @@
 import { Platform } from 'react-native';
-import { zloginfo, zlogerror } from '../../utils/logger';
+import { zloginfo, zlogerror, zlogwarning } from '../../utils/logger';
 import { ZegoUIKitPluginType } from './defines';
 
 const _plugins = new Map(); // type -> plugin
@@ -36,7 +36,7 @@ const ZegoUIKitCorePlugin = {
               _plugins.set('CallKit', callKitPlugin);
               zloginfo(`[ZegoUIKitCorePlugin][installPlugins] Plugin install success, plugin: CallKit, index: ${index}`);
             } catch(error) {
-              zloginfo(`[ZegoUIKitCorePlugin][installPlugins] Cannot resolve module zego-callkit-react-native`);
+              zlogwarning(`[ZegoUIKitCorePlugin][installPlugins] Cannot resolve module zego-callkit-react-native`);
             }
           }
         }
@@ -69,7 +69,7 @@ const ZegoUIKitCorePlugin = {
   },
   getPlugin: (type: number) => {
     if (type === ZegoUIKitPluginType.signaling) {
-      zloginfo('[ZegoUIKitCorePlugin][getPlugin] type: ', type);
+      zloginfo('[ZegoUIKitCorePlugin][getPlugin] type:', type);
       return _plugins.get(type) || ZegoUIKitCorePlugin.getZIMPlugin();
     }
     return _plugins.get(type);

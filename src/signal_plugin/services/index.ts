@@ -1,9 +1,10 @@
+import type { ZIMCallInviteConfig, ZIMCallCancelConfig, ZIMConnectionState } from 'zego-zim-react-native';
+import type { ZPNsRegisterMessage, ZPNsMessage } from 'zego-zpns-react-native';
+
 import ZegoSignalingPluginCore from '../core';
 import ZegoPluginResult from '../core/defines';
 import { zlogerror, zloginfo, zlogwarning } from '../utils/logger';
-import type { ZPNsRegisterMessage, ZPNsMessage } from 'zego-zpns-react-native';
-import type { ZIMCallInviteConfig, ZIMCallCancelConfig, ZIMConnectionState } from 'zego-zim-react-native';
-import { CXCallEndedReason } from '../defines';
+import { CXCallEndedReason, CXCallUpdate } from '../defines';
 import ZegoUIKitCorePlugin from '../../components/internal/ZegoUIKitCorePlugin';
 import { Platform } from 'react-native';
 import ZegoUIKitReport from '../../utils/report';
@@ -14,6 +15,7 @@ export default class ZegoPluginInvitationService {
   _iOSOfflineDataHandler: (data: any, uuid: string) => void;
   _callKitAnswerCallHandler: (action: any) => void;
   _callKitEndCallHandler: (action: any) => void;
+  _advancedConfig: { [index: string]: string } = {};
 
   constructor() {
     if (!ZegoPluginInvitationService.shared) {
@@ -88,8 +90,19 @@ export default class ZegoPluginInvitationService {
   getEndCallHandle() {
     return this._callKitEndCallHandler;
   }
-  reportCallKitCallEnded(uuid: string, reason: number) {
-    return ZegoUIKitCorePlugin.getCallKitPlugin().default.getInstance().reportCallEnded(reason, uuid);
+  reportCallKitCallEnded(uuid: string, reason: CXCallEndedReason) {
+    if (ZegoUIKitCorePlugin.getCallKitPlugin()) {
+      return ZegoUIKitCorePlugin.getCallKitPlugin().default.getInstance().reportCallEnded(reason, uuid);
+    } else {
+      zlogwarning('[ZegoPluginInvitationService][reportCallKitCallEnded] Cannot getCallKitPlugin');
+    }
+  }
+  reportIncomingCall(cxCallUpdate: CXCallUpdate, uuid: string) {
+    if (ZegoUIKitCorePlugin.getCallKitPlugin()) {
+      return ZegoUIKitCorePlugin.getCallKitPlugin().default.getInstance().reportIncomingCall(cxCallUpdate, uuid);
+    } else {
+      zlogwarning('[ZegoPluginInvitationService][reportIncomingCall] Cannot getCallKitPlugin');
+    }
   }
   getZIMInstance() {
     return ZegoSignalingPluginCore.getInstance().getZIMInstance();
@@ -101,6 +114,12 @@ export default class ZegoPluginInvitationService {
     ZegoSignalingPluginCore.getInstance().create({
       appID,
       appSign,
+    });
+
+    // Some advanced key need to be called after create
+    Object.keys(this._advancedConfig).forEach(key => {
+      let value = this._advancedConfig[key]
+      ZegoSignalingPluginCore.getInstance().setAdvancedConfig(key, value);
     });
   }
   uninit() {
@@ -225,7 +244,11 @@ export default class ZegoPluginInvitationService {
     }
   }
   setAdvancedConfig(key: string, value: string) {
-    ZegoSignalingPluginCore.getInstance().setAdvancedConfig(key, value);
+    if (key === 'zim_voip_call_id') {
+      this._advancedConfig[key] = value
+    } else {
+      ZegoSignalingPluginCore.getInstance().setAdvancedConfig(key, value);
+    }
   }
 
   sendInvitation(inviterName: string, invitees: string[], timeout: number, type: number, data?: string, notificationConfig?: any) {
@@ -259,6 +282,7 @@ export default class ZegoPluginInvitationService {
     
     return ZegoSignalingPluginCore.getInstance().invite(invitees, config);
   }
+
   cancelInvitation(invitees: string[], data?: string, notificationConfig?: any) {
     invitees = invitees.map((invitee) => invitee);
     if (!invitees.length) {
@@ -286,6 +310,7 @@ export default class ZegoPluginInvitationService {
       config
     );
   }
+
   refuseInvitation(inviterID: string, data?: string) {
     let callID;
     // Parse data and adapt automatic rejection
@@ -306,13 +331,21 @@ export default class ZegoPluginInvitationService {
     );
     return ZegoSignalingPluginCore.getInstance().reject(callID, config);
   }
+
   acceptInvitation(inviterID: string, data?: string) {
-    const callID =
-      ZegoSignalingPluginCore.getInstance().getCallIDByUserID(inviterID);
+    let callID = ZegoSignalingPluginCore.getInstance().getCallIDByUserID(inviterID);
     if (!callID) {
-      zlogerror('[Service]Call id corresponding to the inviterID is empty.', inviterID, data);
-      return Promise.reject(new ZegoPluginResult());
+      if (data) {
+        const dataObj = JSON.parse(data);
+        callID = dataObj.callID;
+      }
+      
+      if (!callID) {
+        zlogerror('[Service]Call id corresponding to the inviterID is empty.', inviterID, data);
+        return Promise.reject(new ZegoPluginResult('', 'Call id corresponding to the inviterID is empty.'));
+      }
     }
+
     const config = { extendedData: data };
     zloginfo(
       `[Service]Accept invitation: callID: ${callID}, inviter id: ${inviterID}, data: ${data}.`
@@ -398,5 +431,8 @@ export default class ZegoPluginInvitationService {
   }
   onRequireNewToken(callbackID: string, callback: () => string) {
     ZegoSignalingPluginCore.getInstance().onRequireNewToken(callbackID, callback);
+  }
+  onLoginSuccess(callbackID: string, callback: () => void) {
+    ZegoSignalingPluginCore.getInstance().onLoginSuccess(callbackID, callback);
   }
 }

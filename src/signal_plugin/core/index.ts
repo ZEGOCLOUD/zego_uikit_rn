@@ -20,6 +20,7 @@ import {
   type ZIMEventOfTokenWillExpireResult,
   ZIMCallUserState,
   ZIMConnectionState,
+  ZIMErrorCode,
 } from 'zego-zim-react-native';
 import ZegoPluginResult from './defines';
 import { zlogerror, zloginfo, zlogwarning } from '../utils/logger';
@@ -45,7 +46,7 @@ export default class ZegoSignalingPluginCore {
   }) => void } = {};
   _onCallInvitationCancelledCallbackMap: { [index: string]: (notifyData: {
     callID: string;
-    inviter: { id: string; name: string; };
+    inviter: { id: string };
     data: string;
   }) => void } = {};
   _onCallInvitationAcceptedCallbackMap: { [index: string]: (notifyData: {
@@ -70,6 +71,7 @@ export default class ZegoSignalingPluginCore {
   }) => void } = {};
   _currentInvitationID = ''
   _onRequireNewTokenCallbackMap: { [index: string]: () => string } = {};
+  _onLoginSuccessCallbackMap: { [index: string]: () => void } = {};
 
   constructor() {
     if (!ZegoSignalingPluginCore.shared) {
@@ -133,6 +135,7 @@ export default class ZegoSignalingPluginCore {
           notifyData.inviter.name = extendedMap.inviter_name;
           notifyData.type = extendedMap.type;
           notifyData.data = extendedMap.data;
+          notifyData.timeout = timeout
         }
         this._notifyCallInvitationReceived(notifyData);
         ZegoUIKitReport.reportEvent('invitationReceived', {
@@ -221,7 +224,7 @@ export default class ZegoSignalingPluginCore {
             zloginfo(`[SignalingPluginCore][callUserStateChanged callback], notifyCallInvitationCancelled`)
             const notifyData = {
               callID,
-              inviter: { id: callUserID, name: '' },
+              inviter: { id: this._getInviterIDByCallID(callID) },
               data: callExtendedData,
             };
             this._notifyCallInvitationCancelled(notifyData);
@@ -283,9 +286,12 @@ export default class ZegoSignalingPluginCore {
   }
   _notifyCallInvitationCancelled(notifyData: {
     callID: string;
-    inviter: { id: string; name: string; };
+    inviter: { id: string };
     data: string;
   }) {
+    let callbackCount = Object.keys(this._onCallInvitationCancelledCallbackMap).length;
+    zloginfo(`[ZegoSignalingPluginCore][_notifyCallInvitationCancelled] notify count: ${callbackCount}`);
+
     Object.keys(this._onCallInvitationCancelledCallbackMap).forEach(
       (callbackID) => {
         if (this._onCallInvitationCancelledCallbackMap[callbackID]) {
@@ -404,7 +410,7 @@ export default class ZegoSignalingPluginCore {
         this._createHandle();
       }
     } else {
-      zlogwarning('[Core]Zim has created.');
+      zlogwarning('[Core]Zim has already created.');
       this._createHandle();
     }
   }
@@ -420,13 +426,25 @@ export default class ZegoSignalingPluginCore {
             this._loginUser = userInfo;
             this._isLogin = true;
             resolve();
+            zloginfo('notify _onLoginSuccessCallbackMap');
+            Object.keys(this._onLoginSuccessCallbackMap).forEach((callbackID) => {
+              if (this._onLoginSuccessCallbackMap[callbackID]) {
+                this._onLoginSuccessCallbackMap[callbackID]()
+              }
+            });
           }).catch((error: ZIMError) => {
-            if (error.code == 6000111) {
+            if (error.code == ZIMErrorCode.NetworkModuleUserHasAlreadyLogged) {
               zloginfo('ZIM login already.');
-              zloginfo('[Core]Login already success.', error);
+              zloginfo('[Core]Login already success.');
               resolve();
+              zloginfo('notify _onLoginSuccessCallbackMap');
+              Object.keys(this._onLoginSuccessCallbackMap).forEach((callbackID) => {
+                if (this._onLoginSuccessCallbackMap[callbackID]) {
+                  this._onLoginSuccessCallbackMap[callbackID]()
+                }
+              });
             } else {
-              zloginfo('ZIM login fail.');
+              zloginfo(`ZIM login fail, error: ${error.code}`);
               reject(error);
             }
           });
@@ -563,6 +581,7 @@ export default class ZegoSignalingPluginCore {
           resolve(new ZegoPluginResult());
         })
         .catch((error: ZIMError) => {
+          zloginfo(`[Core]Reject invitation error, call id: ${callID}, error: ${error.code}`);
           reject(error);
         });
     });
@@ -638,11 +657,7 @@ export default class ZegoSignalingPluginCore {
   }) => void) {
     if (typeof callback !== 'function') {
       if (callbackID in this._onCallInvitationCancelledCallbackMap) {
-        zloginfo(
-          '[Core][onCallInvitationCancelled] Remove callback for: [',
-          callbackID,
-          '] because callback is not a valid function!'
-        );
+        zloginfo('[Core][onCallInvitationCancelled] Remove callback for: [', callbackID, ']');
         delete this._onCallInvitationCancelledCallbackMap[callbackID];
       }
     } else {
@@ -733,6 +748,20 @@ export default class ZegoSignalingPluginCore {
       }
     } else {
       this._onRequireNewTokenCallbackMap[callbackID] = callback;
+    }
+  }
+  onLoginSuccess(callbackID: string, callback?: () => void) {
+    if (typeof callback !== 'function') {
+      if (callbackID in this._onLoginSuccessCallbackMap) {
+        delete this._onLoginSuccessCallbackMap[callbackID];
+        zloginfo(`[onLoginSuccess] Remove callback for: ${callbackID}`)
+      }
+    } else {
+      this._onLoginSuccessCallbackMap[callbackID] = callback;
+      if (this._isLogin) {
+        zloginfo(`[onLoginSuccess] already login, execute callback directly.`)
+        callback()
+      }
     }
   }
 }

@@ -29,6 +29,8 @@ import ZegoUIKitSignalingPluginImpl, {
 import ZegoUIKitLogger from './utils/kitlogger';
 import ZegoUIKitReport from './utils/report';
 import ZegoToast from './components/ZegoToast';
+import ZegoPluginResult from './signal_plugin/core/defines';
+import { CXAction, CXCallUpdate } from './signal_plugin/defines';
 
 export default {
   init: ZegoUIKitInternal.connectSDK,
@@ -130,4 +132,7 @@ export {
   ZegoUIKitReport,
   ZegoToast,
   ZegoToastType,
+  ZegoPluginResult,
+  CXAction,
+  CXCallUpdate
 };

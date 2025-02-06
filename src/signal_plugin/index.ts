@@ -1,5 +1,5 @@
 import ZegoPluginInvitationService from './services';
-import { ZegoUIKitPluginType } from './defines';
+import { CXCallEndedReason, CXCallUpdate, ZegoUIKitPluginType } from './defines';
 import ZegoPluginRoomPropertiesService from './services/room_properties_service';
 import ZegoPluginInRoomMessageService from './services/in_room_message_service';
 import ZegoPluginUserInRoomAttributesService from './services/user_in_room_attributes_service';
@@ -50,8 +50,11 @@ export default class ZegoUIKitSignalingPlugin {
   onCallKitEndCall(handler: (action: any) => void) {
     ZegoPluginInvitationService.getInstance().onCallKitEndCall(handler);
   }
-  reportCallKitCallEnded(uuid: string, reason: number) {
+  reportCallKitCallEnded(uuid: string, reason: CXCallEndedReason) {
     ZegoPluginInvitationService.getInstance().reportCallKitCallEnded(uuid, reason);
+  }
+  reportIncomingCall(cxCallUpdate: CXCallUpdate, uuid: string) {
+    ZegoPluginInvitationService.getInstance().reportIncomingCall(cxCallUpdate, uuid);
   }
   queryCallList(count: number, nextFlag?: number) {
     return ZegoPluginInvitationService.getInstance().queryCallList(count, nextFlag);
@@ -105,6 +108,11 @@ export default class ZegoUIKitSignalingPlugin {
         return ZegoPluginInvitationService.getInstance().reportCallKitCallEnded(
           params.uuid,
           params.reason
+        );
+      case 'reportIncomingCall':
+        return ZegoPluginInvitationService.getInstance().reportIncomingCall(
+          params.cxCallUpdate,
+          params.uuid
         );
       case 'refuseInvitation':
         return ZegoPluginInvitationService.getInstance().refuseInvitation(
@@ -236,6 +244,9 @@ export default class ZegoUIKitSignalingPlugin {
         break;
       case 'onRequireNewToken':
         ZegoPluginInvitationService.getInstance().onRequireNewToken(callbackID, callback);
+        break;
+      case 'onLoginSuccess':
+        ZegoPluginInvitationService.getInstance().onLoginSuccess(callbackID, callback);
         break;
       default:
         break;

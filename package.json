@@ -77,7 +77,8 @@
     "typescript": "^4.5.2",
     "zego-express-engine-reactnative": "^3.19.2",
     "zego-zim-react-native": "^2.20.0",
-    "zego-zpns-react-native": "^2.8.1"
+    "zego-zpns-react-native": "^2.8.1",
+    "zego-callkit-react-native": "^1.0.6"
   },
   "resolutions": {
     "@types/react": "17.0.21"
