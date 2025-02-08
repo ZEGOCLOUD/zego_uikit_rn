@@ -167,10 +167,16 @@ export default class ZegoSignalingPluginCore {
           } else if (callUserID !== this._loginUser.userID) {
             // detect other state changed
             zloginfo(`[SignalingPluginCore][callUserStateChanged callback], notifyCallInvitationAccepted`)
+
+            let dataParsed = callExtendedData ? JSON.parse(callExtendedData) : {}
+            dataParsed.callID = callID
+            dataParsed.call_id = dataParsed.call_id ?? ''
+            dataParsed.invitee = dataParsed.invitee ?? {userID: callUserID, userName: ''}
+
             const notifyData = {
               callID,
               invitee: { id: callUserID, name: '' },
-              data: callExtendedData,
+              data: JSON.stringify(dataParsed),
             };
             this._notifyCallInvitationAccepted(notifyData);
           }
@@ -183,10 +189,16 @@ export default class ZegoSignalingPluginCore {
           } else {
             // detect other state changed
             zloginfo(`[SignalingPluginCore][callUserStateChanged callback], notifyCallInvitationRejected`)
+
+            let dataParsed = callExtendedData ? JSON.parse(callExtendedData) : {}
+            dataParsed.callID = callID
+            dataParsed.call_id = dataParsed.call_id ?? ''
+            dataParsed.invitee = dataParsed.invitee ?? {userID: callUserID, userName: ''}
+
             const notifyData = {
               callID,
               invitee: { id: callUserID, name: '' },
-              data: callExtendedData,
+              data: JSON.stringify(dataParsed),
             };
             this._notifyCallInvitationRejected(notifyData);  
           }
@@ -196,20 +208,30 @@ export default class ZegoSignalingPluginCore {
           zloginfo(`[SignalingPluginCore][callUserStateChanged callback], detect ${callUserID} Timeout`)
           if (this._loginUser.userID === callerID) {
             zloginfo(`[SignalingPluginCore][callUserStateChanged callback], notifyCallInviteesAnsweredTimeout`)
+
+            let dataParsed = callExtendedData ? JSON.parse(callExtendedData) : {}
+            dataParsed.call_id = dataParsed.call_id ?? ''
+            dataParsed.invitees = [{userID: callUserID, userName: ''}]
+
             const notifyData = {
               callID,
               invitees: [{ id: callUserID, name: '' }],
-              data: '',
+              data: JSON.stringify(dataParsed),
             };
-            this._notifyCallInviteesAnsweredTimeout(notifyData);
+            this._notifyCallInviteesAnsweredTimeout(notifyData);  // for onOutgoingCallTimeout
           } else if (callUserID === this._loginUser.userID) {
             zloginfo(`[SignalingPluginCore][callUserStateChanged callback], notifyCallInvitationTimeout`)
+
+            let dataParsed = callExtendedData ? JSON.parse(callExtendedData) : {}
+            dataParsed.call_id = dataParsed.call_id ?? ''
+            dataParsed.inviter = [{userID: this._getInviterIDByCallID(callID), userName: ''}]
+
             const notifyData = {
               callID,
               inviter: { id: this._getInviterIDByCallID(callID), name: '' },
-              data: '',
+              data: JSON.stringify(dataParsed),
             };
-            this._notifyCallInvitationTimeout(notifyData);      
+            this._notifyCallInvitationTimeout(notifyData);        // for onIncomingCallTimeout
           } else {
             zloginfo(`[SignalingPluginCore][callUserStateChanged callback], ignore`)
           }
@@ -220,13 +242,19 @@ export default class ZegoSignalingPluginCore {
           if (callUserID !== this._loginUser.userID) {
             zloginfo(`[SignalingPluginCore][callUserStateChanged callback], ignore`)
           } else {
-            this._callIDUsers.delete(callID);
             zloginfo(`[SignalingPluginCore][callUserStateChanged callback], notifyCallInvitationCancelled`)
+            
+            let dataParsed = callExtendedData ? JSON.parse(callExtendedData) : {}
+            dataParsed.callID = callID
+            dataParsed.call_id = dataParsed.call_id ?? ''
+            dataParsed.inviter = dataParsed.inviter ?? {userID: '', userName: ''}
+            
             const notifyData = {
               callID,
               inviter: { id: this._getInviterIDByCallID(callID) },
-              data: callExtendedData,
+              data: JSON.stringify(dataParsed),
             };
+            this._callIDUsers.delete(callID);
             this._notifyCallInvitationCancelled(notifyData);
           }
         }
