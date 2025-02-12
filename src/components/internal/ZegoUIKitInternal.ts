@@ -725,8 +725,7 @@ function _registerEngineCallback() {
         return;
       }
 
-      // 0 or 11 for device is on
-      let isCameraOn = (state == ZegoRemoteDeviceState.Open || state == ZegoRemoteDeviceState.Interruption)
+      let isCameraOn = (state == ZegoRemoteDeviceState.Open)
       _onRemoteCameraStateUpdate(_getUserIDByStreamID(streamID), isCameraOn);
     }
   );
