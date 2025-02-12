@@ -6,7 +6,7 @@ import ZegoUIKitReport from './report';
 
 export const logComponentsVersion = (extraInfo: Map<string, string>) => {
     var expressVersionPromise = require('zego-express-engine-reactnative').default.getVersion()
-    var zimVersionPromise = ZegoUIKitCorePlugin.getZIMPlugin().default.getVersion()
+    var zimVersionPromise = ZegoUIKitCorePlugin.getZIMPlugin() ? ZegoUIKitCorePlugin.getZIMPlugin().default.getVersion() : ""
     var zpnsVersionPromise = ZegoUIKitCorePlugin.getZPNsPlugin() ? ZegoUIKitCorePlugin.getZPNsPlugin().default.getVersion() : ""
     var callkitVersionPromise = ZegoUIKitCorePlugin.getCallKitPlugin() ? "unknown" : ""
     var reportVersionPromise = ZegoUIKitReport.getVersion()
