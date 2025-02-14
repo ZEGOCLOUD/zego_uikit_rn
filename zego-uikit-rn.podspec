@@ -17,6 +17,6 @@ Pod::Spec.new do |s|
   s.requires_arc = true
 
   s.dependency "React-Core"
-  s.dependency 'ZegoUIKitReport', '0.2.10'
+  s.dependency 'ZegoUIKitReport', '0.5.1'
   
 end
