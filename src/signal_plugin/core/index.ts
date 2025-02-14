@@ -562,22 +562,22 @@ export default class ZegoSignalingPluginCore {
         });
     });
   }
-  cancel(invitees: string[], callID: string, config: ZIMCallCancelConfig): Promise<{ code: string, message: string; errorInvitees: string[]; }> {
+  cancel(invitees: string[], callID: string, config: ZIMCallCancelConfig): Promise<{ code: string, message: string; callID: string, errorInvitees: string[]; }> {
     return new Promise((resolve, reject) => {
       ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()
         .callCancel(invitees, callID, config)
-        .then(({ callID: resCallID, errorInvitees }: ZIMCallCancelSentResult) => {
+        .then(({ callID, errorInvitees }: ZIMCallCancelSentResult) => {
           this._callIDUsers.delete(callID);
           if (!errorInvitees || !errorInvitees.length) {
             zloginfo(`[Core]Cancel invitation done, call id: ${callID}`);
-            resolve({ ...new ZegoPluginResult('', ''), errorInvitees: [] });
+            resolve({ ...new ZegoPluginResult('', ''), callID, errorInvitees: [] });
           } else {
             errorInvitees.forEach((inviteeID) => {
               zlogwarning(
                 `[Core]Cancel invitation error, invitee id: ${inviteeID}`
               );
             });
-            resolve({ ...new ZegoPluginResult('', ''), errorInvitees });
+            resolve({ ...new ZegoPluginResult('', ''), callID, errorInvitees });
           }
         })
         .catch((error: ZIMError) => {
@@ -590,9 +590,9 @@ export default class ZegoSignalingPluginCore {
     return new Promise((resolve, reject) => {
       ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()
         .callAccept(callID, config)
-        .then(({ callID: resCallID }: ZIMCallAcceptanceSentResult) => {
+        .then(({ callID }: ZIMCallAcceptanceSentResult) => {
           zloginfo(`[Core]Accept invitation done, call id: ${callID}`);
-          resolve(new ZegoPluginResult());
+          resolve(new ZegoPluginResult('', '', {callID}));
         })
         .catch((error: ZIMError) => {
           reject(error);
@@ -603,10 +603,10 @@ export default class ZegoSignalingPluginCore {
     return new Promise((resolve, reject) => {
       ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()
         .callReject(callID, config)
-        .then(({ callID: resCallID }: ZIMCallRejectionSentResult) => {
+        .then(({ callID }: ZIMCallRejectionSentResult) => {
           zloginfo(`[Core]Reject invitation done, call id: ${callID}`);
           this._callIDUsers.delete(callID);
-          resolve(new ZegoPluginResult());
+          resolve(new ZegoPluginResult('', '', {callID}));
         })
         .catch((error: ZIMError) => {
           zloginfo(`[Core]Reject invitation error, call id: ${callID}, error: ${error.code}`);

@@ -1,8 +1,11 @@
 export default class ZegoPluginResult {
   code = '';
   message = '';
-  constructor(code = '', message = '') {
+  data = {};
+
+  constructor(code = '', message = '', data = {}) {
     this.code = code;
     this.message = message;
+    this.data = data;
   }
 }

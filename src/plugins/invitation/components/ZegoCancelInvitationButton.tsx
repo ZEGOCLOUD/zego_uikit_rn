@@ -71,21 +71,22 @@ export default function ZegoCancelInvitationButton(props: any) {
       `[Components]Cancel invitation start, invitees: ${invitees}, data: ${data}`
     );
     ZegoUIKitInvitationService.cancelInvitation(invitees, data)
-      .then(({ code, message, errorInvitees }: any) => {
+      .then(({ code, message, callID, errorInvitees }: any) => {
         zloginfo(
-          `[Components]Cancel invitation success, errorInvitees: ${errorInvitees}`
+          `[Components]Cancel invitation success, callID: ${callID}, errorInvitees: ${errorInvitees}`
         );
         if (invitees.length > errorInvitees.length) {
           if (typeof onPressed === 'function') {
-            const inviteesBackup = JSON.parse(JSON.stringify(invitees));
+            const succInvitees = JSON.parse(JSON.stringify(invitees));
             errorInvitees.forEach((errorInviteeID: string) => {
-              const index = inviteesBackup.findIndex(
+              const index = succInvitees.findIndex(
                 (inviteeID: string) => errorInviteeID === inviteeID
               );
-              index !== -1 && inviteesBackup.splice(index, 1);
+              index !== -1 && succInvitees.splice(index, 1);
             });
             onPressed({
-              invitees: inviteesBackup,
+              callID,
+              invitees: succInvitees,
             });
           }
         }
