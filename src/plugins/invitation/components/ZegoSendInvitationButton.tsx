@@ -130,7 +130,7 @@ export default function ZegoSendInvitationButton(props: any) {
 
     let notificationConfig = { resourceID, title: notificationTitle, message: notificationMessage }
     zloginfo(
-      `[Components]Send invitation start, invitees: ${invitees}, timeout: ${timeout}, type: ${type}, data: ${updatedData}, notificationConfig: ${JSON.stringify(notificationConfig)}`
+      `[Components]Send invitation start, invitees: ${JSON.stringify(invitees)}, timeout: ${timeout}, type: ${type}, data: ${updatedData}, notificationConfig: ${JSON.stringify(notificationConfig)}`
     );
     ZegoUIKitInvitationService.sendInvitation(invitees, timeout, type, updatedData, notificationConfig)
       .then(({ code, message, callID, errorInvitees }: any) => {

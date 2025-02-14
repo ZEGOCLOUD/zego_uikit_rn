@@ -16,7 +16,7 @@ import { getZegoUpdateTypeName } from '../../utils/enum_name';
 import { zlogerror, zloginfo, zlogwarning } from '../../utils/logger';
 import { getPackageVersion } from '../../utils/package_version';
 import ZegoUIKitReport from '../../utils/report';
-import { getRnVersion, logComponentsVersion } from '../../utils/version';
+import { logComponentsVersion } from '../../utils/version';
 
 var _appInfo = {
   appID: 0,
@@ -1257,9 +1257,6 @@ const ZegoUIKitInternal =  {
         scenario: 0,
       };
       ZegoUIKitReport.create(appID, appSign, {
-        'platform': 'rn',
-        'platform_version': getRnVersion(),
-        'uikit_version': getPackageVersion(),
         'user_id': userInfo.userID
       });
 

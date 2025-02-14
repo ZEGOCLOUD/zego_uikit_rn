@@ -1,5 +1,7 @@
-import { NativeModules, Platform } from 'react-native';
+import { NativeModules } from 'react-native';
 import { zloginfo } from './logger';
+import { getPackageVersion } from './package_version';
+import { getRnVersion } from './version';
 
 const { ReportRNModule } = NativeModules;
 
@@ -9,7 +11,14 @@ const ZegoUIKitReport = {
     },
 
     create: (appID: number, appSign: string, commonParams: {}) => {
-        zloginfo(`[ZegoUIKitReport][create] appID: ${appID}`)
+        // @ts-ignore
+        commonParams.platform = 'rn'
+        // @ts-ignore
+        commonParams.platform_version = getRnVersion()
+        // @ts-ignore
+        commonParams.uikit_version = getPackageVersion()
+
+        zloginfo(`[ZegoUIKitReport][create] appID: ${appID}, commonParams: ${JSON.stringify(commonParams)}`)
         ReportRNModule.create(appID.toString(), appSign, commonParams)
     },
 

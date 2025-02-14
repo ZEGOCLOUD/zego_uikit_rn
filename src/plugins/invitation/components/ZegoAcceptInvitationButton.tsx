@@ -1,8 +1,10 @@
 import React, { Fragment }from 'react';
 import { Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
-import ZegoUIKitInvitationService from '../services';
-import { zloginfo, zlogerror } from '../../../utils/logger';
+
 import ZegoUIKitInternal from '../../../components/internal/ZegoUIKitInternal';
+import ZegoPluginResult from '../../../signal_plugin/core/defines';
+import { zloginfo, zlogerror } from '../../../utils/logger';
+import ZegoUIKitInvitationService from '../services';
 
 export default function ZegoAcceptInvitationButton(props: any) {
   const {
@@ -69,11 +71,16 @@ export default function ZegoAcceptInvitationButton(props: any) {
     zloginfo(
       `[Components]Accept invitation start, inviterID: ${inviterID}, data: ${data}`
     );
+
     ZegoUIKitInvitationService.acceptInvitation(inviterID, data)
-      .then(() => {
-        zloginfo(`[Components]Accept invitation success`);
+      .then((result: ZegoPluginResult) => {
+        // @ts-ignore
+        zloginfo(`[Components]Accept invitation success, callID: ${result.data.callID}`);
         if (typeof onPressed === 'function') {
-          onPressed();
+          zloginfo('[ZegoAcceptInvitationButton][acceptInvitation] execute onPressed will')
+          // @ts-ignore
+          onPressed({inviterID, callID: result.data.callID});
+          zloginfo('[ZegoAcceptInvitationButton][acceptInvitation] execute onPressed succeed')
         }
       })
       .catch(({ code, message }: any) => {

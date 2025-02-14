@@ -1,8 +1,10 @@
-import React, { Fragment }from 'react';
+import React, { Fragment } from 'react';
 import { Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
-import ZegoUIKitInvitationService from '../services';
-import { zloginfo, zlogerror } from '../../../utils/logger';
+
 import ZegoUIKitInternal from '../../../components/internal/ZegoUIKitInternal';
+import ZegoPluginResult from '../../../signal_plugin/core/defines';
+import { zloginfo, zlogerror } from '../../../utils/logger';
+import ZegoUIKitInvitationService from '../services';
 
 export default function ZegoRefuseInvitationButton(props: any) {
   const {
@@ -69,11 +71,14 @@ export default function ZegoRefuseInvitationButton(props: any) {
     zloginfo(
       `[Components]Refuse invitation start, inviterID: ${inviterID}, data: ${data}`
     );
+    
     ZegoUIKitInvitationService.refuseInvitation(inviterID, data)
-      .then(() => {
-        zloginfo(`[Components]Refuse invitation success`);
+      .then((result: ZegoPluginResult) => {
+        // @ts-ignore
+        zloginfo(`[Components]Refuse invitation success, callID: ${result.data.callID}`);
         if (typeof onPressed === 'function') {
-          onPressed();
+          // @ts-ignore
+          onPressed({inviterID, callID: result.data.callID});
         }
       })
       .catch(({ code, message }: any) => {
