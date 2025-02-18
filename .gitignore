@@ -67,3 +67,5 @@ lib/
 
 npm
 zego-uikit-rn.zip
+build_local_package.sh
+dev.py
