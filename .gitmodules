@@ -4,9 +4,6 @@
 [submodule "prebuilts/call"]
 	path = prebuilts/call
 	url = git@github.com:ZEGOCLOUD/zego_uikit_prebuilt_call_rn.git
-[submodule "prebuilts/video_conference"]
-	path = prebuilts/video_conference
-	url = git@github.com:ZEGOCLOUD/zego_uikit_prebuilt_video_conference_rn.git
 [submodule "prebuilts/live_audio_room"]
 	path = prebuilts/live_audio_room
 	url = git@github.com:ZEGOCLOUD/zego_uikit_prebuilt_live_audio_room_rn.git
