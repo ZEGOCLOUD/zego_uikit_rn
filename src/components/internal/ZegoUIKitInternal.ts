@@ -1324,7 +1324,7 @@ const ZegoUIKitInternal =  {
     } else if (userID in _coreUserMap) {
       return _coreUserMap[userID].isMicDeviceOn;
     } else {
-      zlogwarning(
+      zloginfo(
         'Can not check mic device is on for user[',
         userID,
         '], because no record!'
@@ -1338,7 +1338,7 @@ const ZegoUIKitInternal =  {
     } else if (userID in _coreUserMap) {
       return _coreUserMap[userID].isCameraDeviceOn;
     } else {
-      zlogwarning(
+      zloginfo(
         'No record for user: ',
         userID,
         '. Can not check camera device is on.'

@@ -1,6 +1,6 @@
 {
   "name": "@zegocloud/zego-uikit-rn",
-  "version": "2.17.3",
+  "version": "2.17.4",
   "description": "ZegoUIKit is a low-code offering with pre-built and UI-ready components, such as AudioVideoView, CameraButtons, etc. Save time and assemble features fast with ZegoUIKit.",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -24,6 +24,7 @@
     "!android/gradlew.bat",
     "!android/local.properties",
     "!ios/build",
+    "!prebuilts/**",
     "!**/__tests__",
     "!**/__fixtures__",
     "!**/__mocks__"
