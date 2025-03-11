@@ -553,7 +553,7 @@ function _leaveRoom() {
       zloginfo('You are not join in any room, no need to leave room.');
       resolve();
     } else {
-      zloginfo(_localCoreUser.userID, ' leaveRoom: ', _currentRoomID);
+      zloginfo('userID:', _localCoreUser.userID, ' leaveRoom:', _currentRoomID);
       ZegoExpressEngine.instance()
         .logoutRoom(_currentRoomID)
         .then(() => {

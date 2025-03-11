@@ -15,6 +15,7 @@ export const logComponentsVersion = (extraInfo: Map<string, string>) => {
     .then(versions => {
       let versionTable = new Map<string, string>(Object.entries({
         'OS': `${Platform.OS} ${Platform.Version ?? ''}`,
+        'RN': getRnVersion(),
         'Express': versions[0],
         'ZIM': versions[1],
         'ZPNs': versions[2],

@@ -148,7 +148,7 @@ export default class ZegoPluginInvitationService {
       }
 
       ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().on("registered", (message: ZPNsRegisterMessage) => {
-        zloginfo("[ZegoPluginInvitationService] ZPNs registered with FCM, ", message)
+        zloginfo("[ZegoPluginInvitationService] ZPNs registered,", message)
         if (message.msg.includes("SERVICE_NOT_AVAILABLE")) {
           zlogwarning('[ZegoPluginInvitationService] ZPNs registered, Please check the network connectivity with FCM.')
         }
