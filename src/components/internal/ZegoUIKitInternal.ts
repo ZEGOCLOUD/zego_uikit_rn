@@ -376,15 +376,16 @@ function _onRemoteMicStateUpdate(userID: string, isOn: boolean) {
   }
 }
 function _onRoomStateChanged(roomID: string, reason: ZegoRoomStateChangedReason, errorCode: number, extendedData: string) {
-  zloginfo('Room state changed: ', roomID, reason, errorCode, extendedData);
+  zloginfo(`Room state changed: roomID: ${roomID}, reason: ${reason}, error: ${errorCode}, extendedData: ${extendedData}`);
+
   // Not support multi-room right now
-  if (reason == 1 || reason == 4) {
+  if (reason == ZegoRoomStateChangedReason.Logined || reason == ZegoRoomStateChangedReason.Reconnected) {
     // Logined || Reconnected
     _isRoomConnected = true;
     _tryStartPublishStream();
   } else {
     _isRoomConnected = false;
-    if (reason == 6) {
+    if (reason === ZegoRoomStateChangedReason.KickOut) {
       // KickOut
       _notifyMeRemovedFromRoom();
     }

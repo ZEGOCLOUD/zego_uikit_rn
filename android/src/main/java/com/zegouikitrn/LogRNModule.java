@@ -91,7 +91,7 @@ public class LogRNModule extends ReactContextBaseJavaModule {
 
             xlogHasInitialized = true;
             XLog.i("\n\n\n");
-            XLog.i("XLog init...");
+            XLog.i("==========PROCESS_START==========");
         }
     }
 
