@@ -98,11 +98,12 @@ export default class ZegoPluginInvitationService {
       zlogwarning('[ZegoPluginInvitationService][reportCallKitCallEnded] Cannot getCallKitPlugin');
     }
   }
-  reportIncomingCall(cxCallUpdate: CXCallUpdate, uuid: string) {
+  reportIncomingCall(cxCallUpdate: CXCallUpdate, uuid: string): Promise<any> {
     if (ZegoUIKitCorePlugin.getCallKitPlugin()) {
       return ZegoUIKitCorePlugin.getCallKitPlugin().default.getInstance().reportIncomingCall(cxCallUpdate, uuid);
     } else {
       zlogwarning('[ZegoPluginInvitationService][reportIncomingCall] Cannot getCallKitPlugin');
+      return Promise.reject('Cannot get CallKit plugin');
     }
   }
   getZIMInstance() {
