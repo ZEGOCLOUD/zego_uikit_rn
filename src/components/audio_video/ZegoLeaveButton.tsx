@@ -1,5 +1,7 @@
 import React from "react";
 import { Image, TouchableOpacity, View } from "react-native";
+
+import { zloginfo } from "../../utils/logger";
 import ZegoUIKitInternal from "../internal/ZegoUIKitInternal";
 
 export default function ZegoLeaveButton(props: any) {
@@ -12,6 +14,7 @@ export default function ZegoLeaveButton(props: any) {
       iconBuilder,
     } = props;
     const onPress = () => {
+        zloginfo('[ZegoLeaveButton][onPress]');
         if (typeof onLeaveConfirmation == 'function') {
             onLeaveConfirmation().then(() => {
                 ZegoUIKitInternal.leaveRoom();
