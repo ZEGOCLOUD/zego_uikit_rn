@@ -59,6 +59,10 @@ const ZegoUIKitLogger = {
             console.error(`${dateFormat} [${module}][${_userID}]`, ...msg);
         }
     },
+
+    logFlush: () => {
+        LogRNModule.flush()
+    }
 }
 
 export default ZegoUIKitLogger;

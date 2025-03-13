@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import type { ZIMCallInviteConfig, ZIMCallCancelConfig, ZIMConnectionState } from 'zego-zim-react-native';
 import type { ZPNsRegisterMessage, ZPNsMessage } from 'zego-zpns-react-native';
 
@@ -6,7 +7,6 @@ import ZegoPluginResult from '../core/defines';
 import { zlogerror, zloginfo, zlogwarning } from '../utils/logger';
 import { CXCallEndedReason, CXCallUpdate } from '../defines';
 import ZegoUIKitCorePlugin from '../../components/internal/ZegoUIKitCorePlugin';
-import { Platform } from 'react-native';
 import ZegoUIKitReport from '../../utils/report';
 
 export default class ZegoPluginInvitationService {
@@ -73,6 +73,7 @@ export default class ZegoPluginInvitationService {
     return this._androidOfflineDataHandler;
   }
   setIOSOfflineDataHandler(handler: (data: any, uuid: string) => void) {
+    zloginfo(`[ZegoPluginInvitationService][setIOSOfflineDataHandler]`)
     this._iOSOfflineDataHandler = handler;
   }
   onCallKitAnswerCall(handler: (action: any) => void) {
