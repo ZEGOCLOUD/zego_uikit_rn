@@ -9995,17 +9995,17 @@ yocto-queue@^0.1.0:
   resolved "https://registry.npmmirror.com/yocto-queue/-/yocto-queue-0.1.0.tgz#0294eb3dee05028d31ee1a5fa2c556a6aaf10a1b"
   integrity sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
 
-zego-express-engine-reactnative@^3.19.1:
-  version "3.19.1"
-  resolved "https://registry.npmmirror.com/zego-express-engine-reactnative/-/zego-express-engine-reactnative-3.19.1.tgz#2acd944eaada9931e2622032e8e6ff68c97f2f67"
-  integrity sha512-TRRS+c6HVozCaLfjPhMEUhWWhHqECz2/rXUjxo/rpBW3fpLaBG9ta1Kd1bpMa2u/eAnHzZbFMOQxVvOvRHDHew==
+zego-express-engine-reactnative@^3.19.2:
+  version "3.19.2"
+  resolved "https://registry.npmmirror.com/zego-express-engine-reactnative/-/zego-express-engine-reactnative-3.19.2.tgz#ee430a243a8742a02fb53a020efae51d5818825a"
+  integrity sha512-MdSGYVhvwiR7yPCxUsRBrQTZ7nHnYqhdnUP8ESwJISVQV1vuKqH4hUFnRglybW44PsT7hxJjLHFMbksyPDqtVQ==
 
-zego-zim-react-native@^2.19.0:
-  version "2.19.1"
-  resolved "https://registry.npmmirror.com/zego-zim-react-native/-/zego-zim-react-native-2.19.1.tgz#903f610c188a32ebfdda2e0a47ef29e72dfc513d"
-  integrity sha512-nWV5+tM7tKYNA7NM8Pws3JwxcqKTKYwOyMf4T5tnDis5WkeCY0W6jvBd8DwahPn4TaNdgsjQ4FZqCRod4LaS9w==
+zego-zim-react-native@^2.20.0:
+  version "2.20.0"
+  resolved "https://registry.npmmirror.com/zego-zim-react-native/-/zego-zim-react-native-2.20.0.tgz#1fde4221d6d82cf6fd42c9d027e6e25340a7c161"
+  integrity sha512-F6aPn58w29g6SeM/ma02sgeThGRii+2/Nc2MEkkFi62f8akvkBg+FUWXFkkbEs4SsnRCBhB9WIl19SsA8TaWxA==
 
-"zego-zpns-react-native@>=2.6.6 <2.8.0":
-  version "2.6.6"
-  resolved "https://registry.npmmirror.com/zego-zpns-react-native/-/zego-zpns-react-native-2.6.6.tgz#b75b8d73f6e048ec6f457c791fbcc769149d5562"
-  integrity sha512-afoIwmqang1Ge08VeEhkkw9wnfoBSFZn9oZGKEK/48CNkqypbdD1LVFKoTYqOeXHpTsJwJxQwbTm21SzgZSosA==
+zego-zpns-react-native@^2.8.1:
+  version "2.8.1"
+  resolved "https://registry.npmmirror.com/zego-zpns-react-native/-/zego-zpns-react-native-2.8.1.tgz#59eea1264cf3d393695529e9561414fe062ebd6d"
+  integrity sha512-6v+so7VLmfQW0RI9FNsBwFly3rdZQy4gGLfOFOJHkrWAv6epMn5OkFlUVrsOEt4G3jn4KsWZmNEXF4O0rYw+ng==
