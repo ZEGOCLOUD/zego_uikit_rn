@@ -152,6 +152,7 @@ export default class ZegoPluginInvitationService {
         ZegoUIKitCorePlugin.getZPNsPlugin().default.setPushConfig({ "enableFCMPush": true, "enableHWPush": false, "enableMiPush": false, "enableOppoPush": false, "enableVivoPush": false, "appType": certificateIndex });
         ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().registerPush({ });
       } else if (Platform.OS === 'ios' && ZegoUIKitCorePlugin.getCallKitPlugin()) {
+        zloginfo('[ZegoPluginInvitationService] registerPush, iOS');
         const CXProviderConfiguration = {
           localizedName: appName ?? 'My app',
           iconTemplateImageName: "AppIcon",
@@ -190,6 +191,7 @@ export default class ZegoPluginInvitationService {
       // })
 
       if (ZegoUIKitCorePlugin.getCallKitPlugin()) {
+        zloginfo('[ZegoPluginInvitationService] register iOS didReceiveIncomingPush');
         ZegoUIKitCorePlugin.getCallKitPlugin().default.getInstance().on("didReceiveIncomingPush", (extras: Record<string, any>, uuid: string) => {
           zloginfo('#########didReceiveIncomingPush', extras, uuid);
           let { payload } = extras;
