@@ -93,6 +93,7 @@ export default {
   onTurnOnYourMicrophoneRequest: ZegoUIKitInternal.onTurnOnYourMicrophoneRequest,
   installPlugins: ZegoUIKitCorePlugin.installPlugins,
   getPlugin: ZegoUIKitCorePlugin.getPlugin,
+  getPluginName: ZegoUIKitCorePlugin.getPluginName,
   logComponentsVersion: ZegoUIKitInternal.logComponentsVersion,
   onError: ZegoUIKitInternal.onError,
   onTokenProvide: ZegoUIKitInternal.onTokenProvide,

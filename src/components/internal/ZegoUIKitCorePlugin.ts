@@ -74,6 +74,9 @@ const ZegoUIKitCorePlugin = {
     }
     return _plugins.get(type);
   },
+  getPluginName: (name: string) => {
+    return _plugins.get(name);
+  }
 };
 export default ZegoUIKitCorePlugin;
 export { ZegoUIKitPluginType };

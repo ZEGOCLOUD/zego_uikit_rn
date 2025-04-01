@@ -3,6 +3,7 @@ import { CXCallEndedReason, CXCallUpdate, ZegoUIKitPluginType } from './defines'
 import ZegoPluginRoomPropertiesService from './services/room_properties_service';
 import ZegoPluginInRoomMessageService from './services/in_room_message_service';
 import ZegoPluginUserInRoomAttributesService from './services/user_in_room_attributes_service';
+import { zloginfo } from '../utils/logger';
 
 export default class ZegoUIKitSignalingPlugin {
   static shared: ZegoUIKitSignalingPlugin;
