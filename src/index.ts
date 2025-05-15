@@ -45,6 +45,7 @@ export default {
   onAudioOutputDeviceChanged: ZegoUIKitInternal.onAudioOutputDeviceTypeChange,
   onSoundLevelUpdated: ZegoUIKitInternal.onSoundLevelUpdate,
   joinRoom: ZegoUIKitInternal.joinRoom,
+  inRoom: ZegoUIKitInternal.inRoom,
   leaveRoom: ZegoUIKitInternal.leaveRoom,
   isRoomConnected: ZegoUIKitInternal.isRoomConnected,
   onJoinRoom: ZegoUIKitInternal.onJoinRoom,

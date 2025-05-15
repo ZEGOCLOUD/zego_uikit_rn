@@ -564,6 +564,7 @@ function _leaveRoom() {
             'error': 0,
             'msg': ''
           })
+          _currentRoomID = ''
 
           _turnCameraDeviceOn(_localCoreUser.userID, false);
           _turnMicDeviceOn(_localCoreUser.userID, false);
@@ -1581,6 +1582,9 @@ const ZegoUIKitInternal =  {
           reject(error);
         });
     });
+  },
+  inRoom() {
+    return _currentRoomID.length > 0
   },
   leaveRoom() {
     return _leaveRoom();
