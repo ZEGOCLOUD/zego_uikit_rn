@@ -138,6 +138,7 @@ export default class ZegoPluginInvitationService {
         ZegoUIKitCorePlugin.getCallKitPlugin().default.setInitConfiguration(CXProviderConfiguration);
         ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().applyNotificationPermission();
         
+        // 0 - Production; 1 - Development; 2 - Automatic
         const iOSEnvironment = isIOSDevelopmentEnvironment == null ? 2 : (isIOSDevelopmentEnvironment ? 1 : 0);
         zloginfo('[ZegoPluginInvitationService] registerPush, iOSEnvironment', iOSEnvironment);
         ZegoUIKitCorePlugin.getZPNsPlugin().default.setPushConfig({ 'appType': certificateIndex });
