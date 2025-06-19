@@ -36,6 +36,7 @@ export default class ZegoSignalingPluginCore {
   _loginUser = {} as ZIMUserInfo;
   _isLogin = false;
   _callIDUsers = new Map<string, string>(); // <zim call id, user id>
+  _callIDExtendedData = new Map<string, string>(); // <zim call id, extendedData>
   _connectionState = ZIMConnectionState.Disconnected;
   _onConnectionStateChangedCallbackMap: { [index: string]: (notifyData: { state: ZIMConnectionState }) => void } = {};
   _onCallInvitationReceivedCallbackMap: { [index: string]: (notifyData: {
@@ -128,6 +129,7 @@ export default class ZegoSignalingPluginCore {
           this._currentInvitationID = callID
         }
         this._callIDUsers.set(callID, inviter);
+        this._callIDExtendedData.set(callID, extendedData)
         
         const notifyData: any = { callID, inviter: { id: inviter } };
         if (extendedData) {
@@ -206,10 +208,14 @@ export default class ZegoSignalingPluginCore {
           // as caller, wait for the other callees's state changed to the Timeout
           // as callee, should only care own state changed to Timeout
           zloginfo(`[SignalingPluginCore][callUserStateChanged callback], detect ${callUserID} Timeout`)
+          
+          // timeout 的 extendedData 为空，为方便后续使用，使用 callInvite 时的 extendedData
+          let _callExtendedData = this._getExtendedDataByCallID(callID)
+
           if (this._loginUser.userID === callerID) {
             zloginfo(`[SignalingPluginCore][callUserStateChanged callback], notifyCallInviteesAnsweredTimeout`)
 
-            let dataParsed = callExtendedData ? JSON.parse(callExtendedData) : {}
+            let dataParsed = _callExtendedData ? JSON.parse(_callExtendedData) : {}
             dataParsed.call_id = dataParsed.call_id ?? ''
             dataParsed.invitees = [{userID: callUserID, userName: ''}]
 
@@ -222,7 +228,7 @@ export default class ZegoSignalingPluginCore {
           } else if (callUserID === this._loginUser.userID) {
             zloginfo(`[SignalingPluginCore][callUserStateChanged callback], notifyCallInvitationTimeout`)
 
-            let dataParsed = callExtendedData ? JSON.parse(callExtendedData) : {}
+            let dataParsed = _callExtendedData ? JSON.parse(_callExtendedData) : {}
             dataParsed.call_id = dataParsed.call_id ?? ''
             dataParsed.inviter = [{userID: this._getInviterIDByCallID(callID), userName: ''}]
 
@@ -255,6 +261,7 @@ export default class ZegoSignalingPluginCore {
               data: JSON.stringify(dataParsed),
             };
             this._callIDUsers.delete(callID);
+            this._callIDExtendedData.delete(callID)
             this._notifyCallInvitationCancelled(notifyData);
           }
         }
@@ -390,10 +397,14 @@ export default class ZegoSignalingPluginCore {
     this._isLogin = false;
     this._loginUser = {} as ZIMUserInfo;
     this._callIDUsers.clear();
+    this._callIDExtendedData.clear()
     this._connectionState = ZIMConnectionState.Disconnected;
   }
   _getInviterIDByCallID(callID: string) {
     return this._callIDUsers.get(callID);
+  }
+  _getExtendedDataByCallID(callID: string) {
+    return this._callIDExtendedData.get(callID);
   }
   _createHandle() {
     this._unregisterEngineCallback();
@@ -520,6 +531,7 @@ export default class ZegoSignalingPluginCore {
           })
 
           this._callIDUsers.set(callID, this._loginUser.userID);
+          this._callIDExtendedData.set(callID, config.extendedData)
           if (!errorInvitees || !errorInvitees.length) {
             zloginfo(`[Core]Invite done, call id: ${callID}`);
             resolve({
@@ -568,6 +580,7 @@ export default class ZegoSignalingPluginCore {
         .callCancel(invitees, callID, config)
         .then(({ callID, errorInvitees }: ZIMCallCancelSentResult) => {
           this._callIDUsers.delete(callID);
+          this._callIDExtendedData.delete(callID)
           if (!errorInvitees || !errorInvitees.length) {
             zloginfo(`[Core]Cancel invitation done, call id: ${callID}`);
             resolve({ ...new ZegoPluginResult('', ''), callID, errorInvitees: [] });
@@ -606,6 +619,7 @@ export default class ZegoSignalingPluginCore {
         .then(({ callID }: ZIMCallRejectionSentResult) => {
           zloginfo(`[Core]Reject invitation done, call id: ${callID}`);
           this._callIDUsers.delete(callID);
+          this._callIDExtendedData.delete(callID)
           resolve(new ZegoPluginResult('', '', {callID}));
         })
         .catch((error: ZIMError) => {
