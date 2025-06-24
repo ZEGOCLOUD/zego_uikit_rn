@@ -1,13 +1,14 @@
 import { 
-  ZIMEventOfReceiveConversationMessageResult,
-  ZIMConversationType,
   ZIMCommandMessage, 
-  ZIMMessageType, 
+  ZIMConversationType,
   ZIMError,
+  ZIMEventOfReceiveConversationMessageResult,
+  ZIMMessagePriority,
   ZIMMessageSentResult,
+  ZIMMessageType, 
   ZIMTextMessage,
 } from 'zego-zim-react-native';
-import { zlogerror, zloginfo } from '../utils/logger';
+import { zlogerror, zloginfo, zlogwarning } from '../utils/logger';
 import ZegoUIKitCorePlugin from "../../components/internal/ZegoUIKitCorePlugin";
 
 export default class ZegoPluginRoomMessageCore {
@@ -126,14 +127,15 @@ export default class ZegoPluginRoomMessageCore {
       const textMessage = {
         type: ZIMMessageType.Text,
         message: message,
-      }
+      } as ZIMTextMessage
       ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()
-      .sendMessage(textMessage, roomID, ZIMConversationType.Room, {priority: 1})
-      .then(({ message }: ZIMMessageSentResult) => {
+      .sendMessage(textMessage, roomID, ZIMConversationType.Room, {priority: ZIMMessagePriority.Low}, null)
+      .then(({ message: _zimMessage }: ZIMMessageSentResult) => {
         zloginfo(`[Core]sendInRoomTextMessage done, roomID: ${roomID}, message: ${message}`);
         resolve();
       })
       .catch((error: ZIMError) => {
+        zlogwarning(`[Core]sendInRoomTextMessage error, roomID: ${roomID}, message: ${message}, error: ${JSON.stringify(error)}`);
         reject(error);
       })
     });
@@ -145,14 +147,15 @@ export default class ZegoPluginRoomMessageCore {
       const commandMessage = {
         type: ZIMMessageType.Command,
         message: command,
-      }
+      } as ZIMCommandMessage
       ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()
-      .sendMessage(commandMessage, roomID, ZIMConversationType.Room, {priority: 1})
-      .then(({ message }: ZIMMessageSentResult) => {
+      .sendMessage(commandMessage, roomID, ZIMConversationType.Room, {priority: ZIMMessagePriority.Low}, null)
+      .then(({ message: _zimMessage }: ZIMMessageSentResult) => {
         zloginfo(`[Core]sendInRoomCommandMessage done, roomID: ${roomID}, message: ${message}`);
         resolve();
       })
       .catch((error: ZIMError) => {
+        zlogwarning(`[Core]sendInRoomCommandMessage error, roomID: ${roomID}, message: ${message}, error: ${JSON.stringify(error)}`);
         reject(error);
       })
     });
