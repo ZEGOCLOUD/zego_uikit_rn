@@ -308,10 +308,11 @@ const ZegoUIKitSignalingPluginImpl = {
       callback
     );
   },
+  
   // ------- live audio room - user------
   joinRoom(roomID: string) {
     if (!ZegoUIKitSignalingPlugin) {
-      zlogerror(`[Plugins][invitation]Signaling plugin install error.`);
+      zlogerror(`[Plugins][invitation] Signaling plugin install error.`);
       return;
     }
     return new Promise((resolve, reject) => {
@@ -321,7 +322,7 @@ const ZegoUIKitSignalingPluginImpl = {
         })
         .then(async () => {
           try {
-            zloginfo('[Plugins][invitation]Join room successfully.', roomID);
+            zloginfo('[Plugins][invitation] Join room successfully, room:', roomID);
             // query the attributes of the users in room
             // const fullAttributes = await _queryUsersInRoomAttributesFully();
             // _usersInRoomAttributes.clear();
@@ -347,11 +348,58 @@ const ZegoUIKitSignalingPluginImpl = {
           }
         })
         .catch((error: any) => {
-          zloginfo('[Plugins][invitation]Failed to join room.', roomID);
+          zloginfo('[Plugins][invitation] Failed to join room.', roomID);
           reject(error);
         });
     });
   },
+
+  leaveRoom: () => {
+    if (!ZegoUIKitSignalingPlugin) {
+      zlogerror(`[Plugins][invitation] Signaling plugin install error.`);
+      return;
+    }
+    return new Promise((resolve, reject) => {
+      ZegoUIKitSignalingPlugin.getInstance()
+        .invoke('leaveRoom')
+        .then(async () => {
+          try {
+            zloginfo('[Plugins][invitation] Leave room successfully.');
+            resolve(new ZegoInvitationImplResult('', ''));
+          } catch (error) {
+            zlogerror(`[Plugins][invitation] Failed to resolve leave room.`, error);
+          }
+        })
+        .catch((error: any) => {
+          zloginfo('[Plugins][invitation] Failed to leave room.');
+          reject(error);
+        });
+    });
+  },
+
+  leaveAllRoom: () => {
+    if (!ZegoUIKitSignalingPlugin) {
+      zlogerror(`[Plugins][invitation] Signaling plugin install error.`);
+      return;
+    }
+    return new Promise((resolve, reject) => {
+      ZegoUIKitSignalingPlugin.getInstance()
+        .invoke('leaveAllRoom')
+        .then(async () => {
+          try {
+            zloginfo('[Plugins][invitation] Leave all room successfully.');
+            resolve(new ZegoInvitationImplResult('', ''));
+          } catch (error) {
+            zlogerror(`[Plugins][invitation] Failed to resolve leave all room.`, error);
+          }
+        })
+        .catch((error: any) => {
+          zloginfo('[Plugins][invitation] Failed to leave all room.');
+          reject(error);
+        });
+    });
+  },
+
   // getUsersInRoomAttributes: () => {
   //   if (!ZegoUIKitSignalingPlugin) {
   //     zlogerror(`[Plugins][invitation]Signaling plugin install error.`);

@@ -123,6 +123,8 @@ export default class ZegoUIKitSignalingPlugin {
         );
       case 'leaveRoom':
         return ZegoPluginUserInRoomAttributesService.getInstance().leaveRoom();
+      case 'leaveAllRoom':
+          return ZegoPluginUserInRoomAttributesService.getInstance().leaveAllRoom();
       case 'setUsersInRoomAttributes':
         return ZegoPluginUserInRoomAttributesService.getInstance().setUsersInRoomAttributes(
           params.key,

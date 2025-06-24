@@ -21,6 +21,9 @@ export default class ZegoPluginUserInRoomAttributesService {
   leaveRoom() {
     return ZegoPluginUserInRoomAttributesCore.getInstance().leaveRoom();
   }
+  leaveAllRoom() {
+    return ZegoPluginUserInRoomAttributesCore.getInstance().leaveAllRoom();
+  }
   setUsersInRoomAttributes(key: string, value: string, userIDs: string[]) {
     const attributes = { [key]: value };
     return ZegoPluginUserInRoomAttributesCore.getInstance().setUsersInRoomAttributes(

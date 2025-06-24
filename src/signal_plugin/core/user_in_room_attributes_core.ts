@@ -145,6 +145,32 @@ export default class ZegoPluginUserInRoomAttributesCore {
         });
     });
   }
+  leaveAllRoom() {
+    if (!ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()) {
+      zlogerror(
+        '[ZegoPluginUserInRoomAttributesCore]Please initialize it first.'
+      );
+      return Promise.reject();
+    }
+    return new Promise((resolve, reject) => {
+      ZegoUIKitCorePlugin.getZIMPlugin().default.getInstance()
+        .leaveAllRoom()
+        .then(() => {
+          zloginfo(
+            `[ZegoPluginUserInRoomAttributesCore]Leave all room successfully.`
+          );
+          this._resetDataForLeaveRoom();
+          resolve(new ZegoPluginResult('', ''));
+        })
+        .catch((error: ZIMError) => {
+          zlogerror(
+            `[ZegoPluginUserInRoomAttributesCore]Failed to leave all room, code: ${error.code}, message: ${error.message}`
+          );
+          reject(error);
+        });
+    });
+  }
+
   getRoomBaseInfo() {
     return this._roomBaseInfo;
   }
