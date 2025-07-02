@@ -6,9 +6,12 @@ import ZegoUIKitReport from './report';
 
 export const logComponentsVersion = (extraInfo: Map<string, string>) => {
     var expressVersionPromise = require('zego-express-engine-reactnative').default.getVersion()
-    var zimVersionPromise = ZegoUIKitCorePlugin.getZIMPlugin() ? ZegoUIKitCorePlugin.getZIMPlugin().default.getVersion() : ""
-    var zpnsVersionPromise = ZegoUIKitCorePlugin.getZPNsPlugin() ? ZegoUIKitCorePlugin.getZPNsPlugin().default.getVersion() : ""
-    var callkitVersionPromise = ZegoUIKitCorePlugin.getCallKitPlugin() ? "unknown" : ""
+    var zimVersionPromise = ZegoUIKitCorePlugin.getZIMPlugin() ? ZegoUIKitCorePlugin.getZIMPlugin().default.getVersion() : _getCustomVersionPromise("Not installed");
+    var zpnsVersionPromise = ZegoUIKitCorePlugin.getZPNsPlugin() ? ZegoUIKitCorePlugin.getZPNsPlugin().default.getVersion() : _getCustomVersionPromise("Not installed");
+    var callkitVersionPromise = _getCustomVersionPromise('Not necessary')
+    if (Platform.OS === 'ios') {
+      callkitVersionPromise = ZegoUIKitCorePlugin.getCallKitPlugin() ? _getCustomVersionPromise("Unknown version") : _getCustomVersionPromise("Not installed");
+    }
     var reportVersionPromise = ZegoUIKitReport.getVersion()
 
     Promise.all([expressVersionPromise, zimVersionPromise, zpnsVersionPromise, callkitVersionPromise, reportVersionPromise])
@@ -51,4 +54,8 @@ export const getRnVersion = () => {
   if (rnVersion.prerelease !== undefined && rnVersion.prerelease !== null) { displayVersion += `.${rnVersion.prerelease}` }
 
   return displayVersion
+}
+
+const _getCustomVersionPromise = (verDesc: string) => {
+  return new Promise<string>((resolve) => {resolve(verDesc);})
 }
