@@ -1,4 +1,5 @@
 import {
+  ZegoOrientation,
   ZegoVideoConfig,
 } from 'zego-express-engine-reactnative';
 
@@ -85,7 +86,7 @@ class ZegoUIKitVideoConfig {
     config.bitrate = this.bitrate;
     config.fps = this.fps;
 
-    const isPortraitUp = orientation === 0 || orientation === 2;
+    const isPortraitUp = (orientation === ZegoOrientation.PortraitUp || orientation === ZegoOrientation.PortraitDown);
     const width = isPortraitUp ? this.width : this.height;
     const height = isPortraitUp ? this.height : this.width;
 

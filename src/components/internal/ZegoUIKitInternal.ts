@@ -1,6 +1,8 @@
 import ZegoExpressEngine, {
   ZegoAudioRoute,
   ZegoEngineProfile,
+  ZegoEngineState,
+  ZegoOrientation,
   ZegoPublishChannel,
   ZegoRemoteDeviceState,
   ZegoRoomConfig,
@@ -75,7 +77,7 @@ var _onErrorCallbackMap: any = {};
 var _onTokenProvideCallback: Function = undefined;
 
 var _videoConfig = ZegoUIKitVideoConfig.preset360P();
-var _appOrientation = 0;
+var _appOrientation = ZegoOrientation.PortraitUp;
 
 const _screenshareStreamIDFlag = '_screensharing';
 
@@ -83,7 +85,7 @@ function _resetData() {
   zloginfo('Reset all data.');
   _appInfo = { appID: 0, appSign: '' };
   _localCoreUser = _createCoreUser('', '', '', {});
-  _localCoreUser.isLandscape = _appOrientation !== 0;
+  _localCoreUser.isLandscape = (_appOrientation !== 0);
   _streamCoreUserMap = {};
   _coreUserMap = {};
   _currentRoomID = '';
@@ -106,7 +108,7 @@ function _resetDataForLeavingRoom() {
   _isRoomConnected = false;
   const { userID, userName, profileUrl, extendInfo } = _localCoreUser;
   _localCoreUser = _createCoreUser(userID, userName, profileUrl, extendInfo);
-  _localCoreUser.isLandscape = _appOrientation !== 0;
+  _localCoreUser.isLandscape = (_appOrientation !== 0);
   _coreUserMap[_localCoreUser.userID] = _localCoreUser;
   _inRoomMessageList = [];
   _roomProperties = {};
@@ -848,9 +850,12 @@ function _unregisterEngineCallback() {
   ZegoExpressEngine.instance().off('roomStateChanged', undefined);
   ZegoExpressEngine.instance().off('audioRouteChange', undefined);
   ZegoExpressEngine.instance().off('IMRecvBroadcastMessage', undefined);
+  ZegoExpressEngine.instance().off('roomTokenWillExpire', undefined);
   ZegoExpressEngine.instance().off('roomExtraInfoUpdate', undefined);
   ZegoExpressEngine.instance().off('roomStreamExtraInfoUpdate', undefined);
   ZegoExpressEngine.instance().off('IMRecvCustomCommand', undefined);
+  ZegoExpressEngine.instance().off('playerVideoSizeChanged', undefined);
+  ZegoExpressEngine.instance().off('publisherVideoSizeChanged', undefined);
 }
 function _notifyUserCountOrPropertyChanged(type: number) {
   const msg = [
@@ -1104,6 +1109,12 @@ function _notifyScreenSharingUnavailable(users: any[]) {
   });
 }
 
+function _applyVideoConfig() {
+  const config = _videoConfig.toSDK(_appOrientation);
+  ZegoExpressEngine.instance().setVideoConfig(config, ZegoPublishChannel.Main);
+  zloginfo(`[setAppOrientation] express setVideoConfig:${JSON.stringify(config)}`);
+}
+
 const _isEngineCreated = () => {
   try {
     return ZegoExpressEngine.instance() != undefined;
@@ -1225,9 +1236,9 @@ const ZegoUIKitInternal =  {
     if (_isEngineCreated()) {
       zloginfo('Create ZegoExpressEngine succeed already!');
 
-      
       _unregisterEngineCallback();
       _registerEngineCallback();
+      _applyVideoConfig()
 
       _localCoreUser.userID = userInfo.userID;
       _localCoreUser.userName = userInfo.userName;
@@ -1271,7 +1282,7 @@ const ZegoUIKitInternal =  {
           _appInfo.appSign = appSign;
           _unregisterEngineCallback();
           _registerEngineCallback();
-
+          _applyVideoConfig()
           _setLocalUserInfo(userInfo);
 
           Object.keys(_onSDKConnectedCallbackMap).forEach((callbackID) => {
@@ -1413,30 +1424,37 @@ const ZegoUIKitInternal =  {
       _onAudioOutputDeviceTypeChangeCallbackMap[callbackID] = callback;
     }
   },
+  
   setAudioConfig(config: any) {
     // TODO
   },
+
+  // 因为屏幕方向不确定，因此会被延迟到 setAppOrientation 时才配置给引擎
   setVideoConfig(config: ZegoUIKitVideoConfig) {
+    zloginfo(`[setVideoConfig] videoConfig:${JSON.stringify(config)}`);
     _videoConfig = config;
   },
-  setAppOrientation(orientation: number) {
+
+  setAppOrientation(orientation: ZegoOrientation) {
+    zloginfo(`[setAppOrientation] orientation:${orientation}`);
     _appOrientation = orientation;
     if (_localCoreUser) {
-      _localCoreUser.isLandscape = orientation !== 0;
+      _localCoreUser.isLandscape = (_appOrientation !== 0);
     }
     if (_coreUserMap[_localCoreUser.userID]) {
-      _coreUserMap[_localCoreUser.userID].isLandscape = orientation !== 0;
+      _coreUserMap[_localCoreUser.userID].isLandscape = (_appOrientation !== 0);
     }
     if (_isEngineCreated()) {
-      const config = _videoConfig.toSDK(orientation);
-      zloginfo('setAppOrientation, ', orientation, config);
-      ZegoExpressEngine.instance().setVideoConfig(config, ZegoPublishChannel.Main);
-      ZegoExpressEngine.instance().setAppOrientation(orientation, ZegoPublishChannel.Main);
+      _applyVideoConfig()
+      ZegoExpressEngine.instance().setAppOrientation(_appOrientation, ZegoPublishChannel.Main);
+      zloginfo(`[setAppOrientation] express setAppOrientation:${_appOrientation}`);
     }
   },
+
   appOrientation() {
     return _appOrientation;
   },
+  
   onAudioVideoAvailable(callbackID: string, callback?: Function) {
     if (typeof callback !== 'function') {
       if (callbackID in _onAudioVideoAvailableCallbackMap) {
