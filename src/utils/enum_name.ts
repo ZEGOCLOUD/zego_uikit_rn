@@ -1,5 +1,13 @@
-import { ZegoRemoteDeviceState, ZegoUpdateType } from "zego-express-engine-reactnative";
-import { ZIMConnectionEvent, ZIMConnectionState } from "zego-zim-react-native";
+import {
+    ZegoEngineState,
+    ZegoRemoteDeviceState,
+    ZegoUpdateType
+} from "zego-express-engine-reactnative";
+
+import {
+    ZIMConnectionEvent,
+    ZIMConnectionState
+} from "zego-zim-react-native";
 
 export const getZegoUpdateTypeName = (type: ZegoUpdateType) => {
     let name = 'unknown'
@@ -38,6 +46,17 @@ export const getZegoRemoteDeviceStateName = (type: ZegoRemoteDeviceState) => {
         name = 'InBackground'
     } else if (type == ZegoRemoteDeviceState.NotSupport) {
         name = 'NotSupport'
+    }
+
+    return `${name}(${type})`
+}
+
+export const getZegoEngineStateName = (type: ZegoEngineState) => {
+    let name = 'unknown'
+    if (type == ZegoEngineState.Start) {
+        name = 'Start'
+    } else if (type == ZegoEngineState.Stop) {
+        name = 'Stop'
     }
 
     return `${name}(${type})`

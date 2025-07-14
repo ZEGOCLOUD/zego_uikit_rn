@@ -14,7 +14,7 @@ import ZegoExpressEngine, {
 
 import { ZegoAudioVideoResourceMode, ZegoChangedCountOrProperty, ZegoRoomPropertyUpdateType, ZegoUIKitVideoConfig } from './defines'
 import ZegoUIKitSignalingPluginImpl from '../../plugins/invitation';
-import { getZegoRemoteDeviceStateName, getZegoUpdateTypeName } from '../../utils/enum_name';
+import { getZegoEngineStateName, getZegoRemoteDeviceStateName, getZegoUpdateTypeName } from '../../utils/enum_name';
 import { zlogerror, zloginfo, zlogwarning } from '../../utils/logger';
 import { getPackageVersion } from '../../utils/package_version';
 import ZegoUIKitReport from '../../utils/report';
@@ -78,6 +78,7 @@ var _onTokenProvideCallback: Function = undefined;
 
 var _videoConfig = ZegoUIKitVideoConfig.preset360P();
 var _appOrientation = ZegoOrientation.PortraitUp;
+var _engineState = ZegoEngineState.Stop;
 
 const _screenshareStreamIDFlag = '_screensharing';
 
@@ -836,6 +837,10 @@ function _registerEngineCallback() {
     }
     ZegoUIKitInternal.forceRenderVideoView();
   });
+  ZegoExpressEngine.instance().on('engineStateUpdate', (state: ZegoEngineState) => {
+    zloginfo('[engineStateUpdate callback]', getZegoEngineStateName(state));
+    _engineState = state;
+  });
 }
 function _unregisterEngineCallback() {
   zloginfo('Unregister callback from ZegoExpressEngine...');
@@ -857,6 +862,7 @@ function _unregisterEngineCallback() {
   ZegoExpressEngine.instance().off('IMRecvCustomCommand', undefined);
   ZegoExpressEngine.instance().off('playerVideoSizeChanged', undefined);
   ZegoExpressEngine.instance().off('publisherVideoSizeChanged', undefined);
+  ZegoExpressEngine.instance().off('engineStateUpdate', undefined);
 }
 function _notifyUserCountOrPropertyChanged(type: number) {
   const msg = [
@@ -1443,9 +1449,13 @@ const ZegoUIKitInternal =  {
       _coreUserMap[_localCoreUser.userID].isLandscape = (_appOrientation !== 0);
     }
     if (_isEngineCreated()) {
-      _applyVideoConfig()
+      if (_engineState === ZegoEngineState.Stop) {
+        _applyVideoConfig()
+      } else {
+        zloginfo(`[setAppOrientation] engineState is Start, can't apply video config`);
+      }
       ZegoExpressEngine.instance().setAppOrientation(_appOrientation, ZegoPublishChannel.Main);
-      zloginfo(`[setAppOrientation] express setAppOrientation:${_appOrientation}`);
+      zloginfo(`[setAppOrientation] express setAppOrientation:${_appOrientation}, engineState:${getZegoEngineStateName(_engineState)}`);
     }
   },
 

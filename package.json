@@ -69,13 +69,13 @@
     "pod-install": "^0.1.0",
     "prettier": "^2.0.5",
     "react": "17.0.2",
-    "react-delegate-component": "^1.0.0",
     "react-native": "0.68.2",
     "react-native-builder-bob": "^0.18.2",
     "redux": "^4.2.0",
     "release-it": "^15.0.0",
     "typescript": "^4.5.2",
-    "zego-express-engine-reactnative": "^3.19.2",
+    "react-delegate-component": "^1.0.0",
+    "zego-express-engine-reactnative": "^3.22.0",
     "zego-zim-react-native": "^2.20.0",
     "zego-zpns-react-native": "^2.8.2",
     "zego-callkit-react-native": "^1.0.6"
@@ -85,9 +85,9 @@
   },
   "peerDependencies": {
     "react": "*",
-    "react-delegate-component": "*",
     "react-native": "*",
-    "zego-express-engine-reactnative": "^3.19.2",
+    "react-delegate-component": "*",
+    "zego-express-engine-reactnative": "^3.22.0",
     "zego-zim-react-native": "^2.20.0"
   },
   "jest": {
