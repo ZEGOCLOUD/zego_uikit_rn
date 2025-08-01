@@ -62,32 +62,34 @@ const ZegoUIKitLogger = {
 }
 
 export default ZegoUIKitLogger;
-    
-function _formatLog(...msg: any[]): string {
+
+function _formatLog(...msgList: any[]): string {
     let isPureString = true;
-    for (let i = 0; i < msg.length; i++) {
-        if (!_canLogToFile(msg[i])) {
+    for (let i = 0; i < msgList.length; i++) {
+        if (!_canLogToFile(msgList[i])) {
             isPureString = false;
             break;
         }
     }
 
     if (isPureString == true) {
-        return msg.join(" ");
+        return msgList.join(" ");
     } else {
         let jsonList: string[] = []
-        for (let i = 0; i < msg.length; i++) {
-            if (_canLogToFile(msg[i])) {
-                jsonList.push(msg[i]);
+        for (let i = 0; i < msgList.length; i++) {
+            if (_canLogToFile(msgList[i])) {
+                jsonList.push(msgList[i]);
             } else {
-                jsonList.push(JSON.stringify(msg[i]));
+                jsonList.push(JSON.stringify(msgList[i]));
             }
         }
         
-        return `unsupport_type: ${ jsonList.join(" ") }`;
+        return `(LogTruncated?) ${ jsonList.join(" ") }`;
     }
 }
 
+const canLogTypeList: string[] = ['string', 'number', 'boolean']
+
 function _canLogToFile(msg: any) {
-    return typeof msg === "string" || typeof msg === "number"
+    return canLogTypeList.includes(typeof msg)
 }

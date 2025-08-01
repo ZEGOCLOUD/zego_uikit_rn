@@ -539,6 +539,7 @@ export default class ZegoSignalingPluginCore {
           }
         })
         .catch((error: ZIMError) => {
+          zloginfo(`[Core]Cancel invitation failed, call id: ${callID}, error: ${error}`);
           reject(error);
         });
     });

@@ -81,7 +81,7 @@ export default function ZegoVideoView(props: any) {
       }
     );
     ZegoUIKitInternal.onUserCountOrPropertyChanged(callbackID, (userList: any[]) => {
-      zloginfo('=========[ZegoVideoView]onUserCountOrPropertyChanged=========', userID, userList);
+      zloginfo('[ZegoVideoView]onUserCountOrPropertyChanged', userID, userList);
       userList.forEach((user) => {
         const temp = user.inRoomAttributes ? user.inRoomAttributes.avatar : '';
         if (user.userID === userID && temp) {

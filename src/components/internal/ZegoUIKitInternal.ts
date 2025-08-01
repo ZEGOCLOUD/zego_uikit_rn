@@ -14,7 +14,7 @@ import ZegoExpressEngine, {
 
 import { ZegoAudioVideoResourceMode, ZegoChangedCountOrProperty, ZegoRoomPropertyUpdateType, ZegoUIKitVideoConfig } from './defines'
 import ZegoUIKitSignalingPluginImpl from '../../plugins/invitation';
-import { getZegoUpdateTypeName } from '../../utils/enum_name';
+import { getZegoRemoteDeviceStateName, getZegoUpdateTypeName } from '../../utils/enum_name';
 import { zlogerror, zloginfo, zlogwarning } from '../../utils/logger';
 import { getPackageVersion } from '../../utils/package_version';
 import ZegoUIKitReport from '../../utils/report';
@@ -463,7 +463,7 @@ async function _onRequireNewToken() {
   }
 }
 function _onRoomExtraInfoUpdate(roomID: string, roomExtraInfoList: any[]) {
-  zloginfo('$$$$$$$$Room extra info update: ', roomID, roomExtraInfoList);
+  zloginfo(`[ZegoUIKitInternal] _onRoomExtraInfoUpdate, roomID:${roomID}, roomExtraInfo:${roomExtraInfoList}`);
   const updateKeys: string[]= [];
   const oldRoomProperties = JSON.parse(JSON.stringify(_roomProperties));
   roomExtraInfoList.forEach(({ key, updateTime, updateUser, value }) => {
@@ -724,7 +724,7 @@ function _registerEngineCallback() {
     }
   );
   ZegoExpressEngine.instance().on('remoteCameraStateUpdate', (streamID, state: ZegoRemoteDeviceState) => {
-      zloginfo('[remoteCameraStateUpdate callback]', streamID, state);
+      zloginfo('[remoteCameraStateUpdate callback]', streamID, getZegoRemoteDeviceStateName(state));
       if (streamID.endsWith(_screenshareStreamIDFlag)) {
         return;
       }
@@ -733,13 +733,14 @@ function _registerEngineCallback() {
       _onRemoteCameraStateUpdate(_getUserIDByStreamID(streamID), isCameraOn);
     }
   );
-  ZegoExpressEngine.instance().on('remoteMicStateUpdate', (streamID, state) => {
-    zloginfo('[remoteMicStateUpdate callback]', streamID, state);
+  ZegoExpressEngine.instance().on('remoteMicStateUpdate', (streamID, state: ZegoRemoteDeviceState) => {
+    zloginfo('[remoteMicStateUpdate callback]', streamID, getZegoRemoteDeviceStateName(state));
     if (streamID.endsWith(_screenshareStreamIDFlag)) {
       return;
     }
-    // 0 for device is on
-    _onRemoteMicStateUpdate(_getUserIDByStreamID(streamID), state == 0);
+
+    let isMicOn = (state == ZegoRemoteDeviceState.Open)
+    _onRemoteMicStateUpdate(_getUserIDByStreamID(streamID), isMicOn);
   });
   ZegoExpressEngine.instance().on(
     'playerStateUpdate',
@@ -1546,7 +1547,6 @@ const ZegoUIKitInternal =  {
       return Promise.resolve();
     }
     
-    zloginfo(`[ZegoUIKitInternal][joinRoom] roomID: ${roomID}`)
     if (_appInfo.appSign === '' && token === '') {
       token = await ZegoUIKitInternal.getToken();
     }

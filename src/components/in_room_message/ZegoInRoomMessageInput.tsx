@@ -67,7 +67,7 @@ class ZegoInRoomMessageInput extends React.Component {
                         selectionColor={'#A653FF'}
                         // @ts-ignore
                         placeholder={this.props.placeholder ? this.props.placeholder : ''}
-                        placeholderTextColor={'rgba(255, 255, 255, 0.2)'}
+                        placeholderTextColor={'rgba(255, 255, 255, 0.6)'}
                         onContentSizeChange={({ nativeEvent: { contentSize: { width, height } } }) => {
                             var h = height;
                             // https://github.com/facebook/react-native/issues/29702

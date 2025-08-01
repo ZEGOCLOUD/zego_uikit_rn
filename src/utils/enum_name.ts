@@ -1,4 +1,4 @@
-import { ZegoUpdateType } from "zego-express-engine-reactnative";
+import { ZegoRemoteDeviceState, ZegoUpdateType } from "zego-express-engine-reactnative";
 import { ZIMConnectionEvent, ZIMConnectionState } from "zego-zim-react-native";
 
 export const getZegoUpdateTypeName = (type: ZegoUpdateType) => {
@@ -7,6 +7,37 @@ export const getZegoUpdateTypeName = (type: ZegoUpdateType) => {
         name = 'Add'
     } else if (type == ZegoUpdateType.Delete) {
         name = 'Delete'
+    }
+
+    return `${name}(${type})`
+}
+
+export const getZegoRemoteDeviceStateName = (type: ZegoRemoteDeviceState) => {
+    let name = 'Untranslated'
+    if (type == ZegoRemoteDeviceState.Open) {
+        name = 'Open'
+    } else if (type == ZegoRemoteDeviceState.GenericError) {
+        name = 'GenericError'
+    } else if (type == ZegoRemoteDeviceState.InvalidID) {
+        name = 'InvalidID'
+    } else if (type == ZegoRemoteDeviceState.NoAuthorization) {
+        name = 'NoAuthorization'
+    } else if (type == ZegoRemoteDeviceState.ZeroFPS) {
+        name = 'ZeroFPS'
+    } else if (type == ZegoRemoteDeviceState.InUseByOther) {
+        name = 'InUseByOther'
+    } else if (type == ZegoRemoteDeviceState.SystemMediaServicesLost) {
+        name = 'SystemMediaServicesLost'
+    } else if (type == ZegoRemoteDeviceState.Disable) {
+        name = 'Disable'
+    } else if (type == ZegoRemoteDeviceState.Mute) {
+        name = 'Mute'
+    } else if (type == ZegoRemoteDeviceState.Interruption) {
+        name = 'Interruption'
+    } else if (type == ZegoRemoteDeviceState.InBackground) {
+        name = 'InBackground'
+    } else if (type == ZegoRemoteDeviceState.NotSupport) {
+        name = 'NotSupport'
     }
 
     return `${name}(${type})`
