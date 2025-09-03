@@ -38,7 +38,7 @@ class ZegoInRoomMessageInput extends React.Component {
             this.props.onContentSizeChange(0, 45);
         }
     }
-    _sumit() {
+    _submit() {
         if (this.state.currentText != '') {
             ZegoUIKitInternal.sendInRoomMessage(this.state.currentText);
             this.clear();
@@ -82,16 +82,20 @@ class ZegoInRoomMessageInput extends React.Component {
                             }
                         }}
                         onChangeText={(text) => { this.setState({ currentText: text }); }}
-                        onSubmitEditing={() => this._sumit()}
+                        onSubmitEditing={() => this._submit()}
                     />
                 </View>
                 <TouchableOpacity
                     style={styles.sendButton}
                     onPress={() => {
-                        this._sumit();
+                        this._submit();
                     }}
                 >
-                    <Image resizeMode='contain' style={styles.icon} source={(this.state.currentText && this.state.currentText != "") ? this.iconPath.enable : this.iconPath.disable} />
+                    <Image
+                        resizeMode='contain'
+                        style={styles.icon}
+                        source={(this.state.currentText && this.state.currentText != "") ? this.iconPath.enable : this.iconPath.disable}
+                    />
                 </TouchableOpacity>
             </View>
         );
