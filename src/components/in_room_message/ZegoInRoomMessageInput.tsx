@@ -72,7 +72,8 @@ class ZegoInRoomMessageInput extends React.Component {
                             var h = height;
                             // https://github.com/facebook/react-native/issues/29702
                             if (Platform.OS == 'ios') {
-                                h = height + 25;
+                                // I suspect that an old React Native version requires this height adjustment.
+                                // h = height + 25;
                             }
                             this.setState({ textInputHeight: h, contentWidth: width })
                             // @ts-ignore
@@ -86,7 +87,7 @@ class ZegoInRoomMessageInput extends React.Component {
                     />
                 </View>
                 <TouchableOpacity
-                    style={styles.sendButton}
+                    style={[styles.sendButton, { top: (this.state.textInputHeight - 29) / 2 }]}
                     onPress={() => {
                         this._submit();
                     }}
@@ -107,7 +108,6 @@ const styles = StyleSheet.create({
     sendButton: {
         position: 'absolute',
         right: 10,
-        bottom: 8,
         width: 29,
         height: 29,
         justifyContent: 'center',
