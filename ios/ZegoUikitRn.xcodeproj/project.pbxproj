@@ -7,8 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3652094D2E73B98F0061077B /* ZegoUIKitRNModule.m in Sources */ = {isa = PBXBuildFile; fileRef = B3E7B5891CC2AC0600A0062D /* ZegoUIKitRNModule.m */; };
+		365209532E73BA5A0061077B /* LogManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 365209502E73BA5A0061077B /* LogManager.m */; };
+		365209542E73BA5A0061077B /* LogRNModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 365209522E73BA5A0061077B /* LogRNModule.m */; };
 		36D13CD02D0939FB00267A66 /* ReportRNModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 36D13CCF2D0939FB00267A66 /* ReportRNModule.m */; };
-		F4FF95D7245B92E800C19C63 /* ZegoUIKitRN.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4FF95D6245B92E800C19C63 /* ZegoUIKitRN.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,10 +27,15 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libZegoUikitRn.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libZegoUikitRn.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		3652094C2E73B9740061077B /* ZegoUIKitRNModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZegoUIKitRNModule.h; sourceTree = "<group>"; };
+		3652094E2E73BA430061077B /* ReportRNModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ReportRNModule.h; sourceTree = "<group>"; };
+		3652094F2E73BA5A0061077B /* LogManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LogManager.h; sourceTree = "<group>"; };
+		365209502E73BA5A0061077B /* LogManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LogManager.m; sourceTree = "<group>"; };
+		365209512E73BA5A0061077B /* LogRNModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LogRNModule.h; sourceTree = "<group>"; };
+		365209522E73BA5A0061077B /* LogRNModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LogRNModule.m; sourceTree = "<group>"; };
 		36D13CCF2D0939FB00267A66 /* ReportRNModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ReportRNModule.m; sourceTree = "<group>"; };
-		B3E7B5891CC2AC0600A0062D /* ZegoUIKitRN.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZegoUIKitRN.m; sourceTree = "<group>"; };
+		B3E7B5891CC2AC0600A0062D /* ZegoUIKitRNModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZegoUIKitRNModule.m; sourceTree = "<group>"; };
 		F4FF95D5245B92E700C19C63 /* ZegoUIKitRN-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ZegoUIKitRN-Bridging-Header.h"; sourceTree = "<group>"; };
-		F4FF95D6245B92E800C19C63 /* ZegoUIKitRN.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZegoUIKitRN.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,9 +60,14 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				3652094C2E73B9740061077B /* ZegoUIKitRNModule.h */,
+				B3E7B5891CC2AC0600A0062D /* ZegoUIKitRNModule.m */,
+				3652094E2E73BA430061077B /* ReportRNModule.h */,
 				36D13CCF2D0939FB00267A66 /* ReportRNModule.m */,
-				F4FF95D6245B92E800C19C63 /* ZegoUIKitRN.swift */,
-				B3E7B5891CC2AC0600A0062D /* ZegoUIKitRN.m */,
+				3652094F2E73BA5A0061077B /* LogManager.h */,
+				365209502E73BA5A0061077B /* LogManager.m */,
+				365209512E73BA5A0061077B /* LogRNModule.h */,
+				365209522E73BA5A0061077B /* LogRNModule.m */,
 				F4FF95D5245B92E700C19C63 /* ZegoUIKitRN-Bridging-Header.h */,
 				134814211AA4EA7D00B7C361 /* Products */,
 			);
@@ -118,8 +130,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F4FF95D7245B92E800C19C63 /* ZegoUIKitRN.swift in Sources */,
 				36D13CD02D0939FB00267A66 /* ReportRNModule.m in Sources */,
+				365209532E73BA5A0061077B /* LogManager.m in Sources */,
+				365209542E73BA5A0061077B /* LogRNModule.m in Sources */,
+				3652094D2E73B98F0061077B /* ZegoUIKitRNModule.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
