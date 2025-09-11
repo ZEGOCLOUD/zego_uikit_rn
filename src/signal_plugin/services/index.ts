@@ -145,7 +145,7 @@ export default class ZegoPluginInvitationService {
     if (!certificateIndex) {
       certificateIndex = 1;
     }
-    zloginfo(`[Service] enableNotifyWhenAppRunningInBackgroundOrQuit, certificateIndex: ${certificateIndex}, isIOSDevelopmentEnvironment: ${isIOSDevelopmentEnvironment}, appName: ${appName}`);
+    zloginfo(`[Service] enableNotifyWhenAppRunningInBackgroundOrQuit, certificateIndex: ${certificateIndex}, isIOSSandboxEnvironment: ${isIOSDevelopmentEnvironment}, appName: ${appName}`);
     if (ZegoUIKitCorePlugin.getZPNsPlugin()) {
       if (Platform.OS === 'android') {
         zloginfo('[ZegoPluginInvitationService] registerPush, Android');
@@ -162,7 +162,7 @@ export default class ZegoPluginInvitationService {
         
         // 0 - Production; 1 - Development; 2 - Automatic
         const iOSEnvironment = isIOSDevelopmentEnvironment == null ? 2 : (isIOSDevelopmentEnvironment ? 1 : 0);
-        zloginfo('[ZegoPluginInvitationService] registerPush, iOSEnvironment', iOSEnvironment);
+        zloginfo('[ZegoPluginInvitationService] registerPush, isIOSSandboxEnvironment', iOSEnvironment);
         ZegoUIKitCorePlugin.getZPNsPlugin().default.setPushConfig({ 'appType': certificateIndex });
         ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().registerPush({ 
           enableIOSVoIP: true,
@@ -177,10 +177,11 @@ export default class ZegoPluginInvitationService {
         }
       });
 
-      // ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().on("notificationArrived", (message) => {
-      //   zloginfo("@@@@@@@@@@@@@@@@notificationArrived>>>>>>>>>>>>>>>############", getCallID(message))
-      //   setZpnState("notificationArrived: " + getCallID(message))
-      // })
+      ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().on("notificationArrived", (message: ZPNsMessage) => {
+        // only support for apple, xiaomi
+        zloginfo("[ZegoPluginInvitationService] ZPNs notificationArrived,", message)
+      })
+
       // ZegoUIKitCorePlugin.getZPNsPlugin().default.getInstance().on("notificationClicked", (message) => {
       //   zloginfo("@@@@@@@@@@@@@@@@notificationClicked>>>>>>>>>>>>>>>############", getCallID(message))
       //   setZpnState("notificationClicked: " + getCallID(message))
