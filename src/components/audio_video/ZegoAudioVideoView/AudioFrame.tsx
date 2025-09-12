@@ -70,7 +70,7 @@ export default function AudioFrame(props: any) {
     >
       <ImageBackground
         source={
-          audioViewBackgroudImage ? { uri: audioViewBackgroudImage } : require('../../internal/resources/pure_4a4b4d.png')
+          audioViewBackgroudImage ? { uri: audioViewBackgroudImage } : require('../../internal/resources/transparent_200x300.png')
         }
         resizeMode="cover"
         style={[
