@@ -1,21 +1,30 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { FlatList, Text, StyleSheet, View } from 'react-native';
-import ZegoUIKitInternal from '../internal/ZegoUIKitInternal';
+import React, { useEffect, useRef, useState } from 'react';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 import Delegate from 'react-delegate-component';
+import ZegoUIKitInternal from '../internal/ZegoUIKitInternal';
 
 export default function ZegoInRoomMessageView(props: any) {
-  const { itemBuilder } = props;
+  const { itemBuilder, systemMessageList } = props;
   const listRef = useRef(null);
   const [messageList, setMessageList] = useState([]);
+  const systemMessageListRef = useRef(systemMessageList);
 
   const refreshMessage = () => {
-    // Update list like this will cause rerender
-    setMessageList((arr) => [...ZegoUIKitInternal.getInRoomMessages()]);
+    const roomMessages = ZegoUIKitInternal.getInRoomMessages();
+    if (systemMessageList && systemMessageList.length) {
+      const latestSystemMessageList = systemMessageListRef.current;
+      const allMessages = [...roomMessages, ...latestSystemMessageList];
+      allMessages.sort((a, b) => a.sendTime - b.sendTime);
+      setMessageList(allMessages);
+    } else {
+      setMessageList((arr) => [...ZegoUIKitInternal.getInRoomMessages()]);
+    }
   };
+
   const renderItem = ({ item }: any) => {
     return (
       !itemBuilder ? <View style={styles.messageContainer}>
-        <Text style={styles.nameLabel}>
+        <Text style={styles.senderNameLabel}>
           {item.sender.userName}
           <Text style={styles.messageLabel}> {item.message}</Text>
         </Text>
@@ -26,9 +35,14 @@ export default function ZegoInRoomMessageView(props: any) {
   useEffect(() => {
     refreshMessage();
   }, []);
+
   useEffect(() => {
-    const callbackID =
-      'ZegoInRoomMessageView' + String(Math.floor(Math.random() * 10000));
+    systemMessageListRef.current = systemMessageList;
+    refreshMessage();
+  }, [systemMessageList]);
+
+  useEffect(() => {
+    const callbackID = 'ZegoInRoomMessageView' + String(Math.floor(Math.random() * 10000));
     ZegoUIKitInternal.onInRoomMessageReceived(callbackID, () => {
       refreshMessage();
     });
@@ -41,6 +55,7 @@ export default function ZegoInRoomMessageView(props: any) {
       ZegoUIKitInternal.onInRoomMessageSent(callbackID);
     };
   }, []);
+
   return (
     <FlatList
       showsVerticalScrollIndicator={false}
@@ -71,10 +86,9 @@ const styles = StyleSheet.create({
     paddingRight: 10,
     paddingLeft: 10,
   },
-  nameLabel: {
+  senderNameLabel: {
     color: '#8BE7FF',
     fontSize: 13,
-    // marginLeft: 10
   },
   messageLabel: {
     color: 'white',

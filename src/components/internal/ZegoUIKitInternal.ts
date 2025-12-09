@@ -200,7 +200,7 @@ function _onRoomUserUpdate(roomID: string, updateType: number, userList: any[]) 
     });
     _notifyUserCountOrPropertyChanged(ZegoChangedCountOrProperty.userAdd);
 
-    zloginfo('User Join: ', userInfoList);
+    zloginfo('Users Join: ', userInfoList);
     Object.keys(_onUserJoinCallbackMap).forEach((callbackID) => {
       if (_onUserJoinCallbackMap[callbackID]) {
         _onUserJoinCallbackMap[callbackID](userInfoList);
@@ -226,7 +226,7 @@ function _onRoomUserUpdate(roomID: string, updateType: number, userList: any[]) 
         delete _coreUserMap[user.userID];
       }
     });
-    zloginfo('User Leave: ', userInfoList);
+    zloginfo('Users Leave: ', userInfoList);
     _notifyUserCountOrPropertyChanged(ZegoChangedCountOrProperty.userDelete);
     Object.keys(_onUserLeaveCallbackMap).forEach((callbackID) => {
       if (_onUserLeaveCallbackMap[callbackID]) {
@@ -417,6 +417,7 @@ function _onInRoomMessageReceived(roomID: string, messageList: any[]) {
       messageID: msg.messageID,
       sendTime: msg.sendTime,
       sender: _createPublicUser(_coreUserMap[msg.fromUser.userID]),
+      type: 'user',
     };
     messages.push(message);
     _inRoomMessageList.push(message);
