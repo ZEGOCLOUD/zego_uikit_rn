@@ -413,11 +413,11 @@ function _onInRoomMessageReceived(roomID: string, messageList: any[]) {
   var messages: any[] = [];
   messageList.forEach((msg) => {
     const message = {
+      type: 'user',
       message: msg.message,
       messageID: msg.messageID,
       sendTime: msg.sendTime,
       sender: _createPublicUser(_coreUserMap[msg.fromUser.userID]),
-      type: 'user',
     };
     messages.push(message);
     _inRoomMessageList.push(message);
@@ -1939,6 +1939,7 @@ const ZegoUIKitInternal =  {
             reject(errorCode);
           } else {
             const inRoomMessage = {
+              type: 'user',
               message: message,
               messageID: messageID,
               sendTime: Date.now(),

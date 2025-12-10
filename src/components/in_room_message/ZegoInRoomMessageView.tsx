@@ -22,12 +22,19 @@ export default function ZegoInRoomMessageView(props: any) {
   };
 
   const renderItem = ({ item }: any) => {
+    let type = item.type || 'user';
     return (
       !itemBuilder ? <View style={styles.messageContainer}>
-        <Text style={styles.senderNameLabel}>
-          {item.sender.userName}
-          <Text style={styles.messageLabel}> {item.message}</Text>
-        </Text>
+        {type === 'system' ? (
+            <Text style={[styles.systemMessageLabel]}>
+              {item.message}
+            </Text>
+          ) : (
+            <Text style={styles.senderNameLabel}>
+              {item.sender?.userName || 'Unknown User'}
+              <Text style={styles.messageLabel}> {item.message}</Text>
+            </Text>
+        )}
       </View> : <Delegate to={itemBuilder} props={{ message: item }} />
     );
   }
@@ -94,5 +101,10 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 13,
     marginLeft: 5,
+  },
+  systemMessageLabel: {
+    color: '#FFD700',
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
 });
