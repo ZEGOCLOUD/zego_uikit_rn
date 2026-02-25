@@ -242,8 +242,10 @@ export default class ZegoSignalingPluginCore {
             zloginfo(`[SignalingPluginCore][callUserStateChanged callback], ignore`)
           }
         } else if (callUserState === ZIMCallUserState.Cancelled || callUserState === ZIMCallUserState.BeCancelled) {  // 3 or 10
-          // as caller, will detect own state Cancelled after cancel active or cancelled by the svr during the network disconnection
-          // as callee, will detect own state BeCancelled after the invitation cancelled
+          // |        |          Cancelled         |                                    BeCancelled                                     |
+          // | caller | caller cancel OutgoingCall | OutgoingCall cancelled by zim server (e.g. caller network disconnection)           |
+          // | callee |                            | IncomingCall cancelled by caller or zim server (e.g. caller network disconnection) |
+          
           zloginfo(`[SignalingPluginCore][callUserStateChanged callback], detect ${callUserID} ${callUserState === ZIMCallUserState.Cancelled ? 'Cancelled' : 'BeCancelled'}`)
           if (callUserID !== this._loginUser.userID) {
             zloginfo(`[SignalingPluginCore][callUserStateChanged callback], ignore`)
@@ -255,9 +257,12 @@ export default class ZegoSignalingPluginCore {
             dataParsed.call_id = dataParsed.call_id ?? ''
             dataParsed.inviter = dataParsed.inviter ?? {userID: '', userName: ''}
             
+            // when caller cancelled, inviter is empty
+            callerID = callerID ?? dataParsed.inviter.userID
+
             const notifyData = {
               callID,
-              inviter: { id: this._getInviterIDByCallID(callID) },
+              inviter: { id: callerID },
               data: JSON.stringify(dataParsed),
             };
             this._callIDUsers.delete(callID);
