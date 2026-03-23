@@ -213,7 +213,7 @@ export default class ZegoSignalingPluginCore {
             let _callExtendedData = this._getExtendedDataByCallID(callID)
 
             if (this._loginUser.userID === callerID) {
-                zloginfo(`[SignalingPluginCore][callUserStateChanged callback], notifyCallInviteesAnsweredTimeout`)
+                zloginfo(`[SignalingPluginCore][callUserStateChanged callback], I am caller, notify each invitee answer timeout`)
 
                 let dataParsed = _callExtendedData ? JSON.parse(_callExtendedData) : {}
                 dataParsed.call_id = dataParsed.call_id ?? ''
@@ -226,7 +226,7 @@ export default class ZegoSignalingPluginCore {
                 };
                 this._notifyCallInviteesAnsweredTimeout(notifyData);  // for onOutgoingCallTimeout
             } else if (callUserID === this._loginUser.userID) {
-                zloginfo(`[SignalingPluginCore][callUserStateChanged callback], notifyCallInvitationTimeout`)
+                zloginfo(`[SignalingPluginCore][callUserStateChanged callback], I am callee, notify answer timeout`)
 
                 let dataParsed = _callExtendedData ? JSON.parse(_callExtendedData) : {}
                 dataParsed.call_id = dataParsed.call_id ?? ''
