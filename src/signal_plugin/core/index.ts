@@ -161,114 +161,115 @@ export default class ZegoSignalingPluginCore {
         let callExtendedData = callUserInfo.extendedData
 
         if (callUserState === ZIMCallUserState.Accepted && callUserID !== this._loginUser.userID) {   // 1
-          // as caller, state changed to Accepted as soon as after call, and wait for the other callees to change to the Accepted state
-          // as callee, should ignore anyone state changed callback
-          zloginfo(`[SignalingPluginCore][callUserStateChanged callback], detect ${callUserID} Accepted`)
-          if (this._loginUser.userID !== callerID) {
-            zloginfo(`[SignalingPluginCore][callUserStateChanged callback], ignore`)
-          } else if (callUserID !== this._loginUser.userID) {
-            // detect other state changed
-            zloginfo(`[SignalingPluginCore][callUserStateChanged callback], notifyCallInvitationAccepted`)
+            // as caller, state changed to Accepted as soon as after call, and wait for the other callees to change to the Accepted state
+            // as callee, should ignore anyone state changed callback
+            zloginfo(`[SignalingPluginCore][callUserStateChanged callback], detect ${callUserID} Accepted`)
+            if (this._loginUser.userID !== callerID) {
+                zloginfo(`[SignalingPluginCore][callUserStateChanged callback], ignore`)
+            } else if (callUserID !== this._loginUser.userID) {
+                // detect other state changed
+                zloginfo(`[SignalingPluginCore][callUserStateChanged callback], notifyCallInvitationAccepted`)
 
-            let dataParsed = callExtendedData ? JSON.parse(callExtendedData) : {}
-            dataParsed.callID = callID
-            dataParsed.call_id = dataParsed.call_id ?? ''
-            dataParsed.invitee = dataParsed.invitee ?? {userID: callUserID, userName: ''}
+                let dataParsed = callExtendedData ? JSON.parse(callExtendedData) : {}
+                dataParsed.callID = callID
+                dataParsed.call_id = dataParsed.call_id ?? ''
+                dataParsed.invitee = dataParsed.invitee ?? {userID: callUserID, userName: ''}
 
-            const notifyData = {
-              callID,
-              invitee: { id: callUserID, name: '' },
-              data: JSON.stringify(dataParsed),
-            };
-            this._notifyCallInvitationAccepted(notifyData);
-          }
+                const notifyData = {
+                    callID,
+                    invitee: { id: callUserID, name: '' },
+                    data: JSON.stringify(dataParsed),
+                };
+                this._notifyCallInvitationAccepted(notifyData);
+            }
         } else if (callUserState === ZIMCallUserState.Rejected) {  // 2
-          // as caller, wait for the other callees's state changed to Rejected
-          // as callee, should ignore anyone state changed callback
-          zloginfo(`[SignalingPluginCore][callUserStateChanged callback], detect ${callUserID} Rejected`)
-          if (this._loginUser.userID !== callerID) {
-            zloginfo(`[SignalingPluginCore][callUserStateChanged callback], ignore`)
-          } else {
-            // detect other state changed
-            zloginfo(`[SignalingPluginCore][callUserStateChanged callback], notifyCallInvitationRejected`)
+            // as caller, wait for the other callees's state changed to Rejected
+            // as callee, should ignore anyone state changed callback
+            zloginfo(`[SignalingPluginCore][callUserStateChanged callback], detect ${callUserID} Rejected`)
+            if (this._loginUser.userID !== callerID) {
+                zloginfo(`[SignalingPluginCore][callUserStateChanged callback], ignore`)
+            } else {
+                // detect other state changed
+                zloginfo(`[SignalingPluginCore][callUserStateChanged callback], notifyCallInvitationRejected`)
 
-            let dataParsed = callExtendedData ? JSON.parse(callExtendedData) : {}
-            dataParsed.callID = callID
-            dataParsed.call_id = dataParsed.call_id ?? ''
-            dataParsed.invitee = dataParsed.invitee ?? {userID: callUserID, userName: ''}
+                let dataParsed = callExtendedData ? JSON.parse(callExtendedData) : {}
+                dataParsed.callID = callID
+                dataParsed.call_id = dataParsed.call_id ?? ''
+                dataParsed.invitee = dataParsed.invitee ?? {userID: callUserID, userName: ''}
 
-            const notifyData = {
-              callID,
-              invitee: { id: callUserID, name: '' },
-              data: JSON.stringify(dataParsed),
-            };
-            this._notifyCallInvitationRejected(notifyData);  
-          }
+                const notifyData = {
+                    callID,
+                    invitee: { id: callUserID, name: '' },
+                    data: JSON.stringify(dataParsed),
+                };
+                this._notifyCallInvitationRejected(notifyData);  
+            }
         } else if (callUserState === ZIMCallUserState.Timeout) {  // 6
-          // as caller, wait for the other callees's state changed to the Timeout
-          // as callee, should only care own state changed to Timeout
-          zloginfo(`[SignalingPluginCore][callUserStateChanged callback], detect ${callUserID} Timeout`)
-          
-          // timeout 的 extendedData 为空，为方便后续使用，使用 callInvite 时的 extendedData
-          let _callExtendedData = this._getExtendedDataByCallID(callID)
+            // as caller, wait for the other callees's state changed to the Timeout
+            // as callee, should only care own state changed to Timeout
+            zloginfo(`[SignalingPluginCore][callUserStateChanged callback], detect ${callUserID} Timeout`)
+            
+            // timeout 的 extendedData 为空，为方便后续使用，使用 callInvite 时的 extendedData
+            let _callExtendedData = this._getExtendedDataByCallID(callID)
 
-          if (this._loginUser.userID === callerID) {
-            zloginfo(`[SignalingPluginCore][callUserStateChanged callback], notifyCallInviteesAnsweredTimeout`)
+            if (this._loginUser.userID === callerID) {
+                zloginfo(`[SignalingPluginCore][callUserStateChanged callback], notifyCallInviteesAnsweredTimeout`)
 
-            let dataParsed = _callExtendedData ? JSON.parse(_callExtendedData) : {}
-            dataParsed.call_id = dataParsed.call_id ?? ''
-            dataParsed.invitees = [{userID: callUserID, userName: ''}]
+                let dataParsed = _callExtendedData ? JSON.parse(_callExtendedData) : {}
+                dataParsed.call_id = dataParsed.call_id ?? ''
+                dataParsed.invitees = [{userID: callUserID, userName: ''}]
 
-            const notifyData = {
-              callID,
-              invitees: [{ id: callUserID, name: '' }],
-              data: JSON.stringify(dataParsed),
-            };
-            this._notifyCallInviteesAnsweredTimeout(notifyData);  // for onOutgoingCallTimeout
-          } else if (callUserID === this._loginUser.userID) {
-            zloginfo(`[SignalingPluginCore][callUserStateChanged callback], notifyCallInvitationTimeout`)
+                const notifyData = {
+                    callID,
+                    invitees: [{ id: callUserID, name: '' }],
+                    data: JSON.stringify(dataParsed),
+                };
+                this._notifyCallInviteesAnsweredTimeout(notifyData);  // for onOutgoingCallTimeout
+            } else if (callUserID === this._loginUser.userID) {
+                zloginfo(`[SignalingPluginCore][callUserStateChanged callback], notifyCallInvitationTimeout`)
 
-            let dataParsed = _callExtendedData ? JSON.parse(_callExtendedData) : {}
-            dataParsed.call_id = dataParsed.call_id ?? ''
-            dataParsed.inviter = [{userID: this._getInviterIDByCallID(callID), userName: ''}]
+                let dataParsed = _callExtendedData ? JSON.parse(_callExtendedData) : {}
+                dataParsed.call_id = dataParsed.call_id ?? ''
+                dataParsed.inviter = [{userID: this._getInviterIDByCallID(callID), userName: ''}]
 
-            const notifyData = {
-              callID,
-              inviter: { id: this._getInviterIDByCallID(callID), name: '' },
-              data: JSON.stringify(dataParsed),
-            };
-            this._notifyCallInvitationTimeout(notifyData);        // for onIncomingCallTimeout
-          } else {
-            zloginfo(`[SignalingPluginCore][callUserStateChanged callback], ignore`)
-          }
+                const notifyData = {
+                    callID,
+                    inviter: { id: this._getInviterIDByCallID(callID), name: '' },
+                    data: JSON.stringify(dataParsed),
+                };
+                this._notifyCallInvitationTimeout(notifyData);        // for onIncomingCallTimeout
+            } else {
+                zloginfo(`[SignalingPluginCore][callUserStateChanged callback], ignore`)
+            }
         } else if (callUserState === ZIMCallUserState.Cancelled || callUserState === ZIMCallUserState.BeCancelled) {  // 3 or 10
-          // |        |          Cancelled         |                                    BeCancelled                                     |
-          // | caller | caller cancel OutgoingCall | OutgoingCall cancelled by zim server (e.g. caller network disconnection)           |
-          // | callee |                            | IncomingCall cancelled by caller or zim server (e.g. caller network disconnection) |
-          
-          zloginfo(`[SignalingPluginCore][callUserStateChanged callback], detect ${callUserID} ${callUserState === ZIMCallUserState.Cancelled ? 'Cancelled' : 'BeCancelled'}`)
-          if (callUserID !== this._loginUser.userID) {
-            zloginfo(`[SignalingPluginCore][callUserStateChanged callback], ignore`)
-          } else {
-            zloginfo(`[SignalingPluginCore][callUserStateChanged callback], notifyCallInvitationCancelled`)
-            
-            let dataParsed = callExtendedData ? JSON.parse(callExtendedData) : {}
-            dataParsed.callID = callID
-            dataParsed.call_id = dataParsed.call_id ?? ''
-            dataParsed.inviter = dataParsed.inviter ?? {userID: '', userName: ''}
-            
-            // when caller cancelled, inviter is empty
-            callerID = callerID ?? dataParsed.inviter.userID
+            // |        |          Cancelled         |                                    BeCancelled                                     |
+            // |--------|----------------------------|------------------------------------------------------------------------------------|
+            // | caller | caller cancel OutgoingCall | OutgoingCall cancelled by zim server (e.g. caller network disconnection)           |
+            // | callee |                            | IncomingCall cancelled by caller or zim server (e.g. caller network disconnection) |
 
-            const notifyData = {
-              callID,
-              inviter: { id: callerID },
-              data: JSON.stringify(dataParsed),
-            };
-            this._callIDUsers.delete(callID);
-            this._callIDExtendedData.delete(callID)
-            this._notifyCallInvitationCancelled(notifyData);
-          }
+            zloginfo(`[SignalingPluginCore][callUserStateChanged callback], detect ${callUserID} ${callUserState === ZIMCallUserState.Cancelled ? 'Cancelled' : 'BeCancelled'}`)
+            if (callUserID !== this._loginUser.userID) {
+                zloginfo(`[SignalingPluginCore][callUserStateChanged callback], ignore`)
+            } else {
+                zloginfo(`[SignalingPluginCore][callUserStateChanged callback], notifyCallInvitationCancelled`)
+                
+                let dataParsed = callExtendedData ? JSON.parse(callExtendedData) : {}
+                dataParsed.callID = callID
+                dataParsed.call_id = dataParsed.call_id ?? ''
+                dataParsed.inviter = dataParsed.inviter ?? {userID: '', userName: ''}
+
+                // when caller cancelled, inviter is empty
+                callerID = callerID ?? dataParsed.inviter.userID
+
+                const notifyData = {
+                    callID,
+                    inviter: { id: callerID },
+                    data: JSON.stringify(dataParsed),
+                };
+                this._callIDUsers.delete(callID);
+                this._callIDExtendedData.delete(callID)
+                this._notifyCallInvitationCancelled(notifyData);
+            }
         }
       })
     });
