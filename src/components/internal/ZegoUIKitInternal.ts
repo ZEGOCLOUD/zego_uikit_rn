@@ -1305,24 +1305,20 @@ const ZegoUIKitInternal =  {
     });
   },
   disconnectSDK() {
+    zloginfo(`[ZegoUIKitInternal][disconnectSDK] destroyEngine`)
     return new Promise<void>((resolve, reject) => {
-      zloginfo(`[ZegoUIKitInternal][disconnectSDK] destroyEngine`)
-      if (ZegoExpressEngine.instance()) {
         ZegoExpressEngine.destroyEngine()
           .then(() => {
-            zloginfo('Destroy ZegoExpressEngine finished!');
+            zloginfo('[ZegoUIKitInternal][disconnectSDK] Destroy ZegoExpressEngine finished!');
             resolve();
           })
           .catch((error) => {
-            zlogerror('Destroy ZegoExpressEngine failed!', error);
+            zlogerror('[ZegoUIKitInternal][disconnectSDK] Destroy ZegoExpressEngine failed!', error);
             reject(error);
           })
           .finally(() => {
             _resetData();
           });
-      } else {
-        resolve();
-      }
     });
   },
 
