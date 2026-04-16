@@ -27,6 +27,7 @@ var _appInfo = {
 var _isRoomConnected = false;
 var _currentRoomState = 7; // Logout
 var _currentRoomID = '';
+var _currentRoomUsage = '';
 var _audioOutputType = 0;
 var _usingFrontFacingCamera = true;
 
@@ -90,6 +91,7 @@ function _resetData() {
   _streamCoreUserMap = {};
   _coreUserMap = {};
   _currentRoomID = '';
+  _currentRoomUsage = '';
   _currentRoomState = 7;
   _isRoomConnected = false;
   _audioOutputType = 0;
@@ -105,6 +107,7 @@ function _resetDataForLeavingRoom() {
   _streamCoreUserMap = {};
   _coreUserMap = {};
   _currentRoomID = '';
+  _currentRoomUsage = '';
   _currentRoomState = 7;
   _isRoomConnected = false;
   const { userID, userName, profileUrl, extendInfo } = _localCoreUser;
@@ -569,6 +572,7 @@ function _leaveRoom() {
             'msg': ''
           })
           _currentRoomID = ''
+          _currentRoomUsage = ''
 
           _turnCameraDeviceOn(_localCoreUser.userID, false);
           _turnMicDeviceOn(_localCoreUser.userID, false);
@@ -1139,8 +1143,12 @@ const ZegoUIKitInternal =  {
   logComponentsVersion(extraInfo: Map<string, string>) {
     logComponentsVersion(extraInfo);
   },
-  isRoomConnected() {
-    return _isRoomConnected;
+  isRoomConnected(usage = '') {
+    if (!_isRoomConnected) {
+      return _isRoomConnected;
+    } else {
+      return _currentRoomUsage === usage;
+    }
   },
   setAudioVideoResourceMode(audioVideoResourceMode: any) {
     zloginfo('setAudioVideoResourceMode', audioVideoResourceMode);
@@ -1540,7 +1548,7 @@ const ZegoUIKitInternal =  {
   },
 
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Room <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-  async joinRoom(roomID: string, token: string, markAsLargeRoom = false) {
+  async joinRoom(roomID: string, token = '', markAsLargeRoom = false, usage = '') {
     if (!roomID || roomID.trim().length == 0) {
       throw new Error("roomID can't is empty when loginRoom!");
     }
@@ -1563,9 +1571,10 @@ const ZegoUIKitInternal =  {
       const config = { isUserStatusNotify: true } as ZegoRoomConfig;
       token && (config.token = token);
       _currentRoomID = roomID;
+      _currentRoomUsage = usage;
 
       const eventBegin = Date.now();
-      zloginfo(`[ZegoUIKitInternal][joinRoom] loginRoom, roomID: ${roomID}`)
+      zloginfo(`[ZegoUIKitInternal][joinRoom] loginRoom, roomID: ${roomID}, usage: ${usage}`)
       ZegoExpressEngine.instance()
         .loginRoom(roomID, user, config)
         .then(() => {
@@ -1601,6 +1610,7 @@ const ZegoUIKitInternal =  {
           })
 
           _currentRoomID = '';
+          _currentRoomUsage = '';
           reject(error);
         });
     });
